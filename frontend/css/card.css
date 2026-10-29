@@ -1,0 +1,259 @@
+/* ==========================================================================
+   VAYORA VIRTUAL CARD & NFC STYLES
+   Simple Light / Dark Theme
+   ========================================================================== */
+
+/* 3D Card Stage */
+.card-scene {
+  perspective: 1000px;
+  width: 100%;
+  max-width: 420px;
+  height: 260px;
+  margin: 0 auto 28px auto;
+}
+
+.card-object {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s ease;
+  cursor: pointer;
+  border-radius: var(--radius-lg);
+}
+
+.card-object.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Card Front & Back Common Styles */
+.card-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+/* Titanium Matte Card Front */
+.card-face-front {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+}
+
+.card-hologram-overlay {
+  display: none !important;
+}
+
+/* Card Frozen State */
+.card-object.is-frozen .card-face-front {
+  filter: grayscale(90%) opacity(75%);
+}
+
+.card-object.is-frozen .card-status-badge {
+  background: rgba(225, 29, 72, 0.2);
+  color: #fb7185;
+  border: 1px solid rgba(225, 29, 72, 0.4);
+}
+
+/* Card Front Layout */
+.card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.card-brand-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-brand-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+}
+
+.card-brand-name span {
+  color: #38bdf8;
+}
+
+.card-chip-contactless {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.emv-chip {
+  width: 38px;
+  height: 28px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #d4af37 0%, #f3e5ab 50%, #aa7c11 100%);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.emv-chip::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.contactless-wave-icon {
+  width: 18px;
+  height: 18px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-number-display {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  letter-spacing: 2.5px;
+  color: #ffffff;
+  position: relative;
+  z-index: 2;
+  margin: 10px 0;
+}
+
+.card-bottom-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+}
+
+.card-holder-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-field-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 600;
+}
+
+.card-holder-name {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.card-expiry-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.card-expiry-val {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Card Back Layout */
+.card-face-back {
+  background: #0f172a;
+  transform: rotateY(180deg);
+  padding: 0;
+  color: #ffffff;
+}
+
+.card-magnetic-stripe {
+  width: 100%;
+  height: 44px;
+  background: #020617;
+  margin-top: 24px;
+}
+
+.card-cvv-strip {
+  margin: 16px 24px 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background: #ffffff;
+  height: 34px;
+  border-radius: 4px;
+  padding: 0 10px;
+}
+
+.cvv-number {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #0f172a;
+  letter-spacing: 2px;
+}
+
+.card-back-disclaimer {
+  padding: 14px 24px;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.3;
+}
+
+/* NFC Screen */
+.nfc-terminal-wrap {
+  max-width: 480px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 30px 16px;
+}
+
+.nfc-pad-target {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 30px auto;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px dashed var(--border-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.nfc-pad-target:hover {
+  border-color: var(--primary-color);
+  transform: scale(1.02);
+  box-shadow: var(--shadow-md);
+}
+
+.nfc-icon-center {
+  width: 60px;
+  height: 60px;
+  color: var(--primary-color);
+  transition: transform var(--transition-fast);
+}
+
+.nfc-pad-target:hover .nfc-icon-center {
+  transform: scale(1.08);
+}

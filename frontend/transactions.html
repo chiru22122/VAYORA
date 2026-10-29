@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Transactions & Payments Ledger — VAYORA</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <style>
+    .tx-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .tx-stat-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px 22px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+    .tx-stat-tile:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-medium);
+      box-shadow: var(--shadow-md);
+    }
+    .tx-stat-label {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .tx-stat-value {
+      font-family: var(--font-display);
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: var(--text-primary);
+    }
+    .tx-stat-sub {
+      font-size: 0.76rem;
+      color: var(--primary-color);
+      margin-top: 6px;
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+    .tx-row-interactive {
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .tx-row-interactive:hover td {
+      background: var(--bg-card-hover) !important;
+    }
+    .receipt-detail-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .receipt-header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 0.75rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+    .receipt-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px dashed var(--border-subtle);
+      font-size: 0.85rem;
+    }
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+    .receipt-key {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .receipt-val {
+      color: var(--text-primary);
+      font-weight: 700;
+      font-family: var(--font-sans);
+    }
+    .receipt-val.mono {
+      font-family: var(--font-mono);
+    }
+    @media (max-width: 900px) {
+      .tx-stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Persistent Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="brand-text-wrap">
+          <div class="brand-title">VAYORA<span>.</span></div>
+          <div class="brand-tagline">Your Digital Value, One Journey.</div>
+        </div>
+      </div>
+
+            <nav class="sidebar-nav">
+        <!-- OVERVIEW -->
+        <div class="nav-section">
+          <div class="nav-section-title">Overview</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/dashboard.html" class="nav-link" data-page="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Dashboard</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- PAYMENTS & MONEY -->
+        <div class="nav-section">
+          <div class="nav-section-title">Payments & Transfers</div>
+          <ul class="nav-list">
+            <li>
+              <a href="javascript:void(0)" onclick="VAYORA.openDepositModal()" class="nav-link" style="color: var(--neon-emerald); font-weight: 700;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Deposit Funds</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">PAY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/send.html" class="nav-link" data-page="send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Send Payment</span>
+              </a>
+            </li>
+            <li>
+              <a href="/receive.html" class="nav-link" data-page="receive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+                <span>Receive & QR</span>
+              </a>
+            </li>
+            <li>
+              <a href="/card.html" class="nav-link" data-page="card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Virtual Card</span>
+              </a>
+            </li>
+            <li>
+              <a href="/nfc.html" class="nav-link" data-page="nfc">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <span>NFC Contactless</span>
+                <span class="badge-tag" style="background: rgba(0, 210, 255, 0.15); color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.3);">TAP</span>
+              </a>
+            </li>
+            <li>
+              <a href="/subscriptions.html" class="nav-link" data-page="subscriptions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                <span>Auto-Pay Subscriptions</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DIGITAL ASSETS & YIELD -->
+        <div class="nav-section">
+          <div class="nav-section-title">Digital Assets & Yield</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/wallet.html" class="nav-link" data-page="wallet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <span>Multi-Asset Wallet</span>
+              </a>
+            </li>
+            <li>
+              <a href="/earn.html" class="nav-link" data-page="earn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+                <span>Staking & Earn Vaults</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">8.5% APY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/swap.html" class="nav-link" data-page="swap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+                <span>Instant Token Swap</span>
+              </a>
+            </li>
+            <li>
+              <a href="/convert.html" class="nav-link" data-page="convert">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0"/></svg>
+                <span>Convert USDT → INR</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- LEDGER & LOGS -->
+        <div class="nav-section">
+          <div class="nav-section-title">Ledger & History</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/transactions.html" class="nav-link" data-page="transactions" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                <span>Transactions Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/activity.html" class="nav-link" data-page="activity">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Security Logs</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/security.html" class="nav-link" data-page="security">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Security Center</span>
+              </a>
+            </li>
+            <li>
+              <a href="/profile.html" class="nav-link" data-page="profile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="/settings.html" class="nav-link" data-page="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="VAYORA.logout()" class="btn btn-secondary btn-sm btn-block">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+          <div class="page-headline">Live Transactions & Payments Ledger</div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
+          <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Deposit Funds</span>
+          </button>
+          <div class="demo-user-switcher">
+            <button class="demo-switch-btn" id="switch-btn-sender" onclick="VAYORA.switchDemoUser('sender')">User A (Sender)</button>
+            <button class="demo-switch-btn" id="switch-btn-receiver" onclick="VAYORA.switchDemoUser('receiver')">User B (Receiver)</button>
+          </div>
+
+          <a href="/notifications.html" class="topbar-action-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge-dot"></span></a>
+          <a href="/profile.html" class="user-profile-chip"><div class="avatar-sphere">U</div><div class="user-info-text"><span class="user-name-label dynamic-user-name">User</span><span class="user-role-label dynamic-user-email">Account</span></div></a>
+        </div>
+      </header>
+
+      <div class="app-content animate-entrance">
+
+        <!-- Live Metrics Ribbon -->
+        <div class="tx-stats-grid">
+          <div class="tx-stat-tile tilt-card">
+            <div class="tx-stat-label">Total Volume Transacted</div>
+            <div class="tx-stat-value" id="stats-total-vol">$0.00</div>
+            <div class="tx-stat-sub">Across All Channels</div>
+          </div>
+          <div class="tx-stat-tile tilt-card">
+            <div class="tx-stat-label">Total Deposits / Inflow</div>
+            <div class="tx-stat-value" id="stats-total-inflow" style="color: var(--neon-emerald);">+$0.00</div>
+            <div class="tx-stat-sub">Real Card & P2P In</div>
+          </div>
+          <div class="tx-stat-tile tilt-card">
+            <div class="tx-stat-label">Total Spent / Outflow</div>
+            <div class="tx-stat-value" id="stats-total-outflow" style="color: var(--neon-cyan);">-$0.00</div>
+            <div class="tx-stat-sub">Transfers, NFC & Cards</div>
+          </div>
+          <div class="tx-stat-tile tilt-card">
+            <div class="tx-stat-label">Audited Records</div>
+            <div class="tx-stat-value" id="stats-total-records">0</div>
+            <div class="tx-stat-sub">Live Database Entries</div>
+          </div>
+        </div>
+        
+        <!-- Filter Bar Card -->
+        <div class="vayora-card" style="margin-bottom: 24px; padding: 20px;">
+          <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap: 14px; align-items: flex-end;">
+            
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="tx-search-input">Search Ledger</label>
+              <input type="text" id="tx-search-input" class="form-control" placeholder="Search reference, hash, counterpart or note...">
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="tx-type-filter">Type</label>
+              <select id="tx-type-filter" class="form-control">
+                <option value="ALL">All Types</option>
+                <option value="DEPOSIT">DEPOSITS (Card / Stripe)</option>
+                <option value="SEND">SEND (P2P)</option>
+                <option value="RECEIVE">RECEIVE (P2P)</option>
+                <option value="SWAP">TOKEN SWAP</option>
+                <option value="CONVERSION">CONVERSION (USDT→INR)</option>
+                <option value="CARD_PAYMENT">VIRTUAL CARD</option>
+                <option value="NFC_PAYMENT">NFC TAP-TO-PAY</option>
+                <option value="BANK_WITHDRAWAL">BANK WITHDRAWAL</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="tx-asset-filter">Asset</label>
+              <select id="tx-asset-filter" class="form-control">
+                <option value="ALL">All Assets</option>
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+                <option value="SOL">SOL</option>
+                <option value="INR">INR</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="tx-status-filter">Status</label>
+              <select id="tx-status-filter" class="form-control">
+                <option value="ALL">All Statuses</option>
+                <option value="COMPLETED">COMPLETED</option>
+                <option value="PENDING">PENDING</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+            </div>
+
+            <button type="button" id="refresh-tx-btn" class="btn btn-secondary" style="height: 42px; display: flex; gap: 6px;" title="Refresh Ledger">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              <span>Refresh</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- Ledger Table -->
+        <div class="vayora-card">
+          <div class="card-header">
+            <div>
+              <h3 class="card-title" style="display: flex; align-items: center; gap: 10px;">
+                <span>Audited Database Ledger</span>
+                <span class="status-pulse-dot" style="width: 8px; height: 8px; background: var(--neon-emerald);"></span>
+              </h3>
+              <div class="card-subtitle">Real-time immutable database records with full audit trail</div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span id="tx-count-indicator" style="font-size: 0.8rem; color: var(--neon-cyan); font-weight: 700;">0 Records</span>
+              <button onclick="exportTransactionsCSV()" class="btn btn-secondary btn-sm">Export CSV</button>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="vayora-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Reference</th>
+                  <th>Type</th>
+                  <th>Channel / Counterparty</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Amount</th>
+                  <th style="text-align: right;">Receipt</th>
+                </tr>
+              </thead>
+              <tbody id="tx-history-tbody">
+                <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Loading transactions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Detailed Transaction Inspector & Digital Receipt Modal -->
+  <div id="tx-detail-modal" class="modal-backdrop">
+    <div class="modal-window" style="max-width: 580px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--neon-emerald);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <span>Transaction Ledger Receipt</span>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('tx-detail-modal').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modal-tx-content">Loading receipt details...</div>
+      </div>
+      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+        <button class="btn btn-secondary" onclick="window.print()">Print Receipt</button>
+        <button class="btn btn-primary" onclick="document.getElementById('tx-detail-modal').classList.remove('open')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      VAYORA.initShell('transactions');
+
+      const tbody = document.getElementById('tx-history-tbody');
+      const countEl = document.getElementById('tx-count-indicator');
+      const searchInput = document.getElementById('tx-search-input');
+      const typeFilter = document.getElementById('tx-type-filter');
+      const assetFilter = document.getElementById('tx-asset-filter');
+      const statusFilter = document.getElementById('tx-status-filter');
+      const refreshBtn = document.getElementById('refresh-tx-btn');
+
+      const volEl = document.getElementById('stats-total-vol');
+      const inflowEl = document.getElementById('stats-total-inflow');
+      const outflowEl = document.getElementById('stats-total-outflow');
+      const recordsEl = document.getElementById('stats-total-records');
+
+      let allTxs = [];
+
+      async function fetchTransactions() {
+        const type = typeFilter.value;
+        const asset = assetFilter.value;
+        const status = statusFilter.value;
+        const search = searchInput.value.trim();
+
+        let endpoint = `/transactions?limit=100`;
+        if (type !== 'ALL') endpoint += `&type=${type}`;
+        if (asset !== 'ALL') endpoint += `&asset=${asset}`;
+        if (status !== 'ALL') endpoint += `&status=${status}`;
+        if (search) endpoint += `&search=${encodeURIComponent(search)}`;
+
+        try {
+          const list = await VAYORA.request(endpoint);
+          allTxs = list || [];
+          renderTransactions(allTxs);
+          calculateStats(allTxs);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+
+      function calculateStats(txs) {
+        let totalVol = 0;
+        let inflow = 0;
+        let outflow = 0;
+
+        txs.forEach(t => {
+          const amt = Math.abs(t.amount);
+          totalVol += amt;
+          if (t.type === 'DEPOSIT' || t.type === 'RECEIVE' || (t.type === 'CONVERSION' && t.amount > 0)) {
+            inflow += amt;
+          } else {
+            outflow += amt;
+          }
+        });
+
+        if (volEl) volEl.textContent = `$${totalVol.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (inflowEl) inflowEl.textContent = `+$${inflow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (outflowEl) outflowEl.textContent = `-$${outflow.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (recordsEl) recordsEl.textContent = txs.length.toString();
+      }
+
+      function renderTransactions(txs) {
+        if (countEl) countEl.textContent = `${txs.length} Records Found`;
+
+        if (!txs || txs.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 36px;">
+                No transactions recorded yet. Use <strong>Deposit Funds</strong> or make a payment to generate transactions.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        tbody.innerHTML = txs.map(t => {
+          const isPositive = t.type === 'RECEIVE' || t.type === 'DEPOSIT' || (t.type === 'CONVERSION' && t.amount > 0);
+          const sign = isPositive ? '+' : '-';
+          const color = isPositive ? 'color: var(--neon-emerald); font-weight: 700;' : 'color: var(--text-primary); font-weight: 700;';
+          const statusClass = t.status === 'COMPLETED' ? 'status-completed' : (t.status === 'PENDING' ? 'status-pending' : 'status-failed');
+
+          let counterparty = isPositive ? (t.sender || 'Direct Card / Stripe Deposit') : (t.receiver || 'VAYORA Network');
+
+          return `
+            <tr class="tx-row-interactive" onclick="showTxDetail(${t.transaction_id})">
+              <td style="font-size: 0.8rem; color: var(--text-secondary);">${VAYORA.formatDate(t.created_at)}</td>
+              <td style="font-family: var(--font-mono); font-size: 0.82rem; color: var(--neon-cyan); font-weight: 600;">
+                ${t.reference_id}
+              </td>
+              <td>
+                <span class="status-pill ${t.type === 'DEPOSIT' ? 'status-completed' : 'status-active'}">${t.type}</span>
+              </td>
+              <td style="font-size: 0.84rem; color: var(--text-secondary); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600;">
+                ${counterparty}
+              </td>
+              <td><span class="status-pill ${statusClass}">${t.status}</span></td>
+              <td style="text-align: right; font-family: var(--font-mono); ${color} font-size: 0.95rem;">
+                ${sign}${Math.abs(t.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${t.asset_symbol || ''}
+              </td>
+              <td style="text-align: right;">
+                <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); showTxDetail(${t.transaction_id})">Receipt</button>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      window.showTxDetail = function(txId) {
+        const tx = allTxs.find(x => x.transaction_id === txId);
+        if (!tx) return;
+
+        const modal = document.getElementById('tx-detail-modal');
+        const content = document.getElementById('modal-tx-content');
+
+        const isPositive = tx.type === 'RECEIVE' || tx.type === 'DEPOSIT' || (tx.type === 'CONVERSION' && tx.amount > 0);
+        const sign = isPositive ? '+' : '-';
+
+        content.innerHTML = `
+          <div class="receipt-detail-card glow-card-vibrant" style="background: var(--bg-surface); padding: 26px;">
+            <div style="text-align: center; margin-bottom: 22px;">
+              <span class="receipt-header-badge ${tx.status === 'COMPLETED' ? 'status-completed' : 'status-active'}">
+                ● ${tx.status} ON LEDGER
+              </span>
+              <div class="${isPositive ? 'text-gradient-emerald' : 'text-gradient-vibrant'}" style="font-family: var(--font-display); font-size: 2.5rem; font-weight: 800; margin-top: 6px; text-shadow: 0 0 30px rgba(0, 255, 157, 0.4);">
+                ${sign}${Math.abs(tx.amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${tx.asset_symbol || 'USDT'}
+              </div>
+              <div style="font-size: 0.82rem; color: var(--text-secondary); font-family: var(--font-mono); margin-top: 6px;">
+                Ref: <span style="color: var(--neon-cyan);">${tx.reference_id}</span>
+                <button type="button" style="background: none; border: none; color: var(--neon-emerald); cursor: pointer; margin-left: 6px; font-size: 0.9rem;" title="Copy Ref" onclick="navigator.clipboard.writeText('${tx.reference_id}'); VAYORA.showToast('Copied', 'Reference hash copied to clipboard', 'info');">📋</button>
+              </div>
+            </div>
+
+            <div class="receipt-row">
+              <span class="receipt-key">Transaction Type</span>
+              <span class="receipt-val" style="color: var(--neon-cyan); font-weight: 800;">${tx.type}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-key">Sender / Source</span>
+              <span class="receipt-val" style="word-break: break-all;">${tx.sender || 'Direct Card Deposit (Stripe Gateway)'}</span>
+            </div>
+            ${tx.sender_address ? `
+            <div class="receipt-row">
+              <span class="receipt-key">Sender Token Address</span>
+              <span class="receipt-val mono" style="font-size: 0.78rem; color: var(--neon-cyan); word-break: break-all;">${tx.sender_address}</span>
+            </div>
+            ` : ''}
+            <div class="receipt-row">
+              <span class="receipt-key">Beneficiary / Destination</span>
+              <span class="receipt-val" style="word-break: break-all;">${tx.receiver || 'VAYORA User Wallet'}</span>
+            </div>
+            ${tx.receiver_address ? `
+            <div class="receipt-row">
+              <span class="receipt-key">Receiver Token Address</span>
+              <span class="receipt-val mono" style="font-size: 0.78rem; color: var(--neon-emerald); word-break: break-all;">${tx.receiver_address}</span>
+            </div>
+            ` : ''}
+            <div class="receipt-row">
+              <span class="receipt-key">Settlement Network</span>
+              <span class="receipt-val" style="color: var(--neon-purple);">${tx.asset_symbol ? (tx.asset_symbol === 'USDT' ? 'TRC-20 / ERC-20 (Instant Settlement)' : tx.asset_symbol) : 'VAYORA Atomic Settlement'}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-key">Network & Processing Fee</span>
+              <span class="receipt-val mono" style="color: var(--neon-emerald); font-weight: 800;">$0.00 (Zero Fee Academic)</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-key">Execution Timestamp</span>
+              <span class="receipt-val mono">${VAYORA.formatDate(tx.created_at, true)}</span>
+            </div>
+            <div class="receipt-row">
+              <span class="receipt-key">Ledger Security Hash</span>
+              <span class="receipt-val mono" style="font-size: 0.72rem; color: var(--neon-cyan);">
+                SHA256-${(tx.reference_id || 'TX').replace(/[^a-zA-Z0-9]/g, '').toLowerCase()}x98f3
+              </span>
+            </div>
+          </div>
+        `;
+        modal.classList.add('open');
+      };
+
+      window.exportTransactionsCSV = function() {
+        if (!allTxs.length) {
+          VAYORA.showToast('No Data', 'There are no transactions to export.', 'info');
+          return;
+        }
+
+        const headers = ['Transaction ID', 'Timestamp', 'Reference', 'Type', 'Sender', 'Receiver', 'Asset', 'Amount', 'Status'];
+        const rows = allTxs.map(t => [
+          t.transaction_id,
+          t.created_at,
+          t.reference_id,
+          t.type,
+          `"${(t.sender || '').replace(/"/g, '""')}"`,
+          `"${(t.receiver || '').replace(/"/g, '""')}"`,
+          t.asset_symbol || '',
+          t.amount,
+          t.status
+        ]);
+
+        const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement('a');
+        link.setAttribute('href', encodedUri);
+        link.setAttribute('download', `vayora_transactions_${new Date().toISOString().slice(0,10)}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        VAYORA.showToast('CSV Exported', 'Transaction history downloaded successfully', 'success');
+      };
+
+      [typeFilter, assetFilter, statusFilter].forEach(el => el.addEventListener('change', fetchTransactions));
+      if (refreshBtn) refreshBtn.addEventListener('click', fetchTransactions);
+
+      let timer;
+      searchInput.addEventListener('input', () => {
+        clearTimeout(timer);
+        timer = setTimeout(fetchTransactions, 300);
+      });
+
+      // Auto-refresh on real deposit or incoming transfer events
+      window.addEventListener('vayora:deposit_settled', fetchTransactions);
+      window.addEventListener('vayora:payment_received', fetchTransactions);
+
+      await fetchTransactions();
+    });
+  </script>
+</body>
+</html>

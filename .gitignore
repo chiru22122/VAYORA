@@ -1,0 +1,83 @@
+# ==============================================================================
+# Environment Variables & Sensitive Credentials
+# ==============================================================================
+.env
+.env.*
+*.env
+backend/.env
+frontend/.env
+!.env.example
+!.env.template
+!*.env.example
+!**/*.env.example
+!**/*.env.template
+
+# ==============================================================================
+# Python Virtual Environments & Bytecode
+# ==============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.mypy_cache/
+coverage/
+*.coverage
+
+# ==============================================================================
+# Database Local Storage, Dumps & Backups
+# ==============================================================================
+*.db
+*.sqlite
+*.sqlite3
+database/*.db
+database/backups/
+*.dump
+*.sql.gz
+*.backup
+*.bak
+
+# ==============================================================================
+# Node.js
+# ==============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==============================================================================
+# Logs & Temporary Files
+# ==============================================================================
+*.log
+*.tmp
+*.temp
+
+# ==============================================================================
+# System & IDE
+# ==============================================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db

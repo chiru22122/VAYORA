@@ -1,0 +1,546 @@
+/* ==========================================================================
+   VAYORA DASHBOARD STYLES - CLEAN FINTECH UI WITH DYNAMIC MOTION
+   High-End Motion, Smooth Spring Feedback & Premium Aesthetics
+   ========================================================================== */
+
+/* Hero Balance Banner & Cyber Hero Card */
+.dashboard-hero,
+.cyber-hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 30px 32px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  transition: transform 0.28s var(--ease-spring),
+              box-shadow 0.28s var(--ease-smooth),
+              border-color 0.25s ease,
+              background-color var(--transition-normal);
+}
+
+/* Dynamic Animated Gradient Accent at the top of the Hero Card */
+.cyber-hero-card::before,
+.dashboard-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #059669, #0284c7, #7c3aed, #2563eb);
+  background-size: 300% 100%;
+  animation: borderShimmer 8s linear infinite;
+  display: block !important;
+  z-index: 3;
+}
+
+.cyber-hero-card:hover,
+.dashboard-hero:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-medium);
+  box-shadow: 0 14px 28px -6px rgba(15, 23, 42, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+}
+
+.hero-welcome-tag {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-welcome-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-emerald);
+  animation: statusRadarPulse 2.4s infinite ease-in-out, statusDotPulse 2s infinite ease-in-out;
+}
+
+.hero-balance-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-balance-main {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-balance-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.hero-balance-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.hero-balance-val {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+  line-height: 1.1;
+  margin: 6px 0;
+  transition: transform 0.25s var(--ease-spring), color 0.2s ease;
+}
+
+.hero-balance-val:hover {
+  transform: scale(1.015);
+}
+
+.hero-balance-secondary {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.76rem;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--neon-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  font-weight: 700;
+  transition: transform 0.2s var(--ease-spring);
+}
+
+.hero-stat-badge:hover {
+  transform: scale(1.05);
+}
+
+/* Micro-Metrics Ribbon within Hero Card */
+.hero-submetrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-subtle);
+  position: relative;
+  z-index: 2;
+}
+
+.hero-metric-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  transition: all 0.22s var(--ease-spring);
+  cursor: default;
+}
+
+.hero-metric-box:hover {
+  border-color: var(--border-medium);
+  transform: translateY(-2px);
+  background: var(--bg-card-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.hero-metric-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hero-metric-value {
+  font-family: var(--font-mono);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  transition: color 0.2s ease;
+}
+
+.hero-metric-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* Currency Selector Pills */
+.currency-toggle-group {
+  display: flex;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 3px;
+}
+
+.currency-toggle-pill {
+  border: none;
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.22s var(--ease-spring);
+}
+
+.currency-toggle-pill:hover {
+  color: var(--text-primary);
+}
+
+.currency-toggle-pill.active {
+  background: var(--bg-surface);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+  transform: scale(1.02);
+}
+
+/* Quick Actions Grid (5 Vivid Action Cards) */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.quick-action-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 16px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  transition: all 0.24s var(--ease-spring);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+/* Subtle Accent Glow Bar on Hover */
+.quick-action-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: var(--primary-color);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.24s var(--ease-spring);
+}
+
+.quick-action-card:hover::after {
+  transform: scaleX(1);
+}
+
+.action-deposit::after { background: var(--neon-emerald); }
+.action-send::after { background: var(--primary-color); }
+.action-receive::after { background: var(--neon-teal); }
+.action-swap::after { background: var(--neon-purple); }
+.action-convert::after { background: var(--neon-amber); }
+
+.quick-action-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-medium);
+  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.08);
+  background: var(--bg-card-hover);
+}
+
+.quick-action-card:active {
+  transform: scale(0.97) translateY(-1px);
+}
+
+.quick-action-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.25s var(--ease-bounce);
+}
+
+.quick-action-card:hover .quick-action-icon {
+  transform: scale(1.14) rotate(3deg);
+}
+
+.quick-action-icon svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2;
+}
+
+/* Action Card Accents */
+.action-deposit .quick-action-icon {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--neon-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.action-send .quick-action-icon {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--primary-color);
+  border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.action-receive .quick-action-icon {
+  background: rgba(13, 148, 136, 0.12);
+  color: var(--neon-teal);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+.action-swap .quick-action-icon {
+  background: rgba(124, 58, 237, 0.12);
+  color: var(--neon-purple);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+}
+
+.action-convert .quick-action-icon {
+  background: rgba(217, 119, 6, 0.12);
+  color: var(--neon-amber);
+  border: 1px solid rgba(217, 119, 6, 0.25);
+}
+
+.action-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.action-desc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Virtual Card Mini-Widget (Black Obsidian Debit) */
+.mini-card-widget {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s var(--ease-spring),
+              box-shadow 0.3s var(--ease-smooth),
+              border-color 0.25s ease;
+}
+
+/* Hologram sheen sweep on card hover */
+.mini-card-widget::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    60deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(0, 240, 255, 0.12) 45%,
+    rgba(0, 255, 157, 0.12) 55%,
+    transparent 70%
+  );
+  transform: rotate(-25deg);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.6s var(--ease-smooth);
+}
+
+.mini-card-widget:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 18px 36px -8px rgba(0, 0, 0, 0.35), 0 0 20px rgba(0, 240, 255, 0.15);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.mini-card-widget:hover::after {
+  opacity: 1;
+  transform: rotate(-25deg) translateY(-20px);
+}
+
+/* Live Staking Vault Mini-Widget */
+.live-yield-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.28s var(--ease-spring);
+}
+
+.live-yield-widget:hover {
+  transform: translateY(-3px);
+  border-color: rgba(5, 150, 105, 0.35);
+  box-shadow: 0 14px 28px -6px rgba(5, 150, 105, 0.12);
+}
+
+/* Chart Canvas Card */
+.chart-card {
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.timeframe-tabs {
+  display: flex;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  padding: 2px;
+  gap: 2px;
+}
+
+.timeframe-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all 0.2s var(--ease-spring);
+}
+
+.timeframe-btn:hover {
+  color: var(--text-primary);
+  transform: translateY(-1px);
+}
+
+.timeframe-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary-color);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-subtle);
+  transform: scale(1.02);
+}
+
+.chart-canvas-container {
+  flex: 1;
+  position: relative;
+  min-height: 260px;
+}
+
+/* Recent Transactions Table Card & Animated Row Highlighting */
+.vayora-table tbody tr {
+  transition: all 0.2s var(--ease-smooth);
+}
+
+.vayora-table tbody tr:hover {
+  background: var(--bg-card-hover);
+  transform: translateX(4px);
+}
+
+.vayora-table tbody tr:hover td:first-child {
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+  box-shadow: inset 3px 0 0 var(--primary-color);
+}
+
+/* Quick Contact Chips in Hero Card */
+.quick-contact-chip {
+  transition: all 0.22s var(--ease-spring);
+}
+
+.quick-contact-chip:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.quick-contact-chip:active {
+  transform: scale(0.96);
+}
+
+/* Nav Links Micro-Slide Interaction */
+.sidebar-nav .nav-link {
+  transition: all 0.22s var(--ease-spring);
+  position: relative;
+}
+
+.sidebar-nav .nav-link:hover {
+  transform: translateX(5px);
+  background: var(--bg-card-hover);
+  color: var(--primary-color);
+}
+
+.sidebar-nav .nav-link.active {
+  box-shadow: inset 3px 0 0 var(--primary-color);
+}
+
+.sidebar-nav .nav-link svg {
+  transition: transform 0.22s var(--ease-bounce);
+}
+
+.sidebar-nav .nav-link:hover svg {
+  transform: scale(1.15);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .hero-balance-val {
+    font-size: 2.2rem;
+  }
+  .dashboard-hero,
+  .cyber-hero-card {
+    padding: 20px 16px;
+  }
+}

@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receive Assets — VAYORA</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/wallet.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <style>
+    .receive-box {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .token-pills-bar {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .token-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 999px;
+      padding: 7px 16px;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .token-pill-btn:hover {
+      border-color: var(--border-strong);
+      color: var(--text-primary);
+      transform: translateY(-1px);
+    }
+    .token-pill-btn.active {
+      background: rgba(0, 245, 155, 0.12);
+      border-color: var(--neon-emerald);
+      color: var(--neon-emerald);
+      box-shadow: 0 0 16px rgba(0, 245, 155, 0.25);
+    }
+    .token-pill-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 800;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+    }
+    .token-pill-btn.active .token-pill-icon {
+      background: var(--neon-emerald);
+      color: #06070a;
+    }
+    .qr-visual-box {
+      width: 220px;
+      height: 220px;
+      margin: 20px auto;
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      position: relative;
+    }
+    .qr-visual-box canvas, .qr-visual-box svg {
+      width: 100%;
+      height: 100%;
+    }
+    .qr-center-badge {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      background: #06070a;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--neon-emerald);
+      font-weight: 900;
+      font-size: 0.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 18px;
+      text-align: left;
+    }
+    .spec-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .spec-item-key {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .spec-item-val {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Persistent Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="brand-text-wrap">
+          <div class="brand-title">VAYORA<span>.</span></div>
+          <div class="brand-tagline">Your Digital Value, One Journey.</div>
+        </div>
+      </div>
+
+            <nav class="sidebar-nav">
+        <!-- OVERVIEW -->
+        <div class="nav-section">
+          <div class="nav-section-title">Overview</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/dashboard.html" class="nav-link" data-page="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Dashboard</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- PAYMENTS & MONEY -->
+        <div class="nav-section">
+          <div class="nav-section-title">Payments & Transfers</div>
+          <ul class="nav-list">
+            <li>
+              <a href="javascript:void(0)" onclick="VAYORA.openDepositModal()" class="nav-link" style="color: var(--neon-emerald); font-weight: 700;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Deposit Funds</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">PAY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/send.html" class="nav-link" data-page="send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Send Payment</span>
+              </a>
+            </li>
+            <li>
+              <a href="/receive.html" class="nav-link" data-page="receive" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+                <span>Receive & QR</span>
+              </a>
+            </li>
+            <li>
+              <a href="/card.html" class="nav-link" data-page="card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Virtual Card</span>
+              </a>
+            </li>
+            <li>
+              <a href="/nfc.html" class="nav-link" data-page="nfc">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <span>NFC Contactless</span>
+                <span class="badge-tag" style="background: rgba(0, 210, 255, 0.15); color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.3);">TAP</span>
+              </a>
+            </li>
+            <li>
+              <a href="/subscriptions.html" class="nav-link" data-page="subscriptions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                <span>Auto-Pay Subscriptions</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DIGITAL ASSETS & YIELD -->
+        <div class="nav-section">
+          <div class="nav-section-title">Digital Assets & Yield</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/wallet.html" class="nav-link" data-page="wallet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <span>Multi-Asset Wallet</span>
+              </a>
+            </li>
+            <li>
+              <a href="/earn.html" class="nav-link" data-page="earn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+                <span>Staking & Earn Vaults</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">8.5% APY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/swap.html" class="nav-link" data-page="swap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+                <span>Instant Token Swap</span>
+              </a>
+            </li>
+            <li>
+              <a href="/convert.html" class="nav-link" data-page="convert">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0"/></svg>
+                <span>Convert USDT → INR</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- LEDGER & LOGS -->
+        <div class="nav-section">
+          <div class="nav-section-title">Ledger & History</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/transactions.html" class="nav-link" data-page="transactions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                <span>Transactions Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/activity.html" class="nav-link" data-page="activity">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Security Logs</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/security.html" class="nav-link" data-page="security">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Security Center</span>
+              </a>
+            </li>
+            <li>
+              <a href="/profile.html" class="nav-link" data-page="profile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="/settings.html" class="nav-link" data-page="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="VAYORA.logout()" class="btn btn-secondary btn-sm btn-block">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+          <div class="page-headline">Receive Digital Assets</div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
+          <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Deposit Funds</span>
+          </button>
+          <div class="demo-user-switcher">
+            <button class="demo-switch-btn" id="switch-btn-sender" onclick="VAYORA.switchDemoUser('sender')">User A (Sender)</button>
+            <button class="demo-switch-btn" id="switch-btn-receiver" onclick="VAYORA.switchDemoUser('receiver')">User B (Receiver)</button>
+          </div>
+
+          <a href="/notifications.html" class="topbar-action-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge-dot"></span></a>
+          <a href="/profile.html" class="user-profile-chip"><div class="avatar-sphere">U</div><div class="user-info-text"><span class="user-name-label dynamic-user-name">User</span><span class="user-role-label dynamic-user-email">Account</span></div></a>
+        </div>
+      </header>
+
+      <div class="app-content animate-entrance">
+        
+        <div class="receive-box">
+          
+          <!-- Token Selector Navigation Tabs -->
+          <div class="token-pills-bar" id="receive-token-tabs">
+            <button type="button" class="token-pill-btn active" data-token="USDT">
+              <span class="token-pill-icon">₮</span>
+              <span>USDT</span>
+            </button>
+            <button type="button" class="token-pill-btn" data-token="USDC">
+              <span class="token-pill-icon">$</span>
+              <span>USDC</span>
+            </button>
+            <button type="button" class="token-pill-btn" data-token="BTC">
+              <span class="token-pill-icon">₿</span>
+              <span>BTC</span>
+            </button>
+            <button type="button" class="token-pill-btn" data-token="ETH">
+              <span class="token-pill-icon">Ξ</span>
+              <span>ETH</span>
+            </button>
+            <button type="button" class="token-pill-btn" data-token="SOL">
+              <span class="token-pill-icon">◎</span>
+              <span>SOL</span>
+            </button>
+            <button type="button" class="token-pill-btn" data-token="INR">
+              <span class="token-pill-icon">₹</span>
+              <span>INR</span>
+            </button>
+          </div>
+
+          <div class="vayora-card highlight-cyan" id="receive-main-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <span class="status-pill status-active" id="receive-network-pill">TRC-20 (Tron Network)</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 700;" id="receive-settlement-time">&lt; 30s Instant</span>
+            </div>
+
+            <h2 id="receive-card-title" style="font-family: var(--font-display); font-size: 1.6rem; color: var(--text-primary); margin-bottom: 6px;">
+              Receive Tether USD (USDT)
+            </h2>
+            <p id="receive-card-desc" style="font-size: 0.85rem; color: var(--text-secondary);">
+              Send only USDT to this address on TRC-20. Funds credit instantly to your VAYORA account.
+            </p>
+
+            <!-- Vector QR Representation with Center Badge -->
+            <div class="qr-visual-box" id="qr-container">
+              <div id="qr-code-mount" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;"></div>
+              <div class="qr-center-badge" id="qr-center-icon">₮</div>
+            </div>
+
+            <!-- Address Field with Copy -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; text-align: left;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;" id="receive-address-label">Dedicated USDT TRC-20 Deposit Address</span>
+                <span id="copied-badge" style="font-size: 0.72rem; color: var(--neon-emerald); font-weight: 700; display: none;">Copied!</span>
+              </div>
+              <div id="receive-wallet-address" style="font-family: var(--font-mono); font-size: 0.95rem; color: var(--neon-cyan); word-break: break-all; user-select: all; line-height: 1.4;">
+                Loading address...
+              </div>
+            </div>
+
+            <!-- Internal VAYORA ID Identifier -->
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px; margin-bottom: 20px; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 2px;">Internal VAYORA ID / Email</div>
+                <div id="receive-user-email" style="font-size: 0.92rem; color: var(--text-primary); font-weight: 600;">
+                  Loading email...
+                </div>
+              </div>
+              <button id="copy-email-btn" class="btn btn-secondary btn-sm" style="padding: 4px 10px; font-size: 0.75rem;">Copy ID</button>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+              <button id="copy-addr-btn" class="btn btn-primary" style="flex: 1;">Copy Token Address</button>
+              <button id="share-addr-btn" class="btn btn-secondary" style="flex: 1;">Share Address</button>
+            </div>
+
+            <!-- Technical Specifications Grid -->
+            <div class="specs-grid">
+              <div class="spec-item">
+                <div class="spec-item-key">Minimum Deposit</div>
+                <div class="spec-item-val" id="spec-min-deposit">1.00 USDT</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-item-key">Required Confirmations</div>
+                <div class="spec-item-val" id="spec-confirmations">1 Block</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-item-key">Deposit Network Fee</div>
+                <div class="spec-item-val" style="color: var(--neon-emerald);" id="spec-fee">0.00 VAYORA Network</div>
+              </div>
+              <div class="spec-item">
+                <div class="spec-item-key">Contract / Standard</div>
+                <div class="spec-item-val" id="spec-standard" style="font-family: var(--font-mono); font-size: 0.75rem;">TRC-20 (Tron)</div>
+              </div>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid var(--border-subtle); margin: 24px 0 20px 0;">
+
+            <!-- Academic Simulation Trigger -->
+            <div>
+              <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 10px;">Academic Demonstration Helper</div>
+              <button id="simulate-receive-btn" class="btn btn-outline-emerald btn-block">
+                Simulate Incoming +<span id="sim-amt">25.00</span> <span id="sim-sym">USDT</span> Transfer
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/payments.js"></script>
+</body>
+</html>

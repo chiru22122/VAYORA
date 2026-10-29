@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yield Vaults & High-Yield Staking — VAYORA</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <style>
+    .earn-hero {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 30px 34px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    }
+
+    .earn-hero::before {
+      display: none !important;
+    }
+
+    .vaults-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 26px;
+    }
+
+    .vault-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-fast);
+    }
+
+    .vault-card:hover {
+      border-color: var(--border-medium);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .apy-badge {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--neon-emerald);
+      line-height: 1;
+    }
+
+    .live-yield-counter {
+      font-family: var(--font-mono);
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+    }
+
+    .vault-stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px dashed var(--border-subtle);
+      font-size: 0.82rem;
+    }
+
+    .vault-stat-row:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Persistent Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo-mark">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+          </svg>
+        </div>
+        <div class="brand-text-wrap">
+          <div class="brand-title">VAYORA<span>.</span></div>
+          <div class="brand-tagline">Your Digital Value, One Journey.</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <!-- OVERVIEW -->
+        <div class="nav-section">
+          <div class="nav-section-title">Overview</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/dashboard.html" class="nav-link" data-page="dashboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                </svg>
+                <span>Dashboard</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- PAYMENTS & MONEY -->
+        <div class="nav-section">
+          <div class="nav-section-title">Payments & Transfers</div>
+          <ul class="nav-list">
+            <li>
+              <a href="javascript:void(0)" onclick="VAYORA.openDepositModal()" class="nav-link"
+                style="color: var(--neon-emerald); font-weight: 700;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="16" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+                <span>Deposit Funds</span>
+                <span class="badge-tag"
+                  style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">PAY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/send.html" class="nav-link" data-page="send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+                <span>Send Payment</span>
+              </a>
+            </li>
+            <li>
+              <a href="/receive.html" class="nav-link" data-page="receive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <polyline points="8 17 12 21 16 17" />
+                  <line x1="12" y1="12" x2="12" y2="21" />
+                  <path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29" />
+                </svg>
+                <span>Receive & QR</span>
+              </a>
+            </li>
+            <li>
+              <a href="/card.html" class="nav-link" data-page="card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
+                  <line x1="1" y1="10" x2="23" y2="10" />
+                </svg>
+                <span>Virtual Card</span>
+              </a>
+            </li>
+            <li>
+              <a href="/nfc.html" class="nav-link" data-page="nfc">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+                  <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+                </svg>
+                <span>NFC Contactless</span>
+                <span class="badge-tag"
+                  style="background: rgba(0, 210, 255, 0.15); color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.3);">TAP</span>
+              </a>
+            </li>
+            <li>
+              <a href="/subscriptions.html" class="nav-link" data-page="subscriptions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  <line x1="8" y1="10" x2="16" y2="10" />
+                </svg>
+                <span>Auto-Pay Subscriptions</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DIGITAL ASSETS & YIELD -->
+        <div class="nav-section">
+          <div class="nav-section-title">Digital Assets & Yield</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/wallet.html" class="nav-link" data-page="wallet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5" />
+                  <path d="M18 12a2 2 0 0 0 0 4h4v-4Z" />
+                </svg>
+                <span>Multi-Asset Wallet</span>
+              </a>
+            </li>
+            <li>
+              <a href="/earn.html" class="nav-link" data-page="earn" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+                  <line x1="12" y1="6" x2="12" y2="8" />
+                  <line x1="12" y1="16" x2="12" y2="18" />
+                </svg>
+                <span>Staking & Earn Vaults</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">8.5%
+                  APY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/swap.html" class="nav-link" data-page="swap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="m16 3 4 4-4 4" />
+                  <path d="M20 7H4" />
+                  <path d="m8 21-4-4 4-4" />
+                  <path d="M4 17h16" />
+                </svg>
+                <span>Instant Token Swap</span>
+              </a>
+            </li>
+            <li>
+              <a href="/convert.html" class="nav-link" data-page="convert">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0" />
+                </svg>
+                <span>Convert USDT → INR</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- LEDGER & LOGS -->
+        <div class="nav-section">
+          <div class="nav-section-title">Ledger & History</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/transactions.html" class="nav-link" data-page="transactions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <line x1="8" y1="6" x2="21" y2="6" />
+                  <line x1="8" y1="12" x2="21" y2="12" />
+                  <line x1="8" y1="18" x2="21" y2="18" />
+                  <line x1="3" y1="6" x2="3.01" y2="6" />
+                  <line x1="3" y1="12" x2="3.01" y2="12" />
+                  <line x1="3" y1="18" x2="3.01" y2="18" />
+                </svg>
+                <span>Transactions Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/activity.html" class="nav-link" data-page="activity">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Security Logs</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/security.html" class="nav-link" data-page="security">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span>Security Center</span>
+              </a>
+            </li>
+            <li>
+              <a href="/profile.html" class="nav-link" data-page="profile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                  <circle cx="12" cy="7" r="4" />
+                </svg>
+                <span>Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="/settings.html" class="nav-link" data-page="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="3" />
+                  <path
+                    d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                </svg>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="VAYORA.logout()" class="btn btn-secondary btn-sm btn-block">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="app-main">
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn"><svg width="20" height="20" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor">
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </svg></button>
+          <div class="page-headline">Staking & High-Yield Earn Vaults</div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
+          <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm"
+            style="display: flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+            <span>Deposit Funds</span>
+          </button>
+          <a href="/notifications.html" class="topbar-action-btn"><svg width="18" height="18" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg><span class="notif-badge-dot"></span></a>
+          <a href="/profile.html" class="user-profile-chip">
+            <div class="avatar-sphere">U</div>
+            <div class="user-info-text"><span class="user-name-label dynamic-user-name">User</span><span
+                class="user-role-label dynamic-user-email">Account</span></div>
+          </a>
+        </div>
+      </header>
+
+      <div class="app-content animate-entrance">
+
+        <!-- Hero Staking Banner -->
+        <div class="earn-hero">
+          <div
+            style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; position: relative; z-index: 2;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                <span class="status-pulse-dot" style="width: 9px; height: 9px; background: var(--neon-emerald);"></span>
+                <span
+                  style="font-size: 0.8rem; font-weight: 800; letter-spacing: 1.5px; color: var(--neon-emerald); text-transform: uppercase;">Automated
+                  Yield Accumulator</span>
+              </div>
+              <h2 style="font-size: 2.3rem; font-weight: 800; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px;">
+                Earn up to <span class="text-gradient-emerald">8.50% APY</span> on Idle Assets</h2>
+              <p style="color: var(--text-secondary); font-size: 0.9rem; max-width: 580px;">Stake stablecoins and crypto
+                with zero lockup penalties, real-time interest compounding, and instant 1-click harvesting.</p>
+            </div>
+            <div
+              style="text-align: right; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border-medium); border-radius: var(--radius-lg); padding: 18px 24px; backdrop-filter: blur(16px);">
+              <div style="font-size: 0.72rem; text-transform: uppercase; color: var(--text-muted); font-weight: 800;">
+                Real-Time Accrued Rewards</div>
+              <div id="live-total-yield-ticking"
+                style="font-family: var(--font-display); font-size: 2.2rem; font-weight: 800; color: var(--neon-emerald); margin: 4px 0; text-shadow: 0 0 25px rgba(0, 255, 157, 0.4);">
+                +$1.250000 USDT
+              </div>
+              <button onclick="harvestAllYield('USDT')" class="btn btn-primary btn-sm" style="margin-top: 4px;">Claim
+                All Yield</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Available Vaults -->
+        <h3
+          style="font-size: 1.25rem; font-weight: 800; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+          <span>Active Institutional Staking Vaults</span>
+          <span class="badge-tag"
+            style="background: rgba(0, 255, 157, 0.15); color: var(--neon-emerald); font-size: 0.75rem; padding: 2px 10px;">Instant
+            Liquidity</span>
+        </h3>
+
+        <div class="vaults-grid" id="vaults-container">
+          <!-- Dynamically populated -->
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Stake Action Modal -->
+  <div id="stake-action-modal" class="modal-backdrop">
+    <div class="modal-window" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title" id="stake-modal-title">Stake in Vault</div>
+        <button class="modal-close-btn"
+          onclick="document.getElementById('stake-action-modal').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <div class="form-label">
+            <span>Available Balance:</span>
+            <span id="stake-available-bal" style="color: var(--neon-emerald); font-weight: 700;">0.00 USDT</span>
+          </div>
+          <div class="input-with-action">
+            <input type="number" id="stake-amount-input" class="form-control" placeholder="0.00" step="any" min="0.1"
+              style="font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; padding-right: 70px;">
+            <button type="button" id="stake-max-btn" class="input-action-btn">MAX</button>
+          </div>
+        </div>
+
+        <div
+          style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.8rem;">
+            <span style="color: var(--text-muted);">APY Interest Rate:</span>
+            <span id="stake-modal-apy" style="color: var(--neon-emerald); font-weight: 800;">8.50%</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.8rem;">
+            <span style="color: var(--text-muted);">Estimated Monthly Reward:</span>
+            <span id="stake-est-monthly"
+              style="color: var(--neon-cyan); font-family: var(--font-mono); font-weight: 700;">+0.00 USDT</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 0.8rem;">
+            <span style="color: var(--text-muted);">Lockup Term:</span>
+            <span style="color: var(--text-primary); font-weight: 700;">Flexible (Unstake Anytime)</span>
+          </div>
+        </div>
+
+        <button type="button" id="confirm-stake-btn" class="btn btn-primary btn-block btn-lg">Confirm Staking</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script>
+    let currentVaults = [];
+    let activeStakingVault = null;
+    let yieldCounterBase = 1.250000;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      VAYORA.initShell('earn');
+      await loadVaults();
+
+      // Live yield ticking simulation every second
+      setInterval(() => {
+        yieldCounterBase += 0.000042;
+        const el = document.getElementById('live-total-yield-ticking');
+        if (el) el.textContent = `+$${yieldCounterBase.toFixed(6)} USDT`;
+      }, 1000);
+    });
+
+    async function loadVaults() {
+      try {
+        const vaults = await VAYORA.request('/earn/vaults');
+        currentVaults = vaults || [];
+        renderVaults(currentVaults);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderVaults(vaults) {
+      const container = document.getElementById('vaults-container');
+      if (!container) return;
+
+      container.innerHTML = vaults.map(v => `
+        <div class="vault-card tilt-card">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
+              <div>
+                <span class="status-pill status-active" style="margin-bottom: 6px; font-size: 0.68rem;">${v.asset_symbol} VAULT</span>
+                <h4 style="font-size: 1.15rem; font-weight: 800; color: #fff;">${v.name}</h4>
+              </div>
+              <div style="text-align: right;">
+                <div class="apy-badge" style="color: ${v.color};">${v.apy}%</div>
+                <div style="font-size: 0.68rem; color: var(--text-muted); font-weight: 700;">NET APY</div>
+              </div>
+            </div>
+
+            <div class="vault-stat-row">
+              <span style="color: var(--text-muted);">Total Pool Liquidity (TVL)</span>
+              <span style="font-weight: 700; color: #fff;">${v.tvl}</span>
+            </div>
+            <div class="vault-stat-row">
+              <span style="color: var(--text-muted);">Available in Wallet</span>
+              <span style="font-family: var(--font-mono); color: var(--neon-cyan); font-weight: 700;">${v.available_wallet_balance.toFixed(2)} ${v.asset_symbol}</span>
+            </div>
+            <div class="vault-stat-row">
+              <span style="color: var(--text-muted);">Your Active Staked</span>
+              <span style="font-family: var(--font-mono); color: var(--neon-emerald); font-weight: 800;">${v.user_staked_amount.toFixed(4)} ${v.asset_symbol}</span>
+            </div>
+            <div class="vault-stat-row">
+              <span style="color: var(--text-muted);">Withdrawal Penalty</span>
+              <span style="color: var(--neon-emerald); font-weight: 700;">0.00% (Instant)</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="openStakeModal('${v.vault_id}')" class="btn btn-primary btn-block btn-sm" style="flex: 2;">+ Stake ${v.asset_symbol}</button>
+            <button onclick="harvestAllYield('${v.asset_symbol}')" class="btn btn-secondary btn-sm" style="flex: 1;">Claim</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.openStakeModal = function (vaultId) {
+      const vault = currentVaults.find(v => v.vault_id === vaultId);
+      if (!vault) return;
+      activeStakingVault = vault;
+
+      document.getElementById('stake-modal-title').textContent = `Stake ${vault.asset_symbol} in ${vault.name}`;
+      document.getElementById('stake-available-bal').textContent = `${vault.available_wallet_balance.toFixed(4)} ${vault.asset_symbol}`;
+      document.getElementById('stake-modal-apy').textContent = `${vault.apy}% APY`;
+      document.getElementById('stake-amount-input').value = (vault.available_wallet_balance * 0.5).toFixed(2);
+      updateYieldEst();
+
+      document.getElementById('stake-max-btn').onclick = () => {
+        document.getElementById('stake-amount-input').value = vault.available_wallet_balance;
+        updateYieldEst();
+      };
+
+      document.getElementById('stake-amount-input').oninput = updateYieldEst;
+      document.getElementById('confirm-stake-btn').onclick = executeStakeSubmit;
+
+      document.getElementById('stake-action-modal').classList.add('open');
+    };
+
+    function updateYieldEst() {
+      if (!activeStakingVault) return;
+      const amt = parseFloat(document.getElementById('stake-amount-input').value) || 0;
+      const monthly = (amt * (activeStakingVault.apy / 100)) / 12;
+      document.getElementById('stake-est-monthly').textContent = `+${monthly.toFixed(4)} ${activeStakingVault.asset_symbol}`;
+    }
+
+    async function executeStakeSubmit() {
+      if (!activeStakingVault) return;
+      const amt = parseFloat(document.getElementById('stake-amount-input').value);
+      if (!amt || amt <= 0) {
+        VAYORA.showToast('Validation Error', 'Enter a valid amount to stake', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('confirm-stake-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Locking Funds in Yield Vault...';
+
+      try {
+        const res = await VAYORA.request('/earn/stake', {
+          method: 'POST',
+          body: {
+            vault_id: activeStakingVault.vault_id,
+            asset_symbol: activeStakingVault.asset_symbol,
+            amount: amt
+          }
+        });
+        document.getElementById('stake-action-modal').classList.remove('open');
+        VAYORA.showToast('Staked Successfully', `Locked ${amt} ${activeStakingVault.asset_symbol} at ${activeStakingVault.apy}% APY!`, 'success');
+        await loadVaults();
+      } catch (e) {
+        VAYORA.showToast('Staking Failed', e.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Confirm Staking';
+      }
+    }
+
+    window.harvestAllYield = async function (symbol) {
+      try {
+        VAYORA.showToast('Claiming Rewards', 'Interacting with smart contract yield accumulator...', 'info', 1500);
+        const res = await VAYORA.request('/earn/harvest', {
+          method: 'POST',
+          body: { vault_id: 'default', asset_symbol: symbol || 'USDT' }
+        });
+        VAYORA.showToast('Harvest Complete!', `Successfully claimed +${res.reward_amount} ${res.asset_symbol} yield to your wallet!`, 'success');
+        await loadVaults();
+      } catch (e) {
+        VAYORA.showToast('Harvest Failed', e.message, 'error');
+      }
+    };
+  </script>
+</body>
+
+</html>

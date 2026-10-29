@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Dashboard — VAYORA FinTech OS</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    /* Clean Dashboard Aesthetics */
+    .dashboard-master-grid {
+      display: grid;
+      grid-template-columns: 2.2fr 1fr;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    .cyber-hero-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px 32px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+      transition: background-color var(--transition-normal), border-color var(--transition-normal);
+    }
+
+    .quick-contacts-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .quick-contacts-bar::-webkit-scrollbar { display: none; }
+
+    .quick-contact-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px 4px 5px;
+      color: var(--text-primary);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .quick-contact-chip:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-medium);
+    }
+    .quick-contact-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.72rem;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    /* Virtual Card Mini-Widget */
+    .mini-card-widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition: border-color var(--transition-fast);
+    }
+
+    /* Staking Vault Mini-Widget */
+    .live-yield-widget {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    @media (max-width: 1100px) {
+      .dashboard-master-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-wrapper">
+
+    <!-- Persistent Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo-mark">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <div class="brand-text-wrap">
+          <div class="brand-title">VAYORA<span>.</span></div>
+          <div class="brand-tagline">Your Digital Value, One Journey.</div>
+        </div>
+      </div>
+
+            <nav class="sidebar-nav">
+        <!-- OVERVIEW -->
+        <div class="nav-section">
+          <div class="nav-section-title">Overview</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/dashboard.html" class="nav-link" data-page="dashboard" class="nav-link active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <span>Dashboard</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- PAYMENTS & MONEY -->
+        <div class="nav-section">
+          <div class="nav-section-title">Payments & Transfers</div>
+          <ul class="nav-list">
+            <li>
+              <a href="javascript:void(0)" onclick="VAYORA.openDepositModal()" class="nav-link" style="color: var(--neon-emerald); font-weight: 700;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                <span>Deposit Funds</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">PAY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/send.html" class="nav-link" data-page="send">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                <span>Send Payment</span>
+              </a>
+            </li>
+            <li>
+              <a href="/receive.html" class="nav-link" data-page="receive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+                <span>Receive & QR</span>
+              </a>
+            </li>
+            <li>
+              <a href="/card.html" class="nav-link" data-page="card">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <span>Virtual Card</span>
+              </a>
+            </li>
+            <li>
+              <a href="/nfc.html" class="nav-link" data-page="nfc">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+                <span>NFC Contactless</span>
+                <span class="badge-tag" style="background: rgba(0, 210, 255, 0.15); color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.3);">TAP</span>
+              </a>
+            </li>
+            <li>
+              <a href="/subscriptions.html" class="nav-link" data-page="subscriptions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="8" y1="10" x2="16" y2="10"/></svg>
+                <span>Auto-Pay Subscriptions</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- DIGITAL ASSETS & YIELD -->
+        <div class="nav-section">
+          <div class="nav-section-title">Digital Assets & Yield</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/wallet.html" class="nav-link" data-page="wallet">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+                <span>Multi-Asset Wallet</span>
+              </a>
+            </li>
+            <li>
+              <a href="/earn.html" class="nav-link" data-page="earn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+                <span>Staking & Earn Vaults</span>
+                <span class="badge-tag" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">8.5% APY</span>
+              </a>
+            </li>
+            <li>
+              <a href="/swap.html" class="nav-link" data-page="swap">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></svg>
+                <span>Instant Token Swap</span>
+              </a>
+            </li>
+            <li>
+              <a href="/convert.html" class="nav-link" data-page="convert">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0"/></svg>
+                <span>Convert USDT → INR</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- LEDGER & LOGS -->
+        <div class="nav-section">
+          <div class="nav-section-title">Ledger & History</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/transactions.html" class="nav-link" data-page="transactions">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                <span>Transactions Ledger</span>
+              </a>
+            </li>
+            <li>
+              <a href="/activity.html" class="nav-link" data-page="activity">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span>Security Logs</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SYSTEM -->
+        <div class="nav-section">
+          <div class="nav-section-title">Account</div>
+          <ul class="nav-list">
+            <li>
+              <a href="/security.html" class="nav-link" data-page="security">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Security Center</span>
+              </a>
+            </li>
+            <li>
+              <a href="/profile.html" class="nav-link" data-page="profile">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span>Profile</span>
+              </a>
+            </li>
+            <li>
+              <a href="/settings.html" class="nav-link" data-page="settings">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button onclick="VAYORA.logout()" class="btn btn-secondary btn-sm btn-block" style="display: flex; gap: 8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      
+      <!-- Topbar Header -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <button id="mobile-menu-btn" class="mobile-menu-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="page-headline">Command Dashboard</div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
+          <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Deposit Funds</span>
+          </button>
+
+          <a href="/notifications.html" class="topbar-action-btn" title="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notif-badge-dot"></span>
+          </a>
+
+          <a href="/profile.html" class="user-profile-chip">
+            <div class="avatar-sphere">U</div>
+            <div class="user-info-text">
+              <span class="user-name-label dynamic-user-name">Loading...</span>
+              <span class="user-role-label dynamic-user-email">Account</span>
+            </div>
+          </a>
+        </div>
+      </header>
+
+      <!-- Dashboard Viewport -->
+      <div class="app-content animate-entrance">
+
+        <!-- Streaming Multi-Asset Crypto & FX Market Ticker Ribbon -->
+        <div class="market-ticker-ribbon animate-entrance stagger-1" id="market-ticker-ribbon">
+          <div class="ticker-item">
+            <span class="ticker-symbol">USDT / INR</span>
+            <span class="ticker-price" id="ticker-usdt-inr">₹90.35</span>
+            <span class="ticker-pill-up">▲ +0.82%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-symbol">BTC / USD</span>
+            <span class="ticker-price" id="ticker-btc-usd">$91,420</span>
+            <span class="ticker-pill-up">▲ +3.15%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-symbol">ETH / USD</span>
+            <span class="ticker-price" id="ticker-eth-usd">$3,485</span>
+            <span class="ticker-pill-up">▲ +2.40%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-symbol">SOL / USD</span>
+            <span class="ticker-price" id="ticker-sol-usd">$218.60</span>
+            <span class="ticker-pill-up">▲ +5.90%</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-symbol" style="color: var(--neon-cyan);">TPS</span>
+            <span class="ticker-price" id="ticker-tps">2,840 tx/s</span>
+            <span class="ticker-pill-up" style="color: var(--neon-cyan);">⚡ Peak</span>
+          </div>
+          <div class="ticker-item">
+            <span class="ticker-symbol" style="color: var(--neon-emerald);">Dual-Ledger</span>
+            <span class="ticker-price">99.998%</span>
+            <span class="ticker-pill-up">● Synced</span>
+          </div>
+        </div>
+
+        <!-- Master Cyber Balance Hero Card -->
+        <div class="cyber-hero-card animate-entrance stagger-2">
+          <div class="hero-balance-label-row">
+            <div class="hero-welcome-tag">
+              <span class="hero-welcome-dot"></span>
+              <span>Account Hub</span> &bull; <span class="dynamic-user-name" style="color: #fff;">User</span>
+            </div>
+
+            <!-- Currency Selector Switcher -->
+            <div class="currency-toggle-group">
+              <button type="button" class="currency-toggle-pill active" data-curr="INR">₹ INR</button>
+              <button type="button" class="currency-toggle-pill" data-curr="USD">$ USD</button>
+              <button type="button" class="currency-toggle-pill" data-curr="EUR">€ EUR</button>
+            </div>
+          </div>
+
+          <div class="hero-balance-row">
+            <div class="hero-balance-main">
+              <div class="hero-balance-label" style="display: flex; align-items: center; gap: 8px;">
+                <span>Total Net Worth</span>
+                <span class="status-pill status-completed" style="font-size: 0.65rem; padding: 2px 8px;">● Live Database Feed</span>
+              </div>
+              <div class="hero-balance-val text-gradient-vibrant" id="total-inr-val">₹0.00</div>
+              <div class="hero-balance-secondary">
+                <span id="total-usd-val">≈ $0.00 USD</span>
+                <span class="hero-stat-badge">+4.2% Today ▲</span>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <button type="button" onclick="VAYORA.openDepositModal('USDT')" class="btn btn-primary btn-lg" style="font-weight: 800; display: inline-flex; align-items: center; gap: 8px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>+ Deposit Funds</span>
+              </button>
+              <a href="/send.html" class="btn btn-secondary btn-lg" style="font-weight: 700;">
+                <span>Send Transfer</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Quick Access Shortcuts -->
+          <div class="quick-contacts-bar">
+            <span style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 800; letter-spacing: 1px;">Quick Actions:</span>
+            <a href="/send.html" class="quick-contact-chip">
+              <div class="quick-contact-avatar">↗</div>
+              <span>Send Money</span>
+            </a>
+            <a href="/receive.html" class="quick-contact-chip">
+              <div class="quick-contact-avatar">↙</div>
+              <span>Receive Funds</span>
+            </a>
+            <a href="/earn.html" class="quick-contact-chip" style="color: var(--neon-emerald); border-color: rgba(0, 255, 157, 0.35);">
+              <div class="quick-contact-avatar" style="background: var(--neon-emerald);">⚡</div>
+              <span>Yield Vault (8.5% APY)</span>
+            </a>
+            <a href="/card.html" class="quick-contact-chip" style="color: var(--neon-cyan); border-color: rgba(0, 240, 255, 0.35);">
+              <div class="quick-contact-avatar" style="background: var(--neon-cyan);">💳</div>
+              <span>Virtual Obsidian Card</span>
+            </a>
+          </div>
+
+          <!-- Embedded Sub-Metrics Ribbon -->
+          <div class="hero-submetrics-grid">
+            <div class="hero-metric-box">
+              <div class="hero-metric-label">
+                <span>24H Gain / Yield</span>
+                <span style="color: var(--neon-emerald);">▲</span>
+              </div>
+              <div class="hero-metric-value" style="color: var(--neon-emerald);" id="hero-gain-val">+₹3,410.50</div>
+              <div class="hero-metric-sub" style="color: var(--neon-emerald);">+4.2% Net Inflow</div>
+            </div>
+
+            <div class="hero-metric-box">
+              <div class="hero-metric-label">
+                <span>Instant Liquidity</span>
+                <span style="color: var(--neon-cyan);">⚡</span>
+              </div>
+              <div class="hero-metric-value" style="color: var(--neon-cyan);">94.8% Float</div>
+              <div class="hero-metric-sub" style="color: var(--text-muted);">Zero-lockup tier</div>
+            </div>
+
+            <div class="hero-metric-box">
+              <div class="hero-metric-label">
+                <span>30-Day Velocity</span>
+                <span style="color: var(--neon-purple);">📊</span>
+              </div>
+              <div class="hero-metric-value" id="hero-volume-val">₹1,45,000</div>
+              <div class="hero-metric-sub" style="color: var(--neon-purple);">Audited Operations</div>
+            </div>
+
+            <div class="hero-metric-box">
+              <div class="hero-metric-label">
+                <span>Security Integrity</span>
+                <span style="color: var(--neon-amber);">🛡️</span>
+              </div>
+              <div class="hero-metric-value" style="color: var(--neon-amber);">AES-256 Multi-Sig</div>
+              <div class="hero-metric-sub" style="color: var(--neon-emerald);">Protected Ledger</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 Vivid Quick Action Buttons -->
+        <div class="quick-actions-grid animate-entrance stagger-3">
+          <button type="button" onclick="VAYORA.openDepositModal('USDT')" class="quick-action-card action-deposit animate-entrance stagger-1" style="text-align: left;">
+            <div class="quick-action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </div>
+            <div>
+              <div class="action-title">Deposit</div>
+              <div class="action-desc">Add real card funds</div>
+            </div>
+          </button>
+
+          <a href="/send.html" class="quick-action-card action-send animate-entrance stagger-2">
+            <div class="quick-action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </div>
+            <div>
+              <div class="action-title">Send</div>
+              <div class="action-desc">Instant P2P transfer</div>
+            </div>
+          </a>
+
+          <a href="/receive.html" class="quick-action-card action-receive animate-entrance stagger-3">
+            <div class="quick-action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+            </div>
+            <div>
+              <div class="action-title">Receive</div>
+              <div class="action-desc">Get payment QR & ID</div>
+            </div>
+          </a>
+
+          <a href="/earn.html" class="quick-action-card action-swap animate-entrance stagger-4" style="border-color: rgba(0, 255, 157, 0.45);">
+            <div class="quick-action-icon" style="background: rgba(0, 255, 157, 0.2); color: var(--neon-emerald);">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="6" x2="12" y2="8"/><line x1="12" y1="16" x2="12" y2="18"/></svg>
+            </div>
+            <div>
+              <div class="action-title">Yield Vaults</div>
+              <div class="action-desc">Earn 8.5% APY Staking</div>
+            </div>
+          </a>
+
+          <a href="/convert.html" class="quick-action-card action-convert animate-entrance stagger-5">
+            <div class="quick-action-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0"/></svg>
+            </div>
+            <div>
+              <div class="action-title">Convert</div>
+              <div class="action-desc">USDT to INR Cashout</div>
+            </div>
+          </a>
+        </div>
+
+        <!-- Main Dashboard Split Grid -->
+        <div class="dashboard-master-grid">
+          
+          <!-- Left Column: Chart & Transactions -->
+          <div style="display: flex; flex-direction: column; gap: 26px;">
+            
+            <!-- Portfolio Performance Chart -->
+            <div class="vayora-card chart-card glow-card-vibrant animate-entrance stagger-4">
+              <div class="chart-header">
+                <div>
+                  <h3 class="card-title" style="display: flex; align-items: center; gap: 10px;">
+                    <span>Portfolio Performance & Valuation Curve</span>
+                    <span class="status-pulse-dot" style="width: 8px; height: 8px; background: var(--neon-emerald);"></span>
+                  </h3>
+                  <div class="card-subtitle">Real-time asset valuation curve & historical settlement</div>
+                </div>
+                <div class="timeframe-tabs">
+                  <button class="timeframe-btn" data-tf="24H">24H</button>
+                  <button class="timeframe-btn active" data-tf="7D">7D</button>
+                  <button class="timeframe-btn" data-tf="30D">30D</button>
+                  <button class="timeframe-btn" data-tf="1Y">1Y</button>
+                </div>
+              </div>
+              <div class="chart-canvas-wrap" style="height: 280px; position: relative;">
+                <canvas id="portfolioChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
+            <div class="vayora-card animate-entrance stagger-5">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Live Transactions Ledger</h3>
+                  <div class="card-subtitle">Latest operations confirmed on database ledger</div>
+                </div>
+                <a href="/transactions.html" class="btn btn-secondary btn-sm">View Full Ledger →</a>
+              </div>
+
+              <div class="table-responsive">
+                <table class="vayora-table">
+                  <thead>
+                    <tr>
+                      <th>Type / Time</th>
+                      <th>Counterparty / Reference</th>
+                      <th>Status</th>
+                      <th style="text-align: right;">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-tx-tbody">
+                    <tr><td colspan="4" style="text-align:center; padding: 24px; color: var(--text-muted);">Loading transactions...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Interactive 3D Card, Staking Stream & Asset Allocations -->
+          <div style="display: flex; flex-direction: column; gap: 24px;">
+            
+            <!-- 3D Virtual Obsidian Card Widget -->
+            <div class="mini-card-widget tilt-card animate-entrance stagger-4">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <div style="font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--neon-cyan); font-weight: 800;">VAYORA OBSIDIAN DEBIT</div>
+                <svg width="36" height="24" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><path d="M12 18V6H8.5L5 8.5V18H12Z" fill="var(--neon-emerald)"/></svg>
+              </div>
+              <div style="font-family: var(--font-mono); font-size: 1.25rem; letter-spacing: 3px; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 0 15px rgba(255,255,255,0.3);">
+                •••• •••• •••• 4242
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px;">
+                <div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Cardholder</div>
+                  <div class="dynamic-user-name" style="font-size: 0.82rem; font-weight: 800; color: #fff;">USER</div>
+                </div>
+                <div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Card Tier</div>
+                  <div style="font-size: 0.82rem; font-weight: 800; color: var(--neon-emerald);">BLACK OBSIDIAN</div>
+                </div>
+              </div>
+              <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px;">
+                <a href="/card.html" class="btn btn-primary btn-sm btn-block" style="font-size: 0.76rem;">Manage Virtual Card</a>
+                <a href="/nfc.html" class="btn btn-secondary btn-sm" style="color: var(--neon-cyan);" title="NFC Tap-To-Pay">📡 Tap</a>
+              </div>
+            </div>
+
+            <!-- Live Yield Accumulator Stream Widget -->
+            <div class="live-yield-widget glow-card-vibrant animate-entrance stagger-5">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                <div>
+                  <span class="status-pill status-completed" style="font-size: 0.65rem; margin-bottom: 4px;">● Yield Staking Stream</span>
+                  <h4 style="font-size: 1rem; font-weight: 800; color: #fff;">USDT Prime Liquidity Vault</h4>
+                </div>
+                <div style="text-align: right;">
+                  <div style="font-family: var(--font-display); font-size: 1.4rem; font-weight: 800; color: var(--neon-emerald);">8.50%</div>
+                  <div style="font-size: 0.65rem; color: var(--text-muted);">APY</div>
+                </div>
+              </div>
+              <div style="background: rgba(0,0,0,0.3); border-radius: var(--radius-md); padding: 10px 12px; margin: 10px 0; display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Live Yield Accruing:</span>
+                <span id="mini-live-yield-ticking" style="font-family: var(--font-mono); font-size: 1rem; font-weight: 800; color: var(--neon-cyan);">+$1.250420</span>
+              </div>
+              <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <a href="/earn.html" class="btn btn-primary btn-sm btn-block" style="font-size: 0.78rem;">Open Staking Vaults</a>
+              </div>
+            </div>
+
+            <!-- Asset Holdings Mini -->
+            <div class="vayora-card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title">Asset Holdings</h3>
+                  <div class="card-subtitle">Multi-chain portfolio balances</div>
+                </div>
+                <a href="/wallet.html" style="color: var(--neon-cyan); font-size: 0.8rem; text-decoration: none; font-weight: 700;">Manage Wallet →</a>
+              </div>
+              
+              <div id="mini-assets-container" class="asset-mini-list">
+                <div style="color: var(--text-muted); padding: 12px;">Loading assets...</div>
+              </div>
+            </div>
+
+            <!-- Portfolio Allocation Segment Widget -->
+            <div class="vayora-card">
+              <div class="card-header" style="margin-bottom: 12px;">
+                <div>
+                  <h3 class="card-title">Asset Allocation</h3>
+                  <div class="card-subtitle">Real-time weight distribution</div>
+                </div>
+                <span class="status-pill status-completed" style="font-size: 0.65rem;">Auto-Bal</span>
+              </div>
+
+              <div class="allocation-bar-wrap">
+                <div class="allocation-bar">
+                  <div class="allocation-segment" id="alloc-bar-usdt" style="width: 52%; background: var(--neon-emerald);" title="USDT"></div>
+                  <div class="allocation-segment" id="alloc-bar-btc" style="width: 24%; background: var(--neon-amber);" title="BTC"></div>
+                  <div class="allocation-segment" id="alloc-bar-eth" style="width: 14%; background: var(--neon-purple);" title="ETH"></div>
+                  <div class="allocation-segment" id="alloc-bar-inr" style="width: 10%; background: var(--neon-cyan);" title="INR"></div>
+                </div>
+
+                <div class="allocation-legend-grid">
+                  <div class="allocation-legend-item">
+                    <span class="allocation-dot" style="background: var(--neon-emerald);"></span>
+                    <div>
+                      <span style="font-weight: 700; color: var(--text-primary);">USDT</span>
+                      <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 4px;" id="alloc-pct-usdt">52%</span>
+                    </div>
+                  </div>
+                  <div class="allocation-legend-item">
+                    <span class="allocation-dot" style="background: var(--neon-amber);"></span>
+                    <div>
+                      <span style="font-weight: 700; color: var(--text-primary);">BTC</span>
+                      <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 4px;" id="alloc-pct-btc">24%</span>
+                    </div>
+                  </div>
+                  <div class="allocation-legend-item">
+                    <span class="allocation-dot" style="background: var(--neon-purple);"></span>
+                    <div>
+                      <span style="font-weight: 700; color: var(--text-primary);">ETH</span>
+                      <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 4px;" id="alloc-pct-eth">14%</span>
+                    </div>
+                  </div>
+                  <div class="allocation-legend-item">
+                    <span class="allocation-dot" style="background: var(--neon-cyan);"></span>
+                    <div>
+                      <span style="font-weight: 700; color: var(--text-primary);">INR</span>
+                      <span style="color: var(--text-muted); font-size: 0.72rem; margin-left: 4px;" id="alloc-pct-inr">10%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/dashboard.js"></script>
+  <script>
+    function quickSendTo(recipient) {
+      VAYORA.playSound('click');
+      window.location.href = `/send.html?to=${encodeURIComponent(recipient)}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — VAYORA</title>
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/animations.css">
+  <style>
+    .auth-page-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      position: relative;
+      background-color: var(--bg-canvas);
+      background-image: url('/assets/vayora-login-bg.png');
+      background-size: cover;
+      background-position: center center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 480px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-xl);
+      padding: 40px 36px;
+      box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.7) inset;
+      backdrop-filter: blur(24px);
+      position: relative;
+      overflow: hidden;
+      animation: smoothEntrance 0.6s var(--ease-spring) both;
+      transition: transform 0.3s var(--ease-spring), box-shadow 0.3s var(--ease-smooth);
+    }
+    .auth-card:hover {
+      box-shadow: 0 24px 50px -10px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+    }
+    /* Animated Dynamic Gradient Accent Bar */
+    .auth-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3.5px;
+      background: linear-gradient(90deg, #2563eb, #059669, #0284c7, #7c3aed, #2563eb);
+      background-size: 300% 100%;
+      animation: borderShimmer 6s linear infinite;
+    }
+    /* Brand Logo Mark Dynamic Interactive Hover */
+    .brand-logo-mark {
+      transition: transform 0.35s var(--ease-bounce), box-shadow 0.3s ease;
+    }
+    .brand-logo-mark:hover {
+      transform: rotate(10deg) scale(1.08);
+      box-shadow: 0 0 18px rgba(5, 150, 105, 0.35);
+    }
+    /* Form Inputs Micro-Animation */
+    .form-control {
+      transition: all 0.22s var(--ease-spring);
+    }
+    .form-control:focus {
+      transform: translateY(-1px);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-subtle), 0 4px 12px rgba(37, 99, 235, 0.08);
+    }
+    .email-system-status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: var(--radius-pill);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.22s var(--ease-spring);
+    }
+    .email-system-status-chip:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-medium);
+      transform: translateY(-1.5px) scale(1.02);
+    }
+    .otp-digits-wrap {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .otp-digit-box {
+      width: 48px;
+      height: 56px;
+      background: var(--bg-surface);
+      border: 1.5px solid var(--border-medium);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 1.6rem;
+      font-weight: 800;
+      text-align: center;
+      transition: all 0.22s var(--ease-spring);
+      outline: none;
+    }
+    .otp-digit-box:focus {
+      transform: scale(1.08) translateY(-2px);
+      border-color: var(--neon-emerald);
+      box-shadow: 0 0 0 4px rgba(5, 150, 105, 0.15), 0 8px 16px -4px rgba(5, 150, 105, 0.2);
+    }
+    /* Animated Shield Badge for OTP Step */
+    .otp-shield-badge {
+      animation: floatSubtle 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="auth-page-wrap">
+    <div class="auth-card animate-entrance">
+      
+      <!-- Brand Header -->
+      <div style="text-align: center; margin-bottom: 22px;">
+        <a href="/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+          <div class="brand-logo-mark" style="width: 44px; height: 44px;">
+            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <span style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--text-primary); letter-spacing: 1px;">
+            VAYORA<span style="color: var(--neon-emerald);">.</span>
+          </span>
+        </a>
+        <h1 id="auth-heading" style="font-family: var(--font-display); font-size: 1.35rem; color: var(--text-primary); font-weight: 700;">Welcome Back</h1>
+        <p id="auth-subheading" style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Sign in to access your digital value platform</p>
+      </div>
+
+      <!-- Real Email Dispatch Status Chip -->
+      <div style="text-align: center;">
+        <div id="email-mode-indicator" class="email-system-status-chip" title="Click to inspect real/sandbox emails">
+          <span class="status-pulse-dot" style="width: 7px; height: 7px; background: var(--neon-emerald); border-radius: 50%; box-shadow: var(--glow-emerald);"></span>
+          <span id="email-mode-label">📧 Real Email Service Active</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: Standard Credentials Form -->
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label" for="login-email">Email Address</label>
+          <input type="email" id="login-email" class="form-control" placeholder="name@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Password</span>
+            <a href="/forgot-password.html" style="color: var(--neon-cyan); text-decoration: none; font-size: 0.75rem;">Forgot Password?</a>
+          </div>
+          <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+        </div>
+
+        <!-- 2FA Email Verification Option Checkbox -->
+        <div style="display: flex; align-items: center; gap: 8px; margin: 16px 0; font-size: 0.8rem; color: var(--text-secondary);">
+          <input type="checkbox" id="require-2fa-check" style="cursor: pointer; accent-color: var(--neon-emerald);">
+          <label for="require-2fa-check" style="cursor: pointer; user-select: none;">
+            Require <strong>Real Email OTP Code</strong> on sign in
+          </label>
+        </div>
+
+        <button type="submit" id="login-submit-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+          Sign In to VAYORA
+        </button>
+      </form>
+
+      <!-- STEP 2: 2-Step Real Email OTP Verification Card (Hidden initially) -->
+      <div id="otp-step-card" style="display: none;" class="animate-entrance">
+        <div style="text-align: center; margin-bottom: 18px;">
+          <div class="otp-shield-badge" style="width: 56px; height: 56px; border-radius: 50%; background: rgba(0, 245, 155, 0.1); border: 1.5px solid var(--neon-emerald); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; box-shadow: var(--glow-emerald);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--neon-emerald);">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h2 style="font-family: var(--font-display); font-size: 1.25rem; color: var(--text-primary); font-weight: 700;">Security Code Required</h2>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.5;">
+            We sent a 6-digit security code to your email:<br>
+            <strong id="otp-target-email" style="color: var(--neon-cyan); font-family: var(--font-mono); font-size: 0.9rem;"></strong>
+          </p>
+        </div>
+
+        <!-- 6-digit OTP Inputs -->
+        <div class="otp-digits-wrap">
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-1" data-idx="0" inputmode="numeric" autofocus>
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-2" data-idx="1" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-3" data-idx="2" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-4" data-idx="3" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-5" data-idx="4" inputmode="numeric">
+          <input type="text" maxlength="1" class="otp-digit-box animate-entrance stagger-6" data-idx="5" inputmode="numeric">
+        </div>
+
+        <!-- Hidden input for single string aggregation -->
+        <input type="hidden" id="login-otp-code">
+
+        <button type="button" id="verify-login-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+          Authorize & Sign In
+        </button>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; font-size: 0.8rem;">
+          <button type="button" id="back-to-login-btn" style="background: none; border: none; color: var(--text-muted); cursor: pointer;">
+            ← Change Email
+          </button>
+          <button type="button" id="resend-login-otp-btn" style="background: none; border: none; color: var(--neon-cyan); font-weight: 600; cursor: pointer;">
+            Resend Code
+          </button>
+        </div>
+      </div>
+
+      <!-- Bottom Switcher -->
+      <div style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-secondary);">
+        Don't have an account? 
+        <a href="/register.html" style="color: var(--neon-emerald); font-weight: 700; text-decoration: none;">Create Free Account</a>
+      </div>
+
+      <div style="text-align: center; margin-top: 14px;">
+        <a href="/" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">← Return to Landing Page</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Real Email / Sandbox Outbox Modal -->
+  <div id="email-outbox-modal" class="modal-backdrop">
+    <div class="modal-window" style="max-width: 600px;">
+      <div class="modal-header">
+        <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>📧 Dispatched Email Activity</span>
+          <span class="status-pill status-active" id="modal-email-mode-pill">LIVE SMTP</span>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('email-outbox-modal').classList.remove('open')">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 14px;">
+          Every real login OTP, verification code, and payment receipt is recorded here in real-time:
+        </p>
+
+        <div id="outbox-email-list" style="max-height: 360px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px;">
+          <div style="text-align: center; color: var(--text-muted); padding: 20px;">No emails dispatched yet in this session.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+</body>
+</html>
