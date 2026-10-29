@@ -12,7 +12,7 @@ from backend.services.presence_service import (
     register_ws, unregister_ws, get_online_count, get_online_users_list
 )
 
-from backend.config import get_cors_origins, BACKEND_URL, FRONTEND_URL
+from backend.config import get_cors_origins, get_cors_origin_regex, BACKEND_URL, FRONTEND_URL
 
 # Initialize database schema
 try:
@@ -32,14 +32,17 @@ app = FastAPI(
 )
 
 # Configure CORS dynamically using backend.config
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=get_cors_origins(),
-    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+_cors_kwargs = {
+    "allow_origins": get_cors_origins(),
+    "allow_credentials": True,
+    "allow_methods": ["*"],
+    "allow_headers": ["*"],
+}
+_origin_regex = get_cors_origin_regex()
+if _origin_regex:
+    _cors_kwargs["allow_origin_regex"] = _origin_regex
+
+app.add_middleware(CORSMiddleware, **_cors_kwargs)
 
 # Include API Routers
 app.include_router(auth.router)
@@ -112,4 +115,5 @@ if os.path.exists(frontend_dir):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.main:app", host="127.0.0.1", port=8000, reload=True)
+    port = int(os.getenv("PORT", "8000"))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=True)

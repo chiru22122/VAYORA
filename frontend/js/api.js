@@ -12,11 +12,17 @@ const VAYORA = (function() {
     if (window.__ENV__ && window.__ENV__.BACKEND_URL) {
       return window.__ENV__.BACKEND_URL.replace(/\/+$/, '');
     }
-    const stored = localStorage.getItem('VAYORA_BACKEND_URL');
+    const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('VAYORA_BACKEND_URL') : null;
     if (stored) return stored.replace(/\/+$/, '');
     // If served directly from the backend server (e.g. port 8000), use current origin
-    if (typeof window !== 'undefined' && window.location.port === '8000') {
-      return `${window.location.protocol}//${window.location.host}`;
+    if (typeof window !== 'undefined') {
+      if (window.location.port === '8000') {
+        return `${window.location.protocol}//${window.location.host}`;
+      }
+      // If deployed in production on Vercel
+      if (window.location.hostname.endsWith('.vercel.app')) {
+        return 'https://vayora-backend.onrender.com';
+      }
     }
     // Default backend server URL
     return 'http://127.0.0.1:8000';
