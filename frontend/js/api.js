@@ -24,16 +24,14 @@ const VAYORA = (function() {
     const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('VAYORA_BACKEND_URL') : null;
     if (stored) return stored.trim().replace(/\/+$/, '');
 
-    // 4. If served directly from the backend server (e.g. port 8000), use current origin
-    if (typeof window !== 'undefined') {
-      if (window.location.port === '8000') {
+    // 4. In unified Vercel deployment or backend server: use current window origin
+    if (typeof window !== 'undefined' && window.location && window.location.host) {
+      const isLocalDevPort = window.location.port === '3000' || window.location.port === '5500' || window.location.port === '5173';
+      if (!isLocalDevPort) {
         return `${window.location.protocol}//${window.location.host}`;
       }
-      // If deployed on Vercel without custom backend override, use Render service placeholder
-      if (window.location.hostname.endsWith('.vercel.app')) {
-        return 'https://vayora-backend.onrender.com';
-      }
     }
+
     // 5. Default local backend server URL
     return 'http://127.0.0.1:8000';
   }

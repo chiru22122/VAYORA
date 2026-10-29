@@ -17,11 +17,14 @@ window.__ENV__.APP_NAME = window.__ENV__.APP_NAME || "VAYORA - Your Digital Valu
   if (savedUrl) {
     window.__ENV__.BACKEND_URL = savedUrl;
   } else if (!window.__ENV__.BACKEND_URL) {
-    if (isVercel) {
-      // Default placeholder pointing to your Render web service.
-      // Update this value with your actual Render URL (e.g. from Render dashboard),
-      // or set it in the browser console via: localStorage.setItem('VAYORA_BACKEND_URL', 'https://your-service.onrender.com')
-      window.__ENV__.BACKEND_URL = "https://vayora-backend.onrender.com";
+    if (typeof window !== 'undefined') {
+      const isLocalDevPort = window.location.port === '3000' || window.location.port === '5500' || window.location.port === '5173';
+      if (isLocalDevPort) {
+        window.__ENV__.BACKEND_URL = "http://127.0.0.1:8000";
+      } else {
+        // Unified Vercel deployment: Frontend and FastAPI backend share the exact same origin
+        window.__ENV__.BACKEND_URL = `${window.location.protocol}//${window.location.host}`;
+      }
     } else {
       window.__ENV__.BACKEND_URL = "http://127.0.0.1:8000";
     }

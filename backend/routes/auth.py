@@ -1,3 +1,4 @@
+import os
 import datetime
 import uuid
 from typing import List, Dict, Any, Optional
@@ -46,6 +47,12 @@ def get_email_status():
 @router.get("/recent-emails")
 def get_dispatched_emails(limit: int = 15):
     """Returns recent dispatched emails for debugging/inspection in sandbox or demo mode."""
+    is_prod = os.getenv("ENVIRONMENT", "development").lower() == "production" or bool(os.getenv("VERCEL_ENV"))
+    if is_prod:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Recent emails inspection is disabled in production."
+        )
     return get_recent_emails(limit)
 
 @router.post("/register", response_model=TokenResponse)

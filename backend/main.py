@@ -114,6 +114,17 @@ def root_service_info():
         "health": "/api/health"
     }
 
+@app.get("/api", tags=["System"])
+def api_root_service_info():
+    """Service status and API documentation entry point for /api."""
+    return {
+        "system": "VAYORA Core Engine API",
+        "status": "online",
+        "version": "1.0.0",
+        "docs": "/api/docs",
+        "health": "/api/health"
+    }
+
 @app.get("/health", include_in_schema=False)
 def redirect_health():
     return RedirectResponse(url="/api/health")

@@ -56,15 +56,16 @@ if DATABASE_URL.startswith("sqlite"):
     engine_kwargs = {"connect_args": connect_args}
 else:
     # PostgreSQL engine with timeout, disabled prepared statements for pooler compatibility, and health pre-pinging
+    is_serverless = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
     engine_kwargs = {
         "connect_args": {
             "connect_timeout": 10,
             "prepare_threshold": None,
         },
         "pool_pre_ping": True,
-        "pool_size": 10,
-        "max_overflow": 20,
-        "pool_recycle": 1800,
+        "pool_size": 5 if is_serverless else 10,
+        "max_overflow": 5 if is_serverless else 20,
+        "pool_recycle": 300 if is_serverless else 1800,
     }
 
 engine = create_engine(DATABASE_URL, **engine_kwargs)

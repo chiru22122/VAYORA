@@ -59,6 +59,11 @@ def get_cors_origins():
             if cleaned:
                 origins.append(cleaned)
 
+    # Auto-allow Vercel system-injected deployment URL
+    vercel_url = os.getenv("VERCEL_URL")
+    if vercel_url:
+        origins.append(f"https://{vercel_url.strip().rstrip('/')}")
+
     # Filter empty and remove duplicates preserving order
     return list(dict.fromkeys([o for o in origins if o]))
 

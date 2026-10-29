@@ -34,20 +34,24 @@ def is_smtp_configured() -> bool:
     return bool(cfg["host"] and cfg["user"] and cfg["password"])
 
 def record_email_dispatch(to_email: str, subject: str, body_text: str, mode: str, status: str, otp_code: Optional[str] = None):
+    is_prod = os.getenv("ENVIRONMENT", "development").lower() == "production" or bool(os.getenv("VERCEL_ENV"))
+    # In production, never retain or expose cleartext OTP codes
+    stored_otp = "[REDACTED]" if (is_prod and otp_code) else otp_code
+
     clean_recipient = to_email.strip().lower()
     for entry in _recent_emails:
         if entry["recipient"] == clean_recipient and entry["subject"] == subject:
             entry["status"] = status
             entry["mode"] = mode
             if otp_code:
-                entry["otp_code"] = otp_code
+                entry["otp_code"] = stored_otp
             return
     entry = {
         "id": len(_recent_emails) + 1,
         "recipient": clean_recipient,
         "subject": subject,
         "summary": body_text[:160] + "..." if len(body_text) > 160 else body_text,
-        "otp_code": otp_code,
+        "otp_code": stored_otp,
         "mode": mode,
         "status": status,
         "timestamp": datetime.datetime.utcnow().isoformat()
@@ -108,25 +112,32 @@ def send_email_sync(
                 "message": f"Real email delivered to {clean_recipient}"
             }
         except Exception as e:
-            logger.error(f"[SMTP SEND ERROR] Failed sending to {clean_recipient}: {e}")
-            record_email_dispatch(clean_recipient, subject, text_content, "LIVE_SMTP_ERROR", f"Error: {str(e)[:100]}", otp_code)
-            # Fallback to sandbox recording so application never crashes
+            err_msg = str(e)
+            if "@" in err_msg:
+                err_msg = err_msg.split("@")[-1]
+            logger.error(f"[SMTP SEND ERROR] Failed sending to {clean_recipient}: {err_msg[:120]}")
+            record_email_dispatch(clean_recipient, subject, text_content, "LIVE_SMTP_ERROR", f"Delivery failed: {err_msg[:80]}", otp_code)
             return {
                 "success": False,
                 "mode": "SMTP_FAILED_FALLBACK",
                 "recipient": clean_recipient,
-                "error": str(e),
-                "message": f"SMTP delivery failed ({e}). Check your .env SMTP credentials."
+                "error": "Email delivery failed",
+                "message": "SMTP delivery failed. Please check SMTP configuration."
             }
     else:
         # Sandbox simulated mode
-        logger.info(f"[SANDBOX EMAIL LOG] To: {clean_recipient} | Subject: {subject} | OTP: {otp_code or 'N/A'}")
+        is_prod = os.getenv("ENVIRONMENT", "development").lower() == "production" or bool(os.getenv("VERCEL_ENV"))
+        logged_otp = "[REDACTED]" if is_prod else (otp_code or "N/A")
+        logger.info(f"[SANDBOX EMAIL LOG] To: {clean_recipient} | Subject: {subject} | OTP: {logged_otp}")
         record_email_dispatch(clean_recipient, subject, text_content, "SANDBOX_SIMULATION", "RECORDED", otp_code)
+        display_msg = "Email recorded in Sandbox mode (SMTP not configured)."
+        if not is_prod and otp_code:
+            display_msg += f" OTP: {otp_code}"
         return {
             "success": True,
             "mode": "SANDBOX_SIMULATION",
             "recipient": clean_recipient,
-            "message": f"Email recorded in Sandbox mode (SMTP not yet configured in .env). OTP: {otp_code or 'N/A'}"
+            "message": display_msg
         }
 
 def send_email_async(
@@ -136,12 +147,21 @@ def send_email_async(
     text_content: Optional[str] = None,
     otp_code: Optional[str] = None
 ):
-    """Dispatches email sending in a background thread."""
+    """
+    Dispatches email sending. In persistent servers, runs in background thread.
+    In serverless environments (e.g. Vercel Functions), executes synchronously
+    to prevent container freeze from interrupting SMTP network transmission.
+    """
     clean_recipient = to_email.strip().lower()
     summary = text_content or html_content.replace("<br>", "\n").replace("</p>", "\n")
     mode = "LIVE_SMTP" if is_smtp_configured() else "SANDBOX_SIMULATION"
     record_email_dispatch(clean_recipient, subject, summary, mode, "DISPATCHING", otp_code)
-    _email_executor.submit(send_email_sync, to_email, subject, html_content, text_content, otp_code)
+    
+    is_serverless = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
+    if is_serverless:
+        send_email_sync(to_email, subject, html_content, text_content, otp_code)
+    else:
+        _email_executor.submit(send_email_sync, to_email, subject, html_content, text_content, otp_code)
 
 
 # --- HTML EMAIL TEMPLATES WITH VAYORA FINTECH BRANDING ---
