@@ -103,6 +103,25 @@ def get_public_config():
 
 from fastapi.responses import RedirectResponse
 
+@app.get("/", tags=["System"])
+def root_service_info():
+    """Service status and API documentation entry point."""
+    return {
+        "system": "VAYORA Core Engine API",
+        "status": "online",
+        "version": "1.0.0",
+        "docs": "/api/docs",
+        "health": "/api/health"
+    }
+
+@app.get("/health", include_in_schema=False)
+def redirect_health():
+    return RedirectResponse(url="/api/health")
+
+@app.get("/docs", include_in_schema=False)
+def redirect_docs():
+    return RedirectResponse(url="/api/docs")
+
 @app.get("/app")
 async def redirect_app_root():
     return RedirectResponse(url="/dashboard.html")

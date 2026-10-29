@@ -9,22 +9,32 @@ const VAYORA = (function() {
   window.__ENV__ = window.__ENV__ || {};
 
   function getBackendUrl() {
+    // 1. Explicit runtime environment bridge (window.__ENV__)
     if (window.__ENV__ && window.__ENV__.BACKEND_URL) {
       return window.__ENV__.BACKEND_URL.replace(/\/+$/, '');
     }
+    // 2. Safe HTML meta tag configuration: <meta name="backend-url" content="...">
+    if (typeof document !== 'undefined') {
+      const meta = document.querySelector('meta[name="backend-url"]');
+      if (meta && meta.content) {
+        return meta.content.trim().replace(/\/+$/, '');
+      }
+    }
+    // 3. Browser localStorage override (allows runtime configuration in browser console)
     const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('VAYORA_BACKEND_URL') : null;
-    if (stored) return stored.replace(/\/+$/, '');
-    // If served directly from the backend server (e.g. port 8000), use current origin
+    if (stored) return stored.trim().replace(/\/+$/, '');
+
+    // 4. If served directly from the backend server (e.g. port 8000), use current origin
     if (typeof window !== 'undefined') {
       if (window.location.port === '8000') {
         return `${window.location.protocol}//${window.location.host}`;
       }
-      // If deployed in production on Vercel
+      // If deployed on Vercel without custom backend override, use Render service placeholder
       if (window.location.hostname.endsWith('.vercel.app')) {
         return 'https://vayora-backend.onrender.com';
       }
     }
-    // Default backend server URL
+    // 5. Default local backend server URL
     return 'http://127.0.0.1:8000';
   }
 
@@ -144,9 +154,11 @@ const VAYORA = (function() {
         throw new Error(errorMsg);
       }
 
-      return data;
     } catch (error) {
       console.error(`[VAYORA API Error] ${endpoint}:`, error);
+      if (typeof window !== 'undefined' && error instanceof TypeError && error.message.toLowerCase().includes('fetch')) {
+        console.warn(`[VAYORA Backend Notice] Could not connect to backend at: ${getBackendUrl()}. If your Render backend service is running at a different URL, set it in the browser console via: VAYORA.setBackendUrl("https://<your-service>.onrender.com") or set <meta name="backend-url" content="..."> in index.html`);
+      }
       throw error;
     }
   }

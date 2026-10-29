@@ -1,0 +1,18 @@
+# ==============================================================================
+# Vercel Deployment Ignore Configuration
+# ==============================================================================
+# Tells Vercel to completely ignore Python backend files, dependencies, and
+# database scripts so that Vercel exclusively deploys the static frontend.
+
+backend/
+database/
+requirements.txt
+.python-version
+render.yaml
+Procfile
+run.py
+start.bat
+test_*.py
+.env
+.env.*
+*.py
