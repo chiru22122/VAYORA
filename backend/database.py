@@ -46,31 +46,46 @@ RAW_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./database/vayora.db")
 DATABASE_URL = normalize_database_url(RAW_DATABASE_URL)
 
 connect_args = {}
-# For SQLite, ensure directory exists
+# For SQLite, ensure directory exists (use writable /tmp in serverless/Vercel)
 if DATABASE_URL.startswith("sqlite"):
+    if os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME"):
+        DATABASE_URL = "sqlite:////tmp/vayora.db"
     db_path = DATABASE_URL.replace("sqlite:///", "")
     db_dir = os.path.dirname(db_path)
     if db_dir and not os.path.exists(db_dir):
-        os.makedirs(db_dir, exist_ok=True)
+        try:
+            os.makedirs(db_dir, exist_ok=True)
+        except OSError:
+            pass
     connect_args = {"check_same_thread": False}
     engine_kwargs = {"connect_args": connect_args}
 else:
-    # PostgreSQL engine with keepalives, disabled prepared statements for pooler compatibility, and high-performance pooling
+    # PostgreSQL engine: use NullPool on serverless (Vercel) to avoid connection leaks/timeouts
     is_serverless = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
-    engine_kwargs = {
-        "connect_args": {
-            "connect_timeout": 10,
-            "prepare_threshold": None,
-            "keepalives": 1,
-            "keepalives_idle": 30,
-            "keepalives_interval": 10,
-            "keepalives_count": 5,
-        },
-        "pool_pre_ping": True if is_serverless else False,
-        "pool_size": 5 if is_serverless else 15,
-        "max_overflow": 5 if is_serverless else 20,
-        "pool_recycle": 300 if is_serverless else 1800,
-    }
+    if is_serverless:
+        from sqlalchemy.pool import NullPool
+        engine_kwargs = {
+            "connect_args": {
+                "connect_timeout": 8,
+                "prepare_threshold": None,
+            },
+            "poolclass": NullPool,
+        }
+    else:
+        engine_kwargs = {
+            "connect_args": {
+                "connect_timeout": 10,
+                "prepare_threshold": None,
+                "keepalives": 1,
+                "keepalives_idle": 30,
+                "keepalives_interval": 10,
+                "keepalives_count": 5,
+            },
+            "pool_pre_ping": False,
+            "pool_size": 15,
+            "max_overflow": 20,
+            "pool_recycle": 1800,
+        }
 
 engine = create_engine(DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

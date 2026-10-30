@@ -27,14 +27,15 @@ from backend.services.presence_service import (
 
 from backend.config import get_cors_origins, get_cors_origin_regex, BACKEND_URL, FRONTEND_URL
 
-# Initialize database schema
-try:
-    Base.metadata.create_all(bind=engine)
-except Exception as _db_init_err:
-    _err_str = str(_db_init_err)
-    if "@" in _err_str:
-        _err_str = _err_str.split("@")[-1]
-    print(f"[Database Notice] Database connection info: {_err_str}")
+# Initialize database schema (skip on Vercel/serverless to guarantee instant cold starts)
+if not (os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME")):
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as _db_init_err:
+        _err_str = str(_db_init_err)
+        if "@" in _err_str:
+            _err_str = _err_str.split("@")[-1]
+        print(f"[Database Notice] Database connection info: {_err_str}")
 
 app = FastAPI(
     title="VAYORA - Your Digital Value, One Journey",
