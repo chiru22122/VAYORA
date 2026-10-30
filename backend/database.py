@@ -55,15 +55,19 @@ if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
     engine_kwargs = {"connect_args": connect_args}
 else:
-    # PostgreSQL engine with timeout, disabled prepared statements for pooler compatibility, and health pre-pinging
+    # PostgreSQL engine with keepalives, disabled prepared statements for pooler compatibility, and high-performance pooling
     is_serverless = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
     engine_kwargs = {
         "connect_args": {
             "connect_timeout": 10,
             "prepare_threshold": None,
+            "keepalives": 1,
+            "keepalives_idle": 30,
+            "keepalives_interval": 10,
+            "keepalives_count": 5,
         },
-        "pool_pre_ping": True,
-        "pool_size": 5 if is_serverless else 10,
+        "pool_pre_ping": True if is_serverless else False,
+        "pool_size": 5 if is_serverless else 15,
         "max_overflow": 5 if is_serverless else 20,
         "pool_recycle": 300 if is_serverless else 1800,
     }

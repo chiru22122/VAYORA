@@ -2,9 +2,15 @@ import sys
 import os
 
 # Ensure repository root is on sys.path if this module is loaded directly
-_ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if _ROOT_DIR not in sys.path:
-    sys.path.insert(0, _ROOT_DIR)
+_CANDIDATE_ROOTS = [
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    os.getcwd(),
+]
+for _c in _CANDIDATE_ROOTS:
+    if _c and os.path.isdir(os.path.join(_c, "backend")):
+        if _c not in sys.path:
+            sys.path.insert(0, _c)
+        break
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
@@ -88,7 +94,8 @@ async def websocket_presence(websocket: WebSocket):
     except Exception:
         unregister_ws(websocket)
 
-@app.get("/api/health")
+@app.get("/api/health", tags=["System"])
+@app.get("/health", tags=["System"], include_in_schema=False)
 def health_check():
     return {
         "status": "healthy",
@@ -100,7 +107,7 @@ def health_check():
         "environment": os.getenv("ENVIRONMENT", "development")
     }
 
-@app.get("/api/config")
+@app.get("/api/config", tags=["System"])
 def get_public_config():
     return {
         "backend_url": BACKEND_URL,
@@ -108,18 +115,7 @@ def get_public_config():
         "environment": os.getenv("ENVIRONMENT", "development")
     }
 
-from fastapi.responses import RedirectResponse
-
-@app.get("/", tags=["System"])
-def root_service_info():
-    """Service status and API documentation entry point."""
-    return {
-        "system": "VAYORA Core Engine API",
-        "status": "online",
-        "version": "1.0.0",
-        "docs": "/api/docs",
-        "health": "/api/health"
-    }
+from fastapi.responses import FileResponse, RedirectResponse
 
 @app.get("/api", tags=["System"])
 def api_root_service_info():
@@ -132,10 +128,6 @@ def api_root_service_info():
         "health": "/api/health"
     }
 
-@app.get("/health", include_in_schema=False)
-def redirect_health():
-    return RedirectResponse(url="/api/health")
-
 @app.get("/docs", include_in_schema=False)
 def redirect_docs():
     return RedirectResponse(url="/api/docs")
@@ -144,9 +136,22 @@ def redirect_docs():
 async def redirect_app_root():
     return RedirectResponse(url="/dashboard.html")
 
-
-# Mount classic static frontend
 frontend_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend")
+
+@app.get("/", include_in_schema=False)
+def serve_root():
+    index_file = os.path.join(frontend_dir, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {
+        "system": "VAYORA Core Engine API",
+        "status": "online",
+        "version": "1.0.0",
+        "docs": "/api/docs",
+        "health": "/api/health"
+    }
+
+# Mount classic static frontend for assets and HTML pages
 if os.path.exists(frontend_dir):
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
 

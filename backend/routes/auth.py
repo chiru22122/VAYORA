@@ -76,13 +76,12 @@ def register(req: UserRegisterRequest, request: Request, db: Session = Depends(g
         created_at=datetime.datetime.utcnow()
     )
     db.add(user)
-    db.commit()
-    db.refresh(user)
+    db.flush()
     
-    # Initialize wallet, token addresses & authoritative double-entry accounts
-    get_or_create_wallet(db, user)
+    # Initialize wallet, token addresses & authoritative double-entry accounts (single transaction)
+    get_or_create_wallet(db, user, auto_commit=False)
     ensure_user_accounts(db, user)
-    ensure_user_token_addresses(db, user)
+    ensure_user_token_addresses(db, user, auto_commit=False)
     
     # Create Default Virtual Card
     card_num = generate_virtual_card_number()

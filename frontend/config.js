@@ -7,26 +7,41 @@ window.__ENV__ = window.__ENV__ || {};
 window.__ENV__.APP_NAME = window.__ENV__.APP_NAME || "VAYORA - Your Digital Value, One Journey";
 
 (function() {
-  const isVercel = typeof window !== 'undefined' && (
-    window.location.hostname.endsWith('.vercel.app') ||
-    (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.port !== '8000')
-  );
-  
+  const isBrowser = typeof window !== 'undefined' && window.location;
+  if (!isBrowser) {
+    window.__ENV__.BACKEND_URL = "http://127.0.0.1:8000";
+    return;
+  }
+
+  const hostname = window.location.hostname;
+  const isFile = window.location.protocol === 'file:';
+  const isLocal = isFile || hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '0.0.0.0' || hostname.startsWith('192.168.') || hostname.startsWith('10.') || hostname === '';
+
+  if (isLocal) {
+    // In local development, clean any stale cloud URLs
+    if (typeof localStorage !== 'undefined') {
+      const stored = localStorage.getItem('VAYORA_BACKEND_URL');
+      if (stored && (stored.includes('vercel.app') || stored.includes('onrender.com'))) {
+        localStorage.removeItem('VAYORA_BACKEND_URL');
+      }
+    }
+    const localHost = (hostname && hostname !== '') ? hostname : '127.0.0.1';
+    window.__ENV__.BACKEND_URL = `http://${localHost}:8000`;
+    return;
+  }
+
+  // In production (Vercel / Cloud)
+  if (typeof localStorage !== 'undefined') {
+    const stored = localStorage.getItem('VAYORA_BACKEND_URL');
+    if (stored && (stored.includes('127.0.0.1') || stored.includes('localhost') || stored.includes('onrender.com'))) {
+      localStorage.removeItem('VAYORA_BACKEND_URL');
+    }
+  }
+
   const savedUrl = typeof localStorage !== 'undefined' ? localStorage.getItem('VAYORA_BACKEND_URL') : null;
-  
   if (savedUrl) {
     window.__ENV__.BACKEND_URL = savedUrl;
-  } else if (!window.__ENV__.BACKEND_URL) {
-    if (typeof window !== 'undefined') {
-      const isLocalDevPort = window.location.port === '3000' || window.location.port === '5500' || window.location.port === '5173';
-      if (isLocalDevPort) {
-        window.__ENV__.BACKEND_URL = "http://127.0.0.1:8000";
-      } else {
-        // Unified Vercel deployment: Frontend and FastAPI backend share the exact same origin
-        window.__ENV__.BACKEND_URL = `${window.location.protocol}//${window.location.host}`;
-      }
-    } else {
-      window.__ENV__.BACKEND_URL = "http://127.0.0.1:8000";
-    }
+  } else {
+    window.__ENV__.BACKEND_URL = "https://vayora-backend-r8gu.vercel.app";
   }
 })();

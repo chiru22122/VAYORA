@@ -6,10 +6,25 @@ Loads and exposes the FastAPI 'app' instance for Vercel Serverless Functions.
 import sys
 import os
 
-# Add project root directory to sys.path so 'backend' package and modules resolve cleanly
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.insert(0, ROOT_DIR)
+# Ensure the directory containing the 'backend' package is in sys.path.
+# In Vercel serverless environments (/var/task), the handler may execute as
+# /var/task/api/index.py or /var/task/index.py. Checking cwd and candidate paths
+# guarantees 'backend' is discoverable in all serverless packaging layouts.
+_candidates = [
+    os.getcwd(),
+    os.path.dirname(os.path.abspath(__file__)),
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+]
+
+for _dir in _candidates:
+    if _dir and os.path.isdir(os.path.join(_dir, "backend")):
+        if _dir not in sys.path:
+            sys.path.insert(0, _dir)
+        break
+else:
+    _root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if _root not in sys.path:
+        sys.path.insert(0, _root)
 
 from backend.main import app
 

@@ -21,7 +21,8 @@ if os.path.exists(ROOT_ENV):
     load_dotenv(ROOT_ENV, override=False)
 
 # Service URLs
-BACKEND_URL = os.getenv("BACKEND_URL", "http://127.0.0.1:8000").rstrip("/")
+_DEFAULT_BACKEND = "https://vayora-backend-r8gu.vercel.app" if os.getenv("VERCEL") else "http://127.0.0.1:8000"
+BACKEND_URL = os.getenv("BACKEND_URL", _DEFAULT_BACKEND).rstrip("/")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:3000").rstrip("/")
 
 # Environment mode
@@ -47,10 +48,12 @@ def get_cors_origins():
             "http://127.0.0.1:8000",
             "http://localhost:5173",
             "http://127.0.0.1:5173",
+            "null",
         ])
 
     if BACKEND_URL:
         origins.append(BACKEND_URL)
+    origins.append("https://vayora-backend-r8gu.vercel.app")
 
     # Support explicit production frontend origins (supports multiple comma-separated URLs)
     if FRONTEND_URL:
@@ -69,23 +72,17 @@ def get_cors_origins():
 
 def get_cors_origin_regex():
     """
-    Returns an allowed CORS origin regex based on environment and intentional preview policy:
+    Returns an allowed CORS origin regex based on environment and Vercel hosting:
     - Custom regex: If ALLOWED_ORIGIN_REGEX is explicitly set in env, use that.
-    - Development: Matches any localhost or 127.0.0.1 port.
-    - Production with previews: If ALLOW_VERCEL_PREVIEWS is explicitly true,
-      permits only scoped VAYORA preview domains: ^https://vayora(-[a-z0-9-]+)?\\.vercel\\.app$
-    - Production default: Returns None (strictly trusts only explicit FRONTEND_URL domains).
+    - Development (non-Vercel): Matches any localhost or 127.0.0.1 port.
+    - Production / Vercel: Scopes to all VAYORA Vercel frontend deployments and previews.
     """
     custom_regex = os.getenv("ALLOWED_ORIGIN_REGEX")
     if custom_regex:
         return custom_regex
 
-    if ENVIRONMENT != "production":
+    if ENVIRONMENT != "production" and not os.getenv("VERCEL"):
         return r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$"
 
-    allow_previews = os.getenv("ALLOW_VERCEL_PREVIEWS", "false").lower() in ("true", "1", "yes")
-    if allow_previews:
-        # Strict scope to VAYORA preview URLs, never arbitrary *.vercel.app or *.onrender.com
-        return r"^https://vayora(-[a-z0-9\-]+)?\.vercel\.app$"
-
-    return None
+    # Allow all VAYORA Vercel frontend deployments, production and preview URLs
+    return r"^https://vayora[a-z0-9\-]*\.vercel\.app$"

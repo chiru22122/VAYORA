@@ -8,7 +8,7 @@ from backend.services.address_service import ensure_user_token_addresses, NETWOR
 
 DEMO_EXCHANGE_RATE_USDT_INR = float(os.getenv("DEMO_EXCHANGE_RATE_USDT_INR", "86.50"))
 
-def get_or_create_wallet(db: Session, user: User) -> Wallet:
+def get_or_create_wallet(db: Session, user: User, auto_commit: bool = True) -> Wallet:
     wallet = db.query(Wallet).filter(Wallet.user_id == user.user_id).first()
     if not wallet:
         wallet = Wallet(
@@ -18,8 +18,7 @@ def get_or_create_wallet(db: Session, user: User) -> Wallet:
             inr_balance=0.0
         )
         db.add(wallet)
-        db.commit()
-        db.refresh(wallet)
+        db.flush()
         
         # Ensure all existing assets have balance records
         assets = db.query(Asset).filter(Asset.status == "ACTIVE").all()
@@ -31,8 +30,11 @@ def get_or_create_wallet(db: Session, user: User) -> Wallet:
                 available_amount=0.0
             )
             db.add(wb)
-        db.commit()
-        db.refresh(wallet)
+        if auto_commit:
+            db.commit()
+            db.refresh(wallet)
+        else:
+            db.flush()
         
     return wallet
 
@@ -45,8 +47,14 @@ def get_wallet_details(db: Session, user: User) -> Dict[str, Any]:
     from backend.models import Account
     ensure_user_accounts(db, user)
 
+    # Batch-fetch all user currency accounts in ONE single query
+    user_accounts = {
+        acct.currency: acct
+        for acct in db.query(Account).filter(Account.user_id == user.user_id).all()
+    }
+
     # Sync INR balance from Account
-    inr_acct = db.query(Account).filter(Account.user_id == user.user_id, Account.currency == "INR").first()
+    inr_acct = user_accounts.get("INR")
     if inr_acct and inr_acct.balance is not None:
         wallet.inr_balance_paise = inr_acct.balance_paise
         wallet.inr_balance = float(inr_acct.balance)
@@ -54,14 +62,18 @@ def get_wallet_details(db: Session, user: User) -> Dict[str, Any]:
 
     assets = db.query(Asset).filter(Asset.status == "ACTIVE").all()
 
+    # Batch-fetch all balances for this wallet in ONE single query
+    existing_wb_list = db.query(WalletBalance).filter(WalletBalance.wallet_id == wallet.wallet_id).all()
+    wb_map = {wb.asset_id: wb for wb in existing_wb_list}
+
+    # Fetch exchange rate ONCE for all assets
+    live_usdt_inr_rate = get_current_usdt_inr_rate_value()
+
     balances_list = []
     total_usd = 0.0
 
     for asset in assets:
-        wb = db.query(WalletBalance).filter(
-            WalletBalance.wallet_id == wallet.wallet_id,
-            WalletBalance.asset_id == asset.asset_id
-        ).first()
+        wb = wb_map.get(asset.asset_id)
 
         if not wb:
             wb = WalletBalance(
@@ -73,9 +85,10 @@ def get_wallet_details(db: Session, user: User) -> Dict[str, Any]:
             db.add(wb)
             db.commit()
             db.refresh(wb)
+            wb_map[asset.asset_id] = wb
 
         # Sync crypto balance with Account if present
-        acct = db.query(Account).filter(Account.user_id == user.user_id, Account.currency == asset.symbol).first()
+        acct = user_accounts.get(asset.symbol)
         if acct and acct.balance is not None and wb.amount != acct.balance:
             wb.amount = acct.balance
             wb.available_amount = acct.available_balance
@@ -84,7 +97,6 @@ def get_wallet_details(db: Session, user: User) -> Dict[str, Any]:
         amt_float = float(wb.amount or 0.0)
         avail_float = float(wb.available_amount or 0.0)
         usd_val = round(amt_float * float(asset.price), 2)
-        live_usdt_inr_rate = get_current_usdt_inr_rate_value()
         inr_val = round(usd_val * live_usdt_inr_rate, 2)
         total_usd += usd_val
         
@@ -119,7 +131,6 @@ def get_wallet_details(db: Session, user: User) -> Dict[str, Any]:
             "updated_at": wb.updated_at
         })
         
-    live_usdt_inr_rate = get_current_usdt_inr_rate_value()
     # Also add the INR balance to total INR valuation
     total_inr = round(total_usd * live_usdt_inr_rate + wallet.inr_balance, 2)
     

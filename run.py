@@ -15,6 +15,6 @@ if __name__ == "__main__":
     print(f"  Backend API:       {BACKEND_URL}")
     print(f"  Frontend Origin:   {FRONTEND_URL}")
     print(f"  API Documentation: {BACKEND_URL}/api/docs")
-    host = os.getenv("HOST", "127.0.0.1")
+    host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", "8000"))
     uvicorn.run("backend.main:app", host=host, port=port, reload=True)

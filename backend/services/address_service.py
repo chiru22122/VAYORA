@@ -172,7 +172,7 @@ def generate_deterministic_token_address(user_id: int, email: str, symbol: str) 
         hex_str = seed_bytes.hex()[:40]
         return f"0x{hex_str}", "VAYORA Network"
 
-def ensure_user_token_addresses(db: Session, user: User) -> Dict[str, str]:
+def ensure_user_token_addresses(db: Session, user: User, auto_commit: bool = True) -> Dict[str, str]:
     """
     Ensures that distinct receiving addresses exist for all supported assets.
     Returns a dictionary of symbol -> address string.
@@ -204,7 +204,10 @@ def ensure_user_token_addresses(db: Session, user: User) -> Dict[str, str]:
             needed_commit = True
 
     if needed_commit:
-        db.commit()
+        if auto_commit:
+            db.commit()
+        else:
+            db.flush()
 
     return existing_map
 

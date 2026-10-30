@@ -8,7 +8,42 @@ const VAYORA = (function() {
   // Read runtime environment configuration (supports frontend/.env and window.__ENV__)
   window.__ENV__ = window.__ENV__ || {};
 
+  const DEFAULT_PROD_BACKEND = "https://vayora-backend-r8gu.vercel.app";
+
+  function isLocalOrigin() {
+    if (typeof window === 'undefined' || !window.location) return true;
+    const h = window.location.hostname;
+    const p = window.location.protocol;
+    return (
+      p === 'file:' ||
+      h === 'localhost' ||
+      h === '127.0.0.1' ||
+      h === '0.0.0.0' ||
+      h.startsWith('192.168.') ||
+      h.startsWith('10.') ||
+      h.endsWith('.local') ||
+      h === ''
+    );
+  }
+
   function getBackendUrl() {
+    const isBrowser = typeof window !== 'undefined' && window.location;
+    if (!isBrowser) return 'http://127.0.0.1:8000';
+
+    if (isLocalOrigin()) {
+      if (typeof localStorage !== 'undefined') {
+        const stored = localStorage.getItem('VAYORA_BACKEND_URL');
+        if (stored && (stored.includes('vercel.app') || stored.includes('onrender.com'))) {
+          localStorage.removeItem('VAYORA_BACKEND_URL');
+        }
+      }
+      if (window.location.port === '8000') {
+        return `${window.location.protocol}//${window.location.host}`;
+      }
+      const localHost = (window.location.hostname && window.location.hostname !== '') ? window.location.hostname : '127.0.0.1';
+      return `http://${localHost}:8000`;
+    }
+
     // 1. Explicit runtime environment bridge (window.__ENV__)
     if (window.__ENV__ && window.__ENV__.BACKEND_URL) {
       return window.__ENV__.BACKEND_URL.replace(/\/+$/, '');
@@ -22,18 +57,12 @@ const VAYORA = (function() {
     }
     // 3. Browser localStorage override (allows runtime configuration in browser console)
     const stored = typeof localStorage !== 'undefined' ? localStorage.getItem('VAYORA_BACKEND_URL') : null;
-    if (stored) return stored.trim().replace(/\/+$/, '');
-
-    // 4. In unified Vercel deployment or backend server: use current window origin
-    if (typeof window !== 'undefined' && window.location && window.location.host) {
-      const isLocalDevPort = window.location.port === '3000' || window.location.port === '5500' || window.location.port === '5173';
-      if (!isLocalDevPort) {
-        return `${window.location.protocol}//${window.location.host}`;
-      }
+    if (stored) {
+      return stored.trim().replace(/\/+$/, '');
     }
 
-    // 5. Default local backend server URL
-    return 'http://127.0.0.1:8000';
+    // 4. Default production backend URL
+    return DEFAULT_PROD_BACKEND;
   }
 
   function getAppName() {
@@ -43,8 +72,18 @@ const VAYORA = (function() {
   }
 
   function getApiBase() {
+    const isBrowser = typeof window !== 'undefined' && window.location;
+    if (!isBrowser) return 'http://127.0.0.1:8000/api';
+
+    // When directly served on port 8000, relative /api connects directly to the FastAPI server
+    if (window.location.port === '8000') {
+      return '/api';
+    }
+
+    // When opened from other ports (e.g. 5500 Live Server, 3000, 5173) or file://,
+    // explicitly connect to backend URL on port 8000
     const backend = getBackendUrl();
-    return backend ? `${backend}/api` : '/api';
+    return backend ? `${backend}/api` : 'http://127.0.0.1:8000/api';
   }
 
   function setBackendUrl(url) {
@@ -152,10 +191,12 @@ const VAYORA = (function() {
         throw new Error(errorMsg);
       }
 
+      return data;
     } catch (error) {
       console.error(`[VAYORA API Error] ${endpoint}:`, error);
       if (typeof window !== 'undefined' && error instanceof TypeError && error.message.toLowerCase().includes('fetch')) {
-        console.warn(`[VAYORA Backend Notice] Could not connect to backend at: ${getBackendUrl()}. If your Render backend service is running at a different URL, set it in the browser console via: VAYORA.setBackendUrl("https://<your-service>.onrender.com") or set <meta name="backend-url" content="..."> in index.html`);
+        console.warn(`[VAYORA Backend Notice] Could not connect to API at: ${url}. Verify backend status at /api/health`);
+        throw new Error(`Could not connect to API at ${url}. Make sure local server is running on port 8000.`);
       }
       throw error;
     }

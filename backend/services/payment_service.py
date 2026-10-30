@@ -15,11 +15,20 @@ from backend.services.address_service import find_user_by_any_identifier, get_us
 def ensure_user_accounts(db: Session, user: User):
     """Ensures authoritative double-entry currency accounts exist for the user, fully synced with wallets."""
     standard_currencies = ["USDT", "INR", "USDC", "BTC", "ETH", "SOL"]
+
+    # Fast check: If user already has all standard accounts, return immediately without extra queries
+    existing_accts = db.query(Account).filter(Account.user_id == user.user_id).all()
+    existing_currencies = {a.currency for a in existing_accts}
+    if set(standard_currencies).issubset(existing_currencies):
+        return
+
     now = datetime.datetime.utcnow()
     wallet = db.query(Wallet).filter(Wallet.user_id == user.user_id).first()
 
     for curr in standard_currencies:
-        acct = db.query(Account).filter(Account.user_id == user.user_id, Account.currency == curr).first()
+        if curr in existing_currencies:
+            continue
+        acct = next((a for a in existing_accts if a.currency == curr), None)
 
         # Calculate initial balance from wallet / wallet_balances if present
         init_balance = Decimal("0.0")

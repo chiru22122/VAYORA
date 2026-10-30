@@ -21,14 +21,14 @@ _rate_cache: Dict[str, Any] = {
     "last_updated_iso": datetime.datetime.utcnow().isoformat()
 }
 
-CACHE_TTL_SECONDS = 10  # Freshness window for real-time polling
+CACHE_TTL_SECONDS = 60  # Freshness window for real-time polling (1 minute high-speed cache)
 
 def _fetch_from_coingecko() -> Optional[Dict[str, Any]]:
     """Fetches live USDT/INR rate from CoinGecko API."""
     try:
         url = "https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=inr&include_24hr_change=true&include_last_updated_at=true"
         headers = {"User-Agent": "VayoraFintech/1.0 (Windows NT 10.0; Win64; x64)"}
-        resp = requests.get(url, headers=headers, timeout=3.5)
+        resp = requests.get(url, headers=headers, timeout=1.5)
         if resp.status_code == 200:
             data = resp.json().get("tether", {})
             rate = float(data.get("inr", 0))
@@ -49,7 +49,7 @@ def _fetch_from_coinbase() -> Optional[Dict[str, Any]]:
     """Fallback: Fetches live USDT/INR rate from Coinbase Public API."""
     try:
         url = "https://api.coinbase.com/v2/exchange-rates?currency=USDT"
-        resp = requests.get(url, timeout=3.5)
+        resp = requests.get(url, timeout=1.5)
         if resp.status_code == 200:
             data = resp.json().get("data", {})
             rates = data.get("rates", {})
@@ -70,7 +70,7 @@ def _fetch_from_open_er() -> Optional[Dict[str, Any]]:
     """Fallback: Fetches live USD/INR benchmark from Open Exchange Rates."""
     try:
         url = "https://open.er-api.com/v6/latest/USD"
-        resp = requests.get(url, timeout=3.5)
+        resp = requests.get(url, timeout=1.5)
         if resp.status_code == 200:
             rates = resp.json().get("rates", {})
             inr = float(rates.get("INR", 0))

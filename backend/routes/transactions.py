@@ -1,6 +1,6 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from backend.database import get_db
 from backend.models import User, Transaction, Asset
 from backend.schemas import TransactionResponse
@@ -18,7 +18,7 @@ def get_transactions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    query = db.query(Transaction).filter(Transaction.user_id == current_user.user_id)
+    query = db.query(Transaction).options(joinedload(Transaction.asset)).filter(Transaction.user_id == current_user.user_id)
     
     if type and type != "ALL":
         query = query.filter(Transaction.type == type.upper())
