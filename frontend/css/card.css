@@ -3,12 +3,13 @@
    Simple Light / Dark Theme
    ========================================================================== */
 
-/* 3D Card Stage */
+/* 3D Card Stage with ISO/IEC 7810 ID-1 Physical Card Aspect Ratio (1.586 : 1) */
 .card-scene {
   perspective: 1000px;
   width: 100%;
   max-width: 420px;
-  height: 260px;
+  aspect-ratio: 1.586 / 1;
+  height: auto;
   margin: 0 auto 28px auto;
 }
 
@@ -256,4 +257,38 @@
 
 .nfc-pad-target:hover .nfc-icon-center {
   transform: scale(1.08);
+}
+
+/* Mobile Responsive Card Ratio & Proportions */
+@media (max-width: 480px) {
+  .card-scene {
+    max-width: 100%;
+    margin-bottom: 20px;
+  }
+  .card-face {
+    padding: 16px 14px;
+    border-radius: var(--radius-md);
+  }
+  .card-brand-name {
+    font-size: 1.05rem;
+    letter-spacing: 1px;
+  }
+  .emv-chip {
+    width: 32px;
+    height: 24px;
+  }
+  .card-number-display {
+    font-size: clamp(0.92rem, 4.2vw, 1.15rem);
+    letter-spacing: clamp(1px, 0.5vw, 2px);
+    margin: 6px 0;
+  }
+  .card-holder-name {
+    font-size: 0.78rem;
+  }
+  .card-expiry-val {
+    font-size: 0.78rem;
+  }
+  .card-actions-grid, .card-controls-grid {
+    grid-template-columns: 1fr !important;
+  }
 }

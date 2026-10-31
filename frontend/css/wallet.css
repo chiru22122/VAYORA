@@ -302,3 +302,21 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 600px) {
+  .wallet-card-item {
+    padding: 14px 12px;
+  }
+  .wallet-token-header {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .token-balance-big {
+    font-size: clamp(1.2rem, 5vw, 1.5rem);
+  }
+  .qr-code-box, .qr-modal-container {
+    max-width: min(220px, 60vw);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+  }
+}

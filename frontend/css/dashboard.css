@@ -525,7 +525,7 @@
   transform: scale(1.15);
 }
 
-/* Responsive */
+/* Responsive Proportions & Scaling */
 @media (max-width: 1200px) {
   .quick-actions-grid {
     grid-template-columns: repeat(3, 1fr);
@@ -535,12 +535,63 @@
 @media (max-width: 768px) {
   .quick-actions-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
   }
   .hero-balance-val {
-    font-size: 2.2rem;
+    font-size: clamp(2rem, 7.5vw, 2.5rem);
+    word-break: break-word;
+  }
+  .hero-balance-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
   }
   .dashboard-hero,
   .cyber-hero-card {
-    padding: 20px 16px;
+    padding: 18px 14px;
+    border-radius: var(--radius-lg);
+  }
+  .hero-submetrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+  .hero-metric-box {
+    padding: 10px 12px;
+  }
+  .chart-card {
+    min-height: 300px;
+  }
+  .chart-canvas-container {
+    min-height: 220px;
+  }
+}
+
+@media (max-width: 480px) {
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .quick-action-card {
+    padding: 12px 10px;
+    gap: 8px;
+  }
+  .quick-action-icon {
+    width: 36px;
+    height: 36px;
+  }
+  .action-title {
+    font-size: 0.82rem;
+  }
+  .hero-submetrics-grid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .hero-balance-val {
+    font-size: clamp(1.75rem, 8vw, 2.15rem);
+  }
+  .hero-balance-secondary {
+    font-size: 0.95rem;
   }
 }

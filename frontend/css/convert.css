@@ -565,3 +565,18 @@
     gap: 12px;
   }
 }
+
+@media (max-width: 600px) {
+  .convert-card-main, .swap-container, .conversion-card {
+    padding: 16px 12px;
+    border-radius: var(--radius-lg);
+  }
+  .currency-input-row, .convert-input-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .currency-amount-input, .convert-amount-input {
+    font-size: clamp(1.4rem, 6vw, 1.8rem);
+  }
+}

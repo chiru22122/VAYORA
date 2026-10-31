@@ -1333,12 +1333,21 @@ a {
 }
 
 @media (max-width: 768px) {
+  /* Prevent horizontal screen jank & support mobile safe areas */
+  html, body {
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   .app-sidebar {
     transform: translateX(-100%);
+    z-index: 1050;
   }
   .app-sidebar.mobile-open {
     transform: translateX(0);
-    width: 250px;
+    width: min(280px, 80vw);
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.4);
   }
   .app-sidebar.mobile-open .brand-text-wrap,
   .app-sidebar.mobile-open .nav-section-title,
@@ -1348,21 +1357,108 @@ a {
   }
   .app-sidebar.mobile-open .nav-link {
     justify-content: flex-start;
-    padding: 9px 12px;
+    padding: 11px 14px;
+    font-size: 0.95rem;
   }
   .app-main {
     margin-left: 0;
+    width: 100%;
+    min-width: 0;
   }
   .mobile-menu-btn {
     display: flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
   }
   .app-content {
-    padding: 18px 14px;
+    padding: 16px 12px;
   }
   .app-topbar {
-    padding: 0 14px;
+    padding: 0 12px;
+    height: 60px;
   }
   .demo-user-switcher span {
     display: none;
+  }
+
+  /* Form Inputs & Touch Targets (Prevents iOS auto-zoom on inputs < 16px) */
+  input, select, textarea, .form-control {
+    font-size: 16px !important;
+    min-height: 44px;
+  }
+  .btn {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Responsive Multi-column Grids Collapse into Clean 1-Column Stacks */
+  .grid-2, .grid-3, .grid-4, .stat-grid, .two-col-layout {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Smooth Table Touch Scrolling */
+  .table-wrap, .data-table-container, .transactions-table-wrap, .crypto-table-container, .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: var(--radius-md);
+  }
+
+  /* Responsive Mobile Modals */
+  .modal-window {
+    width: calc(100% - 20px) !important;
+    max-width: calc(100% - 20px) !important;
+    max-height: calc(100vh - 36px) !important;
+    margin: 10px auto;
+    border-radius: var(--radius-lg);
+  }
+  .modal-body {
+    max-height: calc(85vh - 110px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+  }
+}
+
+/* Small Smartphone Ratio & Typography Refinement (< 480px / iPhone SE / Galaxy) */
+@media (max-width: 480px) {
+  .app-content {
+    padding: 12px 8px;
+  }
+  .app-topbar {
+    height: 54px;
+    padding: 0 8px;
+  }
+  .topbar-right {
+    gap: 6px;
+  }
+  .avatar-sphere {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+
+  /* Auth Card Responsive Mobile Ratio */
+  .auth-page-wrap {
+    padding: 14px 8px !important;
+  }
+  .auth-card {
+    padding: 24px 16px !important;
+    border-radius: var(--radius-lg) !important;
+    width: 100% !important;
+  }
+  .otp-digits-wrap {
+    gap: 5px !important;
+  }
+  .otp-digit-box {
+    width: clamp(34px, 12.8vw, 44px) !important;
+    height: clamp(44px, 15vw, 54px) !important;
+    font-size: 1.25rem !important;
+    border-radius: var(--radius-sm) !important;
   }
 }
