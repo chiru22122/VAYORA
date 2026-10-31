@@ -42,6 +42,9 @@ window.__ENV__.APP_NAME = window.__ENV__.APP_NAME || "VAYORA - Your Digital Valu
   if (savedUrl) {
     window.__ENV__.BACKEND_URL = savedUrl;
   } else {
-    window.__ENV__.BACKEND_URL = "https://vayora-backend-r8gu.vercel.app";
+    // In production unified deployments, backend is hosted on the same origin (window.location.origin)
+    window.__ENV__.BACKEND_URL = (typeof window !== 'undefined' && window.location && window.location.origin)
+      ? window.location.origin
+      : "http://127.0.0.1:8000";
   }
 })();

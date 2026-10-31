@@ -35,8 +35,9 @@ except Exception as e:
     from fastapi import FastAPI
     from fastapi.responses import JSONResponse
     app = FastAPI(title="VAYORA Initialization Error")
+    @app.api_route("/", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
     @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"])
-    def error_handler(path: str):
+    def error_handler(path: str = ""):
         return JSONResponse(
             status_code=500,
             content={

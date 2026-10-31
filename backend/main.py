@@ -27,8 +27,8 @@ from backend.services.presence_service import (
 
 from backend.config import get_cors_origins, get_cors_origin_regex, BACKEND_URL, FRONTEND_URL
 
-# Initialize database schema (skip on Vercel/serverless to guarantee instant cold starts)
-if not (os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME")):
+# Initialize database schema (skip on Vercel/serverless when using PostgreSQL to guarantee instant cold starts)
+if not (os.getenv("VERCEL") or os.getenv("AWS_LAMBDA_FUNCTION_NAME")) or str(engine.url).startswith("sqlite"):
     try:
         Base.metadata.create_all(bind=engine)
     except Exception as _db_init_err:

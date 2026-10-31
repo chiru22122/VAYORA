@@ -21,7 +21,7 @@ if os.path.exists(ROOT_ENV):
     load_dotenv(ROOT_ENV, override=False)
 
 # Service URLs
-_DEFAULT_BACKEND = "https://vayora-backend-r8gu.vercel.app" if os.getenv("VERCEL") else "http://127.0.0.1:8000"
+_DEFAULT_BACKEND = f"https://{os.getenv('VERCEL_URL')}" if os.getenv("VERCEL_URL") else "http://127.0.0.1:8000"
 BACKEND_URL = os.getenv("BACKEND_URL", _DEFAULT_BACKEND).rstrip("/")
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://127.0.0.1:3000").rstrip("/")
 
@@ -53,7 +53,6 @@ def get_cors_origins():
 
     if BACKEND_URL:
         origins.append(BACKEND_URL)
-    origins.append("https://vayora-backend-r8gu.vercel.app")
 
     # Support explicit production frontend origins (supports multiple comma-separated URLs)
     if FRONTEND_URL:

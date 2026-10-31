@@ -8,7 +8,9 @@ const VAYORA = (function() {
   // Read runtime environment configuration (supports frontend/.env and window.__ENV__)
   window.__ENV__ = window.__ENV__ || {};
 
-  const DEFAULT_PROD_BACKEND = "https://vayora-backend-r8gu.vercel.app";
+  const DEFAULT_PROD_BACKEND = (typeof window !== 'undefined' && window.location && window.location.origin)
+    ? window.location.origin
+    : "http://127.0.0.1:8000";
 
   function isLocalOrigin() {
     if (typeof window === 'undefined' || !window.location) return true;
