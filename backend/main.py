@@ -152,6 +152,18 @@ def serve_root():
         "health": "/api/health"
     }
 
+# Clean URL support: automatically serves .html for paths like /register, /dashboard, /login
+@app.middleware("http")
+async def clean_html_url_middleware(request, call_next):
+    response = await call_next(request)
+    if response.status_code == 404 and not request.url.path.startswith("/api"):
+        clean_path = request.url.path.strip("/")
+        if clean_path:
+            candidate = os.path.join(frontend_dir, clean_path + ".html")
+            if os.path.isfile(candidate):
+                return FileResponse(candidate)
+    return response
+
 # Mount classic static frontend for assets and HTML pages
 if os.path.exists(frontend_dir):
     app.mount("/", StaticFiles(directory=frontend_dir, html=True), name="frontend")
