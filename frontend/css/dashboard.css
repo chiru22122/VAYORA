@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    VAYORA DASHBOARD STYLES - CLEAN FINTECH UI WITH DYNAMIC MOTION
    High-End Motion, Smooth Spring Feedback & Premium Aesthetics
    ========================================================================== */
@@ -533,19 +533,65 @@
 }
 
 @media (max-width: 768px) {
+  /* Quick Actions: Horizontal Touch Carousel on Mobile */
   .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    overflow-x: auto;
     gap: 10px;
+    padding: 4px 2px 10px 2px;
+    margin-bottom: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .quick-actions-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .quick-action-card {
+    flex: 0 0 130px;
+    min-width: 130px;
+    padding: 14px 10px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    border-radius: var(--radius-md);
+  }
+  .action-title {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .action-desc {
+    font-size: 0.68rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 105px;
+  }
+
+  /* Hero Balance Row */
   .hero-balance-val {
-    font-size: clamp(2rem, 7.5vw, 2.5rem);
+    font-size: clamp(1.9rem, 7.5vw, 2.4rem);
     word-break: break-word;
   }
   .hero-balance-row {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 14px;
+    align-items: stretch !important;
+    gap: 16px;
   }
+  .hero-balance-row > div:last-child {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+  .hero-balance-row > div:last-child .btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    padding: 10px 8px !important;
+    font-size: 0.84rem !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+  }
+
   .dashboard-hero,
   .cyber-hero-card {
     padding: 18px 14px;
@@ -558,40 +604,39 @@
     padding-top: 14px;
   }
   .hero-metric-box {
-    padding: 10px 12px;
+    padding: 10px 8px;
   }
   .chart-card {
-    min-height: 300px;
+    min-height: 280px;
   }
-  .chart-canvas-container {
-    min-height: 220px;
+  .chart-canvas-container,
+  .chart-canvas-wrap {
+    min-height: 200px;
+    height: 220px !important;
   }
 }
 
 @media (max-width: 480px) {
-  .quick-actions-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-  }
-  .quick-action-card {
-    padding: 12px 10px;
-    gap: 8px;
-  }
-  .quick-action-icon {
-    width: 36px;
-    height: 36px;
-  }
-  .action-title {
-    font-size: 0.82rem;
-  }
   .hero-submetrics-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 6px;
   }
+  .hero-metric-box {
+    padding: 8px;
+  }
+  .hero-metric-label {
+    font-size: 0.62rem;
+  }
+  .hero-metric-value {
+    font-size: 0.9rem;
+  }
+  .hero-metric-sub {
+    font-size: 0.65rem;
+  }
   .hero-balance-val {
-    font-size: clamp(1.75rem, 8vw, 2.15rem);
+    font-size: clamp(1.7rem, 8vw, 2.1rem);
   }
   .hero-balance-secondary {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
 }

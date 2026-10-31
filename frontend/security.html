@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -186,7 +186,7 @@
       <div class="app-content animate-entrance">
         
         <!-- Security Overview Row -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
+        <div class="sec-overview-grid">
           
           <div class="vayora-card highlight-emerald">
             <div class="card-header">
@@ -221,10 +221,10 @@
         <div id="recovery-codes-box" class="vayora-card highlight-cyan" style="display: none; margin-bottom: 28px;">
           <h4 style="font-family: var(--font-display); color: var(--text-primary); font-size: 1.1rem; margin-bottom: 6px;">Backup Recovery Codes</h4>
           <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px;">Keep these one-time access codes safe. You can use them to recover access if your primary session is lost.</p>
-          <div id="recovery-codes-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;"></div>
+          <div id="recovery-codes-grid" class="recovery-codes-grid"></div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 28px;">
+        <div class="sec-sessions-grid">
           
           <!-- Active Sessions Table -->
           <div class="vayora-card">

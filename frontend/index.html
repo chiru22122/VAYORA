@@ -153,7 +153,20 @@
       .hero-heading { font-size: 2.4rem; }
       .pipeline-grid { grid-template-columns: 1fr 1fr; }
       .features-grid { grid-template-columns: 1fr; }
-      .landing-nav { padding: 0 20px; }
+      .landing-nav { padding: 0 16px; height: 64px; }
+    }
+    @media (max-width: 600px) {
+      .landing-nav .brand-tagline { display: none !important; }
+      .landing-nav .btn { padding: 6px 12px !important; font-size: 0.82rem !important; }
+      .landing-hero { padding: 40px 14px 30px 14px !important; }
+      .hero-heading { font-size: clamp(1.8rem, 8vw, 2.2rem) !important; }
+      .hero-subtext { font-size: 0.95rem !important; margin-bottom: 24px !important; line-height: 1.5 !important; }
+      .hero-badge { font-size: 0.7rem !important; padding: 4px 10px !important; max-width: 96% !important; text-align: center; }
+      .pipeline-container { padding: 20px 14px !important; margin: 24px auto !important; }
+      .pipeline-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+      .hero-cta-group { flex-direction: column !important; width: 100% !important; gap: 10px !important; }
+      .hero-cta-group .btn { width: 100% !important; max-width: 320px !important; }
+      .features-section { padding: 0 14px !important; margin: 30px auto 50px auto !important; }
     }
   </style>
 </head>

@@ -1152,6 +1152,7 @@ a {
 
 .ticker-item {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
@@ -1332,6 +1333,54 @@ a {
   }
 }
 
+/* Structural Page Component Grids */
+.convert-modules-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 32px;
+}
+.payout-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.tx-filter-bar {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr auto;
+  gap: 14px;
+  align-items: flex-end;
+}
+.sec-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.sec-sessions-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 28px;
+}
+.recovery-codes-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.portfolio-split-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-bottom: 30px;
+}
+.nfc-config-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
 @media (max-width: 768px) {
   /* Prevent horizontal screen jank & support mobile safe areas */
   html, body {
@@ -1376,11 +1425,31 @@ a {
     padding: 16px 12px;
   }
   .app-topbar {
-    padding: 0 12px;
-    height: 60px;
+    padding: 0 10px;
+    height: 56px;
   }
-  .demo-user-switcher span {
-    display: none;
+  .demo-user-switcher {
+    display: none !important;
+  }
+  .user-info-text {
+    display: none !important;
+  }
+  .topbar-right .btn span {
+    display: none !important;
+  }
+  .topbar-right .btn {
+    padding: 6px 10px !important;
+    min-height: 36px !important;
+  }
+  .topbar-right {
+    gap: 6px !important;
+  }
+  .page-headline {
+    font-size: clamp(0.9rem, 3.5vw, 1.15rem) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
   }
 
   /* Form Inputs & Touch Targets (Prevents iOS auto-zoom on inputs < 16px) */
@@ -1396,9 +1465,28 @@ a {
   }
 
   /* Responsive Multi-column Grids Collapse into Clean 1-Column Stacks */
-  .grid-2, .grid-3, .grid-4, .stat-grid, .two-col-layout {
+  .grid-2, .grid-3, .grid-4, .stat-grid, .two-col-layout,
+  .sec-overview-grid, .sec-sessions-grid, .portfolio-split-grid,
+  .nfc-config-grid, .convert-modules-grid, .payout-details-grid,
+  .tx-filter-bar {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
+  }
+  .vayora-card {
+    padding: 18px 14px;
+  }
+  .card-header {
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .form-label {
+    flex-wrap: wrap;
+    gap: 4px;
+    align-items: center;
+  }
+  .allocation-legend-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   /* Smooth Table Touch Scrolling */
@@ -1441,6 +1529,38 @@ a {
     width: 32px;
     height: 32px;
     font-size: 0.8rem;
+  }
+  .vayora-card {
+    padding: 14px 10px;
+    border-radius: var(--radius-md);
+  }
+  .recovery-codes-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .vayora-card {
+    padding: 14px 10px;
+    border-radius: var(--radius-md);
+  }
+  .recovery-codes-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .vayora-card {
+    padding: 14px 10px;
+    border-radius: var(--radius-md);
+  }
+  .recovery-codes-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
+  }
+  .vayora-card {
+    padding: 14px 10px;
+    border-radius: var(--radius-md);
+  }
+  .recovery-codes-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 8px !important;
   }
 
   /* Auth Card Responsive Mobile Ratio */

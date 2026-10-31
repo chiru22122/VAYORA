@@ -1,4 +1,4 @@
-/* ==========================================================================
+﻿/* ==========================================================================
    VAYORA VIRTUAL CARD & NFC STYLES
    Simple Light / Dark Theme
    ========================================================================== */
@@ -290,5 +290,31 @@
   }
   .card-actions-grid, .card-controls-grid {
     grid-template-columns: 1fr !important;
+  }
+  .card-controls-group {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .card-controls-group .btn {
+    flex: 1;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    white-space: nowrap;
+  }
+  .card-controls-group {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .card-controls-group .btn {
+    flex: 1;
+    font-size: 0.8rem;
+    padding: 8px 10px;
+    white-space: nowrap;
   }
 }

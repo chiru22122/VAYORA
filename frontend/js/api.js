@@ -1,4 +1,4 @@
-/**
+﻿/**
  * VAYORA CLIENT-SIDE API & UI ORCHESTRATION ENGINE
  * Handles network requests, token authentication, dynamic toasts,
  * real-time presence (WebSocket + heartbeat), and real payment checkout modal.
@@ -1079,12 +1079,23 @@ const VAYORA = (function() {
       });
     }
 
-    // Mobile menu toggle
+    // Mobile menu toggle & outside-click drawer auto-close
     const mobileBtn = document.getElementById('mobile-menu-btn');
     const sidebar = document.querySelector('.app-sidebar');
     if (mobileBtn && sidebar) {
-      mobileBtn.addEventListener('click', () => {
+      mobileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
         sidebar.classList.toggle('mobile-open');
+      });
+      document.addEventListener('click', (e) => {
+        if (sidebar.classList.contains('mobile-open') && !sidebar.contains(e.target) && e.target !== mobileBtn) {
+          sidebar.classList.remove('mobile-open');
+        }
+      });
+      sidebar.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          sidebar.classList.remove('mobile-open');
+        });
       });
     }
     updateSoundToggleUI();

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -250,7 +250,7 @@
 
         <!-- VIEW 1: Instant Converter & Bank Payout View -->
         <div id="view-instant" style="display: block;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 32px;">
+          <div class="convert-modules-grid">
 
             <!-- Module 1: Convert USDT to INR with Live Auto-Calculator -->
             <div class="vayora-card highlight-emerald">
@@ -347,7 +347,7 @@
                 <input type="text" id="withdraw-bank-name" class="form-control" value="HDFC Bank Ltd" placeholder="e.g. State Bank of India, HDFC, ICICI">
               </div>
 
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="payout-details-grid">
                 <div class="form-group">
                   <label class="form-label" for="withdraw-account-number">Account Number</label>
                   <input type="text" id="withdraw-account-number" class="form-control" value="50100492819201" placeholder="Account Number">
