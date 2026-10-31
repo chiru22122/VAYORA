@@ -77,8 +77,9 @@ const VAYORA = (function() {
     const isBrowser = typeof window !== 'undefined' && window.location;
     if (!isBrowser) return 'http://127.0.0.1:8000/api';
 
-    // When directly served on port 8000, relative /api connects directly to the FastAPI server
-    if (window.location.port === '8000') {
+    // When directly served on port 8000 or hosted on Vercel unified deployment,
+    // relative /api connects directly to the FastAPI server on the same domain
+    if (window.location.port === '8000' || (window.location.hostname && window.location.hostname.includes('vercel.app'))) {
       return '/api';
     }
 

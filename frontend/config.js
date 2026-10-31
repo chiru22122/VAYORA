@@ -33,7 +33,7 @@ window.__ENV__.APP_NAME = window.__ENV__.APP_NAME || "VAYORA - Your Digital Valu
   // In production (Vercel / Cloud)
   if (typeof localStorage !== 'undefined') {
     const stored = localStorage.getItem('VAYORA_BACKEND_URL');
-    if (stored && (stored.includes('127.0.0.1') || stored.includes('localhost') || stored.includes('onrender.com'))) {
+    if (stored && (stored.includes('127.0.0.1') || stored.includes('localhost') || stored.includes('onrender.com') || stored.includes('r8gu') || (window.location && stored !== window.location.origin))) {
       localStorage.removeItem('VAYORA_BACKEND_URL');
     }
   }
