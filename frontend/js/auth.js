@@ -4,9 +4,9 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const isLoginPage = window.location.pathname.includes('login.html');
-  const isRegisterPage = window.location.pathname.includes('register.html');
-  const isForgotPage = window.location.pathname.includes('forgot-password.html');
+  const isLoginPage = Boolean(document.getElementById('login-form')) || window.location.pathname.includes('login');
+  const isRegisterPage = Boolean(document.getElementById('register-form')) || window.location.pathname.includes('register');
+  const isForgotPage = Boolean(document.getElementById('forgot-form')) || window.location.pathname.includes('forgot');
 
   // --- LOGIN WORKFLOW ---
   if (isLoginPage) {

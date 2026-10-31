@@ -180,8 +180,8 @@ const VAYORA = (function() {
       const response = await fetch(url, config);
 
       if (response.status === 401) {
-        const path = window.location.pathname;
-        if (!path.includes('login.html') && !path.includes('register.html') && !path.endsWith('/') && !path.includes('index.html')) {
+        const path = window.location.pathname.toLowerCase();
+        if (!path.includes('login') && !path.includes('register') && !path.includes('forgot') && !path.endsWith('/') && !path.includes('index')) {
           logout();
           return null;
         }
@@ -1043,8 +1043,8 @@ const VAYORA = (function() {
 
     const user = getCurrentUser();
     if (!user) {
-      const path = window.location.pathname;
-      if (!path.includes('login.html') && !path.includes('register.html') && !path.endsWith('/') && !path.includes('index.html')) {
+      const path = window.location.pathname.toLowerCase();
+      if (!path.includes('login') && !path.includes('register') && !path.includes('forgot') && !path.endsWith('/') && !path.includes('index')) {
         window.location.href = '/login.html';
         return;
       }

@@ -5,8 +5,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const isSendPage = window.location.pathname.includes('send.html');
-  const isReceivePage = window.location.pathname.includes('receive.html');
+  const isSendPage = Boolean(document.getElementById('send-form')) || window.location.pathname.includes('send');
+  const isReceivePage = Boolean(document.getElementById('receive-token-select')) || window.location.pathname.includes('receive');
 
   if (isSendPage) {
     VAYORA.initShell('send');
