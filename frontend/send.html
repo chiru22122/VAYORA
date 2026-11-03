@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Send Payment — VAYORA</title>
+    <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#030712">
+  <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+  <link rel="apple-touch-icon" href="/assets/icon-192.png">
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/wallet.css">
   <link rel="stylesheet" href="/css/animations.css">
@@ -11,6 +15,24 @@
     .send-container {
       max-width: 620px;
       margin: 0 auto;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (max-width: 640px) {
+      .send-container {
+        width: 100%;
+        padding: 0 2px;
+      }
+      .send-container .vayora-card {
+        padding: 20px 14px !important;
+        border-radius: var(--radius-md) !important;
+      }
+      #send-demo-presets-container {
+        grid-template-columns: 1fr !important;
+      }
+      .scanner-viewport-box {
+        max-width: 270px !important;
+        border-radius: 16px !important;
+      }
     }
   </style>
 </head>
@@ -180,6 +202,7 @@
         </div>
 
         <div class="topbar-right">
+          <button id="pwa-install-topbar-btn" class="pwa-install-pill" style="display: none;" onclick="VAYORA.installApp()">📲 Install App</button>
           <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
           <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -198,6 +221,87 @@
       <div class="app-content animate-entrance">
         
         <div class="send-container">
+
+          <!-- DEDICATED SEPARATE CAMERA & QR SCANNER SECTION -->
+          <div id="send-camera-section" class="vayora-card highlight-cyan" style="margin-bottom: 24px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 245, 155, 0.15); color: var(--neon-emerald); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
+                  📷
+                </div>
+                <div>
+                  <h3 style="font-size: 1.15rem; color: var(--text-primary); margin: 0; font-family: var(--font-display);">Camera &amp; QR Code Scanner</h3>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Scan recipient or invoice QR to auto-fill the transfer form</div>
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="status-pill status-active" id="send-cam-live-indicator" style="display: none;">● Live Stream</span>
+                <button type="button" id="toggle-send-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.74rem;">Hide Scanner</button>
+              </div>
+            </div>
+
+            <div id="send-cam-content-wrap">
+              <!-- Scanner Sub-tabs -->
+              <div style="display: flex; gap: 6px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 16px;">
+                <button type="button" id="tab-send-camera" class="scanner-tab-btn active" style="flex: 1; border: none; background: var(--bg-surface); color: var(--primary-color); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Live Camera</button>
+                <button type="button" id="tab-send-upload" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Upload / Drop Image</button>
+                <button type="button" id="tab-send-demo" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Instant Demo Presets</button>
+              </div>
+
+              <!-- VIEW 1: Live Video Camera Viewfinder -->
+              <div id="view-send-camera" style="display: block; text-align: center;">
+                <div class="scanner-viewport-box" style="position: relative; width: 100%; aspect-ratio: 1/1; max-width: 300px; margin: 0 auto 12px auto; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-medium); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                  <video id="send-video-feed" playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+                  <canvas id="send-canvas-feed" style="display: none;"></canvas>
+                  
+                  <!-- Viewfinder reticle overlay -->
+                  <div class="scanner-reticle-overlay" style="position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 72%; height: 72%; border: 2px solid rgba(0, 245, 155, 0.85); border-radius: 14px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); position: relative;">
+                      <div class="scanner-laser-line"></div>
+                    </div>
+                  </div>
+                  
+                  <div id="send-camera-status-text" style="position: absolute; bottom: 8px; left: 8px; right: 8px; text-align: center; font-size: 0.72rem; background: rgba(0,0,0,0.78); color: #fff; padding: 4px 8px; border-radius: var(--radius-pill);">
+                    Camera ready. Click "Start Camera" to scan.
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
+                  <button type="button" id="send-start-cam-btn" class="btn btn-primary btn-sm" style="font-size: 0.76rem; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    <span>Start Camera</span>
+                  </button>
+                  <button type="button" id="send-stop-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.76rem; display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="6" width="12" height="12"/></svg>
+                    <span>Stop Camera</span>
+                  </button>
+                  <button type="button" id="send-flip-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.76rem;">
+                    🔄 Flip Camera
+                  </button>
+                </div>
+              </div>
+
+              <!-- VIEW 2: Upload or Drop QR Image -->
+              <div id="view-send-upload" style="display: none;">
+                <div id="send-dropzone-box" style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 26px 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--bg-secondary); margin-bottom: 8px;">
+                  <div style="font-size: 2rem; margin-bottom: 4px;">🖼️</div>
+                  <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Click to Browse or Drag &amp; Drop QR Image</div>
+                  <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 10px;">Or press Ctrl+V anywhere to paste screenshot</div>
+                  <input type="file" id="send-file-picker" accept="image/*" style="display: none;">
+                  <span class="btn btn-primary btn-sm" style="pointer-events: none;">Select File</span>
+                </div>
+                <div id="send-upload-status" style="text-align: center; font-size: 0.74rem; color: var(--text-secondary); min-height: 16px;"></div>
+              </div>
+
+              <!-- VIEW 3: Instant Demo Presets -->
+              <div id="view-send-demo" style="display: none;">
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Simulate scanning a real recipient invoice QR code to test form auto-fill:</div>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;" id="send-demo-presets-container">
+                  <!-- Populated dynamically by payments.js -->
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Core Transfer Card -->
           <div id="send-form-card" class="vayora-card highlight-emerald">
@@ -243,10 +347,28 @@
                     <span>Recipient Email, Token Address, or VAYORA ID</span>
                     <span id="recipient-online-badge" style="display: none; font-size: 0.7rem; font-weight: 700; color: var(--neon-emerald);"></span>
                   </div>
+                  <button type="button" id="open-qr-scanner-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; font-size: 0.75rem; color: var(--neon-cyan); border-color: rgba(2, 132, 199, 0.4);" title="Scan QR Code to Pre-fill Recipient and Amount">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
+                    <span>Scan QR</span>
+                  </button>
                 </div>
+                <!-- RECENT RECIPIENTS QUICK-PAY CAROUSEL -->
+                <div class="recent-recipients-wrap">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                    <span style="font-size: 0.70rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 4px;">
+                      <span>⚡</span> Recent Recipients
+                    </span>
+                    <span style="font-size: 0.70rem; color: var(--text-muted);">Tap to 1-click select</span>
+                  </div>
+                  <div id="recent-recipients-list" class="recent-recipients-scroller">
+                    <!-- Populated dynamically via payments.js -->
+                  </div>
+                </div>
+
                 <input type="text" id="send-recipient-input" class="form-control" placeholder="Enter recipient email or token address (e.g. TX..., bc1q..., 0x...)" required>
                 <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap;">
                   <span style="font-size: 0.72rem; color: var(--text-muted);">Quick Demo Fill:</span>
+                  <button type="button" id="scan-qr-quick-btn" class="demo-btn-pill" style="margin: 0; padding: 3px 8px; font-size: 0.7rem; color: var(--neon-cyan); border-color: rgba(2, 132, 199, 0.4);">📷 Scan QR Code</button>
                   <button type="button" id="fill-demo-receiver-btn" class="demo-btn-pill" style="margin: 0; padding: 3px 8px; font-size: 0.7rem;">Demo Receiver Address</button>
                   <button type="button" id="fill-demo-receiver-email-btn" class="demo-btn-pill" style="margin: 0; padding: 3px 8px; font-size: 0.7rem;">receiver@vayora.demo</button>
                 </div>
@@ -291,34 +413,81 @@
             </form>
           </div>
 
-          <!-- Success Box (Initially Hidden) -->
-          <div id="send-success-box" class="vayora-card" style="display: none; text-align: center; padding: 40px 30px;">
-            <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(0, 184, 116, 0.15); color: var(--neon-emerald); border: 2px solid var(--neon-emerald); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; box-shadow: var(--glow-emerald);">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          <!-- Digital Receipt & Success Box (Initially Hidden) -->
+          <div id="send-success-box" class="vayora-card" style="display: none; text-align: center; padding: 30px 22px;">
+            <div style="width: 58px; height: 58px; border-radius: 50%; background: rgba(0, 184, 116, 0.15); color: var(--neon-emerald); border: 2px solid var(--neon-emerald); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px auto; box-shadow: var(--glow-emerald);">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
             </div>
-            <h2 style="font-family: var(--font-display); font-size: 1.6rem; color: var(--text-primary); margin-bottom: 8px;">Transfer Successfully Settled</h2>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">
-              The digital asset transfer has been executed on the database ledger with dual-entry accounting.
+            <h2 style="font-family: var(--font-display); font-size: 1.45rem; color: var(--text-primary); margin-bottom: 4px;">Transfer Successfully Settled</h2>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 16px;">
+              Digital asset transfer committed to the dual-entry database ledger.
             </p>
 
-            <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 24px; text-align: left; font-size: 0.85rem;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Reference:</span>
-                <span id="success-ref-id" style="font-family: var(--font-mono); color: var(--neon-cyan); font-weight: 700;">TX-0000-0000</span>
+            <!-- Printable Digital Receipt Slip -->
+            <div id="printable-receipt-slip" class="receipt-paper-card">
+              <div class="receipt-header-brand">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <span style="font-size: 1.15rem; font-weight: 800; color: var(--neon-emerald); font-family: var(--font-display);">VAYORA</span>
+                  <span style="font-size: 0.68rem; color: var(--text-muted); border-left: 1px solid var(--border-medium); padding-left: 8px;">OFFICIAL SETTLEMENT SLIP</span>
+                </div>
+                <span class="status-pill status-completed" style="font-size: 0.65rem;">● SETTLED</span>
               </div>
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: var(--text-muted);">Sender Token Address:</span>
-                <span id="success-sender-addr" style="font-family: var(--font-mono); color: var(--text-primary); font-size: 0.78rem; word-break: break-all; max-width: 60%; text-align: right;">-</span>
+
+              <div class="receipt-amount-display">
+                <div id="receipt-display-amount" class="receipt-amount-val">100.00 USDT</div>
+                <div id="receipt-display-fiat" style="font-size: 0.78rem; color: var(--neon-cyan); margin-top: 2px;">≈ $100.00 USD</div>
               </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span style="color: var(--text-muted);">Receiver Token Address:</span>
-                <span id="success-receiver-addr" style="font-family: var(--font-mono); color: var(--neon-emerald); font-size: 0.78rem; word-break: break-all; max-width: 60%; text-align: right;">-</span>
+
+              <div class="receipt-grid-rows">
+                <div class="receipt-grid-row">
+                  <span class="rk">Reference Hash:</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span id="success-ref-id" class="rv mono" style="color: var(--neon-cyan); font-weight: 700;">TX-0000-0000</span>
+                    <button type="button" id="copy-ref-receipt-btn" style="background: none; border: none; cursor: pointer; color: var(--neon-emerald); font-size: 0.85rem;" title="Copy Reference">📋</button>
+                  </div>
+                </div>
+                <div class="receipt-grid-row">
+                  <span class="rk">Sender Address:</span>
+                  <span id="success-sender-addr" class="rv mono" style="font-size: 0.72rem; color: var(--text-primary);">-</span>
+                </div>
+                <div class="receipt-grid-row">
+                  <span class="rk">Receiver Address:</span>
+                  <span id="success-receiver-addr" class="rv mono" style="font-size: 0.72rem; color: var(--neon-emerald);">-</span>
+                </div>
+                <div class="receipt-grid-row">
+                  <span class="rk">Settlement Network:</span>
+                  <span class="rv" style="color: var(--neon-purple); font-size: 0.76rem;">VAYORA Dual-Entry Ledger</span>
+                </div>
+                <div class="receipt-grid-row">
+                  <span class="rk">Network Fee:</span>
+                  <span class="rv" style="color: var(--neon-emerald); font-weight: 700;">$0.00 (Zero Fee Academic)</span>
+                </div>
+                <div class="receipt-grid-row">
+                  <span class="rk">Timestamp:</span>
+                  <span id="success-timestamp" class="rv mono" style="font-size: 0.72rem;">-</span>
+                </div>
               </div>
             </div>
 
-            <div style="display: flex; gap: 12px; justify-content: center;">
+            <!-- Receipt Actions: Download, Share, Print -->
+            <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap;">
+              <button type="button" id="download-receipt-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                <span>Download Receipt</span>
+              </button>
+              <button type="button" id="share-receipt-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>Share Receipt</span>
+              </button>
+              <button type="button" id="print-receipt-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; font-size: 0.76rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                <span>Print</span>
+              </button>
+            </div>
+
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
               <a href="/dashboard.html" class="btn btn-primary">Return to Dashboard</a>
-              <button onclick="window.location.reload()" class="btn btn-secondary">Send Another</button>
+              <button onclick="window.location.reload()" class="btn btn-secondary">Send Another Payment</button>
             </div>
           </div>
 
@@ -328,42 +497,161 @@
     </main>
   </div>
 
-  <!-- Send Confirmation Modal -->
+  <!-- Send Confirmation Modal with 4-Digit PIN & Biometrics -->
   <div id="send-confirm-modal" class="modal-backdrop">
-    <div class="modal-window">
+    <div class="modal-window" style="max-width: 440px;">
       <div class="modal-header">
-        <div class="modal-title">Confirm Transfer</div>
-        <button class="modal-close-btn" onclick="document.getElementById('send-confirm-modal').classList.remove('open')">✕</button>
+        <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+          <span>🔐</span>
+          <span>Confirm &amp; Authorize Transfer</span>
+        </div>
+        <button class="modal-close-btn" onclick="document.getElementById('send-confirm-modal').classList.remove('open'); document.getElementById('send-confirm-modal').style.display='none';">✕</button>
       </div>
-      <div class="modal-body">
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 18px;">
-          Please review the transaction parameters before authorizing:
-        </p>
-
-        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 16px; margin-bottom: 20px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: var(--text-muted);">Amount:</span>
-            <span id="modal-conf-amount" style="font-family: var(--font-mono); font-weight: 700; color: var(--text-primary);">100.00 USDT</span>
+      <div class="modal-body" style="padding: 18px 20px;">
+        <!-- Transfer summary badge -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-size: 0.72rem; color: var(--text-muted);">Total Transfer</span>
+            <span class="status-pill status-completed" style="font-size: 0.65rem;">Zero Fee Demo</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-            <span style="color: var(--text-muted);">Recipient:</span>
-            <span id="modal-conf-recipient" style="color: var(--neon-cyan); font-weight: 600;">receiver@vayora.demo</span>
+          <div style="text-align: center; margin: 4px 0 10px 0;">
+            <div id="modal-conf-amount" style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: var(--neon-emerald); text-shadow: 0 0 20px rgba(0, 245, 155, 0.35);">100.00 USDT</div>
+            <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">
+              to <strong id="modal-conf-recipient" style="color: var(--neon-cyan); word-break: break-all;">receiver@vayora.demo</strong>
+            </div>
           </div>
-          <div style="display: flex; justify-content: space-between;">
-            <span style="color: var(--text-muted);">Memo:</span>
-            <span id="modal-conf-note" style="color: var(--text-secondary);">None</span>
+          <div style="display: flex; justify-content: space-between; font-size: 0.75rem; border-top: 1px dashed var(--border-medium); padding-top: 6px;">
+            <span style="color: var(--text-muted);">Memo / Note:</span>
+            <span id="modal-conf-note" style="color: var(--text-secondary); max-width: 60%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">None</span>
           </div>
         </div>
 
-        <button type="button" id="modal-conf-btn" class="btn btn-primary btn-block btn-lg">
-          Authorize & Execute Transfer
+        <!-- 4-Digit PIN & Biometric Authorization -->
+        <div class="pin-auth-container">
+          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
+            Security Authorization PIN
+          </div>
+          <div style="font-size: 0.70rem; color: var(--text-muted);">
+            Enter your 4-digit PIN or tap Face ID
+          </div>
+
+          <!-- PIN Dots Indicator -->
+          <div class="pin-dots-container" id="pin-dots-display">
+            <span class="pin-dot" id="pindot-0"></span>
+            <span class="pin-dot" id="pindot-1"></span>
+            <span class="pin-dot" id="pindot-2"></span>
+            <span class="pin-dot" id="pindot-3"></span>
+          </div>
+
+          <!-- Biometric Scanning Feedback -->
+          <div class="bio-scanning-wrap" id="bio-scanning-feedback">
+            <div class="bio-scanner-icon">🧬</div>
+            <div style="font-size: 0.84rem; font-weight: 700; color: var(--neon-cyan); margin-bottom: 2px;">Verifying Biometrics...</div>
+            <div style="font-size: 0.70rem; color: var(--text-muted);">Simulating Touch / Face ID cryptographic handshake</div>
+          </div>
+
+          <!-- Onscreen Keypad -->
+          <div class="pin-keypad" id="pin-keypad-grid">
+            <button type="button" class="pin-key" data-digit="1">1</button>
+            <button type="button" class="pin-key" data-digit="2">2</button>
+            <button type="button" class="pin-key" data-digit="3">3</button>
+            <button type="button" class="pin-key" data-digit="4">4</button>
+            <button type="button" class="pin-key" data-digit="5">5</button>
+            <button type="button" class="pin-key" data-digit="6">6</button>
+            <button type="button" class="pin-key" data-digit="7">7</button>
+            <button type="button" class="pin-key" data-digit="8">8</button>
+            <button type="button" class="pin-key" data-digit="9">9</button>
+            <button type="button" class="pin-key pin-key-bio" id="pin-faceid-btn" title="Simulate Biometric Face ID Scan">
+              <span style="font-size: 1.1rem;">🧬</span>
+              <span style="font-size: 0.60rem; font-weight: 700; color: var(--neon-cyan);">Face ID</span>
+            </button>
+            <button type="button" class="pin-key" data-digit="0">0</button>
+            <button type="button" class="pin-key pin-key-del" id="pin-backspace-btn" title="Backspace">⌫</button>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.70rem;">
+            <span style="color: var(--text-muted);">Demo PIN: <strong style="color: var(--neon-emerald);">1234</strong></span>
+            <button type="button" id="pin-bypass-btn" style="background: none; border: none; color: var(--neon-cyan); cursor: pointer; text-decoration: underline; font-size: 0.70rem;">Skip PIN (Instant)</button>
+          </div>
+        </div>
+
+        <button type="button" id="modal-conf-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 14px;">
+          Authorize &amp; Execute Transfer
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Scanner Modal -->
+  <div id="qr-scanner-modal" class="modal-backdrop" style="display: none;">
+    <div class="modal-window" style="max-width: 500px;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="display: inline-flex; width: 28px; height: 28px; border-radius: 50%; background: rgba(2, 132, 199, 0.15); color: var(--neon-cyan); align-items: center; justify-content: center; font-size: 0.9rem;">📷</span>
+          <h3 class="modal-title" style="font-size: 1.15rem;">Scan Payment QR Code</h3>
+        </div>
+        <button type="button" class="modal-close-btn" id="close-qr-scanner-btn">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 18px 20px;">
+        <!-- Scanner Mode Tabs -->
+        <div style="display: flex; gap: 6px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 18px;">
+          <button type="button" id="tab-scan-camera" class="scanner-tab-btn active" style="flex: 1; border: none; background: var(--bg-surface); color: var(--primary-color); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Live Camera</button>
+          <button type="button" id="tab-scan-upload" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Upload / Drop Image</button>
+          <button type="button" id="tab-scan-demo" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Demo QRs</button>
+        </div>
+
+        <!-- VIEW 1: Camera Scanner -->
+        <div id="scan-view-camera" style="display: block;">
+          <div class="scanner-viewport-box" style="position: relative; width: 100%; aspect-ratio: 1/1; max-width: 320px; margin: 0 auto 14px auto; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-medium);">
+            <video id="qr-video-element" playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+            <canvas id="qr-canvas-hidden" style="display: none;"></canvas>
+            
+            <!-- Viewfinder reticle overlay -->
+            <div class="scanner-reticle-overlay" style="position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center;">
+              <div style="width: 72%; height: 72%; border: 2px solid rgba(0, 245, 155, 0.85); border-radius: 14px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); position: relative;">
+                <div class="scanner-laser-line"></div>
+              </div>
+            </div>
+            
+            <div id="camera-status-msg" style="position: absolute; bottom: 10px; left: 10px; right: 10px; text-align: center; font-size: 0.74rem; background: rgba(0,0,0,0.75); color: #fff; padding: 5px 8px; border-radius: var(--radius-pill);">
+              Point camera at a VAYORA or crypto payment QR
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: center; gap: 8px;">
+            <button type="button" id="btn-toggle-camera-facing" class="btn btn-secondary btn-sm" style="font-size: 0.76rem;">🔄 Flip Camera</button>
+            <button type="button" id="btn-restart-camera" class="btn btn-secondary btn-sm" style="font-size: 0.76rem;">⚡ Restart Video</button>
+          </div>
+        </div>
+
+        <!-- VIEW 2: Upload or Drop Image -->
+        <div id="scan-view-upload" style="display: none;">
+          <div id="qr-dropzone" style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 32px 18px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--bg-secondary); margin-bottom: 12px;">
+            <div style="font-size: 2.2rem; margin-bottom: 6px;">🖼️</div>
+            <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary); margin-bottom: 3px;">Click to Select QR Code Image</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px;">Or drag & drop file, or press Ctrl+V to paste</div>
+            <input type="file" id="qr-file-input" accept="image/*" style="display: none;">
+            <span class="btn btn-primary btn-sm" style="pointer-events: none;">Browse File</span>
+          </div>
+          <div id="upload-status-msg" style="text-align: center; font-size: 0.78rem; color: var(--text-secondary); min-height: 18px;"></div>
+        </div>
+
+        <!-- VIEW 3: Instant Demo Test QRs -->
+        <div id="scan-view-demo" style="display: none;">
+          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Select a simulated recipient QR to test auto-fill instantly without needing a physical camera:</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;" id="demo-qr-list">
+            <!-- Populated dynamically by payments.js -->
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
 
   <div id="toast-container"></div>
   <script src="/js/api.js"></script>
+  <script src="/js/jsqr.min.js"></script>
   <script src="/js/payments.js"></script>
 </body>
 </html>

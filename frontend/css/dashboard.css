@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    VAYORA DASHBOARD STYLES - CLEAN FINTECH UI WITH DYNAMIC MOTION
    High-End Motion, Smooth Spring Feedback & Premium Aesthetics
    ========================================================================== */
@@ -106,7 +106,7 @@
 }
 
 .hero-balance-val:hover {
-  transform: scale(1.015);
+  color: var(--neon-cyan);
 }
 
 .hero-balance-secondary {
@@ -134,7 +134,8 @@
 }
 
 .hero-stat-badge:hover {
-  transform: scale(1.05);
+  background: rgba(16, 185, 129, 0.22);
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 /* Micro-Metrics Ribbon within Hero Card */
@@ -275,14 +276,14 @@
 .action-convert::after { background: var(--neon-amber); }
 
 .quick-action-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   border-color: var(--border-medium);
-  box-shadow: 0 10px 20px -4px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 18px -4px rgba(15, 23, 42, 0.08);
   background: var(--bg-card-hover);
 }
 
 .quick-action-card:active {
-  transform: scale(0.97) translateY(-1px);
+  transform: scale(0.985);
 }
 
 .quick-action-icon {
@@ -297,7 +298,7 @@
 }
 
 .quick-action-card:hover .quick-action-icon {
-  transform: scale(1.14) rotate(3deg);
+  transform: scale(1.06);
 }
 
 .quick-action-icon svg {
@@ -493,12 +494,12 @@
 }
 
 .quick-contact-chip:hover {
-  transform: translateY(-2px) scale(1.03);
+  transform: translateY(-1.5px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
 
 .quick-contact-chip:active {
-  transform: scale(0.96);
+  transform: scale(0.985);
 }
 
 /* Nav Links Micro-Slide Interaction */
@@ -522,7 +523,7 @@
 }
 
 .sidebar-nav .nav-link:hover svg {
-  transform: scale(1.15);
+  transform: scale(1.06);
 }
 
 /* Responsive Proportions & Scaling */
@@ -639,4 +640,287 @@
   .hero-balance-secondary {
     font-size: 0.9rem;
   }
+}
+
+
+/* ==========================================================================
+   RECENT RECIPIENTS QUICK-PAY CAROUSEL
+   ========================================================================== */
+.recent-recipients-wrap {
+  margin-bottom: 14px;
+}
+.recent-recipients-scroller {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px 8px 2px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.recent-recipients-scroller::-webkit-scrollbar {
+  height: 4px;
+}
+.recent-recipients-scroller::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+.recent-recipient-chip {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-pill);
+  padding: 5px 12px 5px 6px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  color: var(--text-primary);
+  text-align: left;
+}
+.recent-recipient-chip:hover {
+  border-color: var(--neon-cyan);
+  background: rgba(0, 210, 255, 0.08);
+  transform: translateY(-1px);
+}
+.recent-recipient-chip.active {
+  border-color: var(--neon-emerald);
+  background: rgba(0, 245, 155, 0.12);
+  box-shadow: 0 0 12px rgba(0, 245, 155, 0.2);
+}
+.recent-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(0, 245, 155, 0.25), rgba(0, 210, 255, 0.25));
+  color: var(--neon-emerald);
+  font-weight: 800;
+  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.recent-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.recent-name {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.recent-addr {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   4-DIGIT PIN & BIOMETRIC AUTHENTICATION KEYPAD
+   ========================================================================== */
+.pin-auth-container {
+  margin: 16px 0 12px 0;
+  text-align: center;
+}
+.pin-dots-container {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 14px 0 18px 0;
+}
+.pin-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--border-medium);
+  background: transparent;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pin-dot.filled {
+  background: var(--neon-emerald);
+  border-color: var(--neon-emerald);
+  box-shadow: 0 0 10px rgba(0, 245, 155, 0.7);
+  transform: scale(1.15);
+}
+.pin-dot.error {
+  background: #ff4757;
+  border-color: #ff4757;
+  box-shadow: 0 0 10px rgba(255, 71, 87, 0.7);
+}
+.pin-dot.success {
+  background: var(--neon-cyan);
+  border-color: var(--neon-cyan);
+  box-shadow: 0 0 12px rgba(0, 210, 255, 0.8);
+}
+.pin-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  max-width: 260px;
+  margin: 0 auto 14px auto;
+}
+.pin-key {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 12px 8px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.pin-key:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--border-light);
+  transform: translateY(-1px);
+}
+.pin-key:active {
+  background: rgba(0, 245, 155, 0.15);
+  border-color: var(--neon-emerald);
+  transform: scale(0.96);
+}
+.pin-key-bio {
+  border-color: rgba(0, 210, 255, 0.35);
+  background: rgba(0, 210, 255, 0.06);
+}
+.pin-key-bio:hover {
+  background: rgba(0, 210, 255, 0.15);
+  border-color: var(--neon-cyan);
+}
+.pin-key-del {
+  border-color: rgba(255, 255, 255, 0.15);
+  color: var(--text-secondary);
+}
+
+/* Biometric Scan Ripple Overlay */
+.bio-scanning-wrap {
+  padding: 18px;
+  text-align: center;
+  display: none;
+}
+.bio-scanner-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 12px auto;
+  border-radius: 50%;
+  border: 2px solid var(--neon-cyan);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  box-shadow: 0 0 25px rgba(0, 210, 255, 0.5);
+  animation: bioPulse 1.2s infinite alternate ease-in-out;
+}
+@keyframes bioPulse {
+  0% { transform: scale(0.95); box-shadow: 0 0 10px rgba(0, 210, 255, 0.3); }
+  100% { transform: scale(1.08); box-shadow: 0 0 30px rgba(0, 210, 255, 0.7); }
+}
+
+/* ==========================================================================
+   DIGITAL RECEIPT & EXPORT SLIP STYLES
+   ========================================================================== */
+.receipt-paper-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  margin-bottom: 20px;
+  position: relative;
+  text-align: left;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+}
+.receipt-paper-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  background: linear-gradient(90deg, var(--neon-emerald), var(--neon-cyan));
+  border-radius: 3px 3px 0 0;
+}
+.receipt-header-brand {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed var(--border-medium);
+}
+.receipt-amount-display {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.receipt-amount-val {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--neon-emerald);
+  text-shadow: 0 0 20px rgba(0, 245, 155, 0.35);
+}
+.receipt-grid-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.82rem;
+}
+.receipt-grid-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.receipt-grid-row .rk {
+  color: var(--text-muted);
+}
+.receipt-grid-row .rv {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-align: right;
+  word-break: break-all;
+}
+.receipt-grid-row .rv.mono {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+}
+
+/* ==========================================================================
+   PWA INSTALL PILL & PROMPT
+   ========================================================================== */
+.pwa-install-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 245, 155, 0.12);
+  border: 1px solid rgba(0, 245, 155, 0.35);
+  color: var(--neon-emerald);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.pwa-install-pill:hover {
+  background: rgba(0, 245, 155, 0.22);
+  border-color: var(--neon-emerald);
+  box-shadow: 0 0 10px rgba(0, 245, 155, 0.3);
 }

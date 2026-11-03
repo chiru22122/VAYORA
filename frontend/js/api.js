@@ -1,4 +1,4 @@
-﻿/**
+/**
  * VAYORA CLIENT-SIDE API & UI ORCHESTRATION ENGINE
  * Handles network requests, token authentication, dynamic toasts,
  * real-time presence (WebSocket + heartbeat), and real payment checkout modal.
@@ -978,28 +978,9 @@ const VAYORA = (function() {
     // Disabled in favor of clean simple light/dark theme
   }
 
-  // --- DYNAMIC RIPPLE CLICK ENGINE ---
+  // --- DYNAMIC RIPPLE CLICK ENGINE (CLEAN NO-OP: PREVENT BUTTON BLOATING) ---
   function initRipples() {
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('.btn, .quick-action-card, .demo-btn-pill, .timeframe-btn');
-      if (!btn) return;
-
-      const rect = btn.getBoundingClientRect();
-      const circle = document.createElement('span');
-      const diameter = Math.max(rect.width, rect.height);
-      const radius = diameter / 2;
-
-      circle.style.width = circle.style.height = `${diameter}px`;
-      circle.style.left = `${e.clientX - rect.left - radius}px`;
-      circle.style.top = `${e.clientY - rect.top - radius}px`;
-      circle.classList.add('ripple-effect');
-
-      const existingRipple = btn.querySelector('.ripple-effect');
-      if (existingRipple) existingRipple.remove();
-
-      btn.appendChild(circle);
-      setTimeout(() => circle.remove(), 600);
-    });
+    // Disabled: Prevents unstyled span insertion that caused buttons to balloon/expand on click
   }
 
   // --- AMBIENT AURORA BACKGROUND INJECTOR (CLEAN NO-OP) ---
@@ -1106,7 +1087,57 @@ const VAYORA = (function() {
     const savedTheme = localStorage.getItem('vayora_theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
+    
+  // Progressive Web App (PWA) Support
+  let _deferredInstallPrompt = null;
+
+  function initPWA() {
+    if (typeof window === 'undefined') return;
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch((err) => {
+          console.debug('ServiceWorker registration skipped:', err);
+        });
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      _deferredInstallPrompt = e;
+      document.querySelectorAll('.pwa-install-btn, .pwa-install-pill, #pwa-install-topbar-btn').forEach((btn) => {
+        btn.style.display = 'inline-flex';
+      });
+    });
+
+    window.addEventListener('appinstalled', () => {
+      _deferredInstallPrompt = null;
+      document.querySelectorAll('.pwa-install-btn, .pwa-install-pill, #pwa-install-topbar-btn').forEach((btn) => {
+        btn.style.display = 'none';
+      });
+      showToast('App Installed', 'VAYORA is installed! Launch it from your home screen.', 'success');
+    });
+  }
+
+  async function installApp() {
+    if (_deferredInstallPrompt) {
+      _deferredInstallPrompt.prompt();
+      const choice = await _deferredInstallPrompt.userChoice;
+      if (choice.outcome === 'accepted') {
+        _deferredInstallPrompt = null;
+      }
+    } else {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+      if (isIOS) {
+        showToast('Install on iOS', 'Tap Share (⎋) in Safari and choose "Add to Home Screen" (+)', 'info');
+      } else {
+        showToast('Install App', 'Use your browser menu (⋮) and select "Install VAYORA" or "Add to Home Screen"', 'info');
+      }
+    }
+  }
+
     document.addEventListener('DOMContentLoaded', () => {
+      initPWA();
       initTheme();
       initRipples();
       updateSoundToggleUI();
@@ -1162,6 +1193,8 @@ const VAYORA = (function() {
     injectAuroraBackground,
     openDepositModal,
     playSound,
-    toggleSound
+    toggleSound,
+    initPWA,
+    installApp
   };
 })();

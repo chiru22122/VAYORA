@@ -1,0 +1,55 @@
+{
+  "name": "VAYORA — Institutional Digital Asset Bank & Payments",
+  "short_name": "VAYORA",
+  "description": "High-speed peer-to-peer digital asset transfers, instant QR scanning, atomic ledger settlement, and virtual cards.",
+  "start_url": "/dashboard.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#030712",
+  "theme_color": "#00F59B",
+  "orientation": "portrait-primary",
+  "categories": ["finance", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Send Payment",
+      "short_name": "Send",
+      "description": "Send crypto or fiat instantly",
+      "url": "/send.html",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Receive & QR",
+      "short_name": "Receive",
+      "description": "Show QR code or scan to receive",
+      "url": "/receive.html",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Transactions Ledger",
+      "short_name": "Ledger",
+      "description": "View dual-entry transaction receipts",
+      "url": "/transactions.html",
+      "icons": [{ "src": "/assets/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
