@@ -1086,8 +1086,8 @@ const VAYORA = (function() {
   if (typeof document !== 'undefined') {
     const savedTheme = localStorage.getItem('vayora_theme') || 'light';
     document.documentElement.setAttribute('data-theme', savedTheme);
+  }
 
-    
   // Progressive Web App (PWA) Support
   let _deferredInstallPrompt = null;
 
@@ -1136,6 +1136,8 @@ const VAYORA = (function() {
     }
   }
 
+
+  if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
       initPWA();
       initTheme();
