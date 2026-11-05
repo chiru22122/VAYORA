@@ -4,34 +4,90 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Create Account — VAYORA</title>
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/global.css?v=6">
+  <link rel="stylesheet" href="/css/animations.css?v=6">
   <style>
     .auth-page-wrap {
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 30px 20px;
+      padding: 36px 20px;
+      position: relative;
+      background-color: var(--bg-canvas);
+      background-image: 
+        radial-gradient(circle at 50% 12%, rgba(37, 99, 235, 0.06) 0%, transparent 55%),
+        radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.04) 0%, transparent 40%),
+        radial-gradient(rgba(148, 163, 184, 0.22) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 24px 24px;
+    }
+    [data-theme="dark"] .auth-page-wrap {
+      background-color: #0c111d;
+      background-image: 
+        radial-gradient(circle at 50% 15%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
+        radial-gradient(circle at 85% 85%, rgba(14, 165, 233, 0.06) 0%, transparent 40%),
+        radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
     }
     .auth-card {
       width: 100%;
-      max-width: 480px;
-      background: rgba(12, 15, 25, 0.85);
-      border: 1px solid var(--border-medium);
-      border-radius: var(--radius-xl);
-      padding: 40px 36px;
-      box-shadow: 0 25px 60px -10px rgba(0,0,0,0.85);
-      backdrop-filter: blur(20px);
+      max-width: 440px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 36px 32px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 8px 10px -6px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
       position: relative;
       overflow: hidden;
+      animation: smoothEntrance 0.5s var(--ease-spring) both;
+      transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .auth-card:hover {
+      border-color: var(--border-medium);
+      box-shadow: 0 14px 30px -4px rgba(15, 23, 42, 0.09), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
     }
     .auth-card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--grad-primary);
+      height: 2.5px;
+      background: linear-gradient(90deg, #2563eb, #3b82f6);
+    }
+    .brand-logo-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .brand-logo-mark:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+    }
+    .brand-logo-mark svg {
+      width: 22px;
+      height: 22px;
+      fill: #ffffff;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      height: 44px;
+      padding: 0 14px;
+      border-radius: 9px;
+      font-size: 0.9rem;
     }
   </style>
 </head>
@@ -41,54 +97,54 @@
     <div class="auth-card animate-entrance">
       
       <!-- Brand Header -->
-      <div style="text-align: center; margin-bottom: 28px;">
+      <div style="text-align: center; margin-bottom: 24px;">
         <a href="/" style="text-decoration: none; display: inline-flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-          <div class="brand-logo-mark" style="width: 44px; height: 44px;">
+          <div class="brand-logo-mark">
             <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
           </div>
-          <span style="font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; color: var(--text-primary); letter-spacing: 1px;">
-            VAYORA<span style="color: var(--neon-emerald);">.</span>
+          <span style="font-family: var(--font-display); font-size: 1.45rem; font-weight: 800; color: var(--text-primary); letter-spacing: 1.2px;">
+            VAYORA<span style="color: var(--primary-color);">.</span>
           </span>
         </a>
-        <h1 style="font-family: var(--font-display); font-size: 1.4rem; color: var(--text-primary); font-weight: 700;">Create Account</h1>
-        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Join the digital value platform</p>
+        <h1 style="font-family: var(--font-display); font-size: 1.35rem; color: var(--text-primary); font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px 0;">Create Account</h1>
+        <p style="font-size: 0.86rem; color: var(--text-muted); margin: 0;">Join the digital value platform</p>
       </div>
 
       <!-- Registration Form -->
       <form id="register-form">
         <div class="form-group">
-          <label class="form-label" for="reg-name">Full Name</label>
-          <input type="text" id="reg-name" class="form-control" placeholder="e.g. Maya Lin" required>
+          <label class="form-label" for="reg-name">Full name</label>
+          <input type="text" id="reg-name" class="form-control" placeholder="Maya Lin" autocomplete="name" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="reg-email">Email Address</label>
-          <input type="email" id="reg-email" class="form-control" placeholder="e.g. maya@example.com" required>
+          <label class="form-label" for="reg-email">Email address</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="maya@example.com" autocomplete="email" required>
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="reg-phone">Phone Number (Optional)</label>
-          <input type="text" id="reg-phone" class="form-control" placeholder="+1 (555) 000-0000">
+          <label class="form-label" for="reg-phone">Phone number (optional)</label>
+          <input type="text" id="reg-phone" class="form-control" placeholder="+1 (555) 000-0000" autocomplete="tel">
         </div>
 
         <div class="form-group">
           <label class="form-label" for="reg-password">Password</label>
-          <input type="password" id="reg-password" class="form-control" placeholder="Minimum 6 characters" required>
+          <input type="password" id="reg-password" class="form-control" placeholder="Minimum 6 characters" autocomplete="new-password" required>
         </div>
 
-        <button type="submit" id="reg-submit-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+        <button type="submit" id="reg-submit-btn" class="btn btn-primary btn-block btn-lg" style="width: 100%; margin-top: 10px;">
           Create Free Account
         </button>
       </form>
 
       <!-- Bottom Switcher -->
-      <div style="text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--text-secondary);">
+      <div style="text-align: center; margin-top: 22px; font-size: 0.85rem; color: var(--text-secondary);">
         Already have an account? 
-        <a href="/login.html" style="color: var(--primary-color); font-weight: 700; text-decoration: none;">Sign In</a>
+        <a href="/login.html" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Sign in</a>
       </div>
 
-      <div style="text-align: center; margin-top: 16px;">
-        <a href="/" style="font-size: 0.78rem; color: var(--text-muted); text-decoration: none;">← Return to Landing Page</a>
+      <div style="text-align: center; margin-top: 14px;">
+        <a href="/" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none; transition: color 0.15s ease;">← Return to landing page</a>
       </div>
 
     </div>
@@ -105,7 +161,7 @@
           A verification OTP has been generated for your account. Enter the 6-digit code below to confirm your email.
         </p>
 
-        <div id="otp-demo-code-notice" style="background: rgba(0, 245, 155, 0.1); border: 1px solid rgba(0, 245, 155, 0.3); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 0.82rem; color: var(--neon-emerald); font-weight: 600; margin-bottom: 20px;">
+        <div id="otp-demo-code-notice" style="background: rgba(37, 99, 235, 0.08); border: 1px solid rgba(37, 99, 235, 0.2); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 0.82rem; color: var(--primary-color); font-weight: 600; margin-bottom: 20px;">
           Checking verification code...
         </div>
 
@@ -114,21 +170,21 @@
           <input type="text" id="reg-otp-code" class="form-control" placeholder="123456" maxlength="6" style="font-family: var(--font-mono); font-size: 1.4rem; letter-spacing: 4px; text-align: center;">
         </div>
 
-        <button type="button" id="verify-otp-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 10px;">
+        <button type="button" id="verify-otp-btn" class="btn btn-primary btn-block btn-lg" style="width: 100%; margin-top: 10px;">
           Verify & Enter Dashboard
         </button>
 
         <div style="text-align: center; margin-top: 16px; font-size: 0.82rem; color: var(--text-secondary);">
           Didn't receive the email? 
-          <a href="#" id="resend-otp-btn" style="color: var(--primary-color); font-weight: 700; text-decoration: none; cursor: pointer;">Resend Code</a>
+          <a href="#" id="resend-otp-btn" style="color: var(--primary-color); font-weight: 600; text-decoration: none; cursor: pointer;">Resend code</a>
         </div>
       </div>
     </div>
   </div>
 
   <div id="toast-container"></div>
-  <script src="/config.js?v=3"></script>
-  <script src="/js/api.js?v=3"></script>
-  <script src="/js/auth.js?v=3"></script>
+  <script src="/config.js?v=7"></script>
+  <script src="/js/api.js?v=7"></script>
+  <script src="/js/auth.js?v=7"></script>
 </body>
 </html>

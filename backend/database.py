@@ -60,16 +60,18 @@ if DATABASE_URL.startswith("sqlite"):
     connect_args = {"check_same_thread": False}
     engine_kwargs = {"connect_args": connect_args}
 else:
-    # PostgreSQL engine: use NullPool on serverless (Vercel) to avoid connection leaks/timeouts
+    # PostgreSQL engine: use lightweight persistent pool on serverless (Vercel) to reuse warm connections
     is_serverless = os.getenv("VERCEL") == "1" or bool(os.getenv("VERCEL_ENV"))
     if is_serverless:
-        from sqlalchemy.pool import NullPool
         engine_kwargs = {
             "connect_args": {
-                "connect_timeout": 8,
+                "connect_timeout": 5,
                 "prepare_threshold": None,
             },
-            "poolclass": NullPool,
+            "pool_size": 2,
+            "max_overflow": 4,
+            "pool_recycle": 300,
+            "pool_pre_ping": False,
         }
     else:
         engine_kwargs = {

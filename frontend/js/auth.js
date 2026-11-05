@@ -186,10 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
             VAYORA.setToken(res.access_token);
             VAYORA.setCurrentUser(res.user);
             VAYORA.showToast('Welcome Back', `Logged in as ${res.user.name}`, 'success');
-
-            setTimeout(() => {
-              window.location.href = '/dashboard.html';
-            }, 600);
+            // Instant redirect: zero lag
+            window.location.href = '/dashboard.html';
+            return;
           }
         } catch (err) {
           VAYORA.showToast('Authentication Failed', err.message || 'Authentication failed', 'error');
@@ -223,10 +222,9 @@ document.addEventListener('DOMContentLoaded', () => {
         VAYORA.setToken(res.access_token);
         VAYORA.setCurrentUser(res.user);
         VAYORA.showToast('Authentication Verified', `Welcome back, ${res.user.name}!`, 'success');
-
-        setTimeout(() => {
-          window.location.href = '/dashboard.html';
-        }, 600);
+        // Instant redirect: zero lag
+        window.location.href = '/dashboard.html';
+        return;
       } catch (err) {
         VAYORA.showToast('Verification Failed', err.message || 'Verification failed', 'error');
         clearOtpDigits();
@@ -410,9 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           verifyOtpBtn.innerHTML = 'Verified!';
           VAYORA.showToast('Verified!', 'Email address verified successfully. Entering dashboard...', 'success');
-          setTimeout(() => {
-            window.location.href = '/dashboard.html';
-          }, 600);
+          window.location.href = '/dashboard.html';
         } catch (err) {
           isVerifyingOtp = false;
           verifyOtpBtn.disabled = false;

@@ -1,6 +1,7 @@
 import os
 import datetime
 import uuid
+import logging
 from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from sqlalchemy.orm import Session
@@ -28,6 +29,20 @@ from backend.services.presence_service import (
 )
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
+logger = logging.getLogger("vayora.auth")
+
+def _async_record_session_and_history(user_id: int, token_id: str, device: str, ip: str, login_type: str = "Login Successful"):
+    try:
+        from backend.database import SessionLocal
+        from backend.models import User
+        from backend.services.security_service import register_session, record_login_attempt
+        with SessionLocal() as s_db:
+            u = s_db.query(User).filter(User.user_id == user_id).first()
+            if u:
+                register_session(s_db, u, token_id, device, ip)
+                record_login_attempt(s_db, user_id, device, ip, True, login_type)
+    except Exception as e:
+        logger.warning(f"Background session record notice: {e}")
 
 def get_client_ip(request: Request) -> str:
     forwarded = request.headers.get("X-Forwarded-For")
@@ -56,7 +71,7 @@ def get_dispatched_emails(limit: int = 15):
     return get_recent_emails(limit)
 
 @router.post("/register", response_model=TokenResponse)
-def register(req: UserRegisterRequest, request: Request, db: Session = Depends(get_db)):
+def register(req: UserRegisterRequest, request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     clean_email = req.email.strip().lower()
     existing = db.query(User).filter(User.email == clean_email).first()
     if existing:
@@ -122,11 +137,8 @@ def register(req: UserRegisterRequest, request: Request, db: Session = Depends(g
     db.add(act)
     db.commit()
     
-    # Dispatch Real Email to user
-    try:
-        send_registration_otp_email(clean_email, otp_code, user.name)
-    except Exception:
-        pass
+    # Dispatch Real Email to user in background (non-blocking)
+    background_tasks.add_task(send_registration_otp_email, clean_email, otp_code, user.name)
     
     token_id = str(uuid.uuid4())
     access_token = create_access_token({"sub": str(user.user_id), "email": user.email, "role": user.role, "jti": token_id})
@@ -278,9 +290,10 @@ def login(req: UserLoginRequest, request: Request, background_tasks: BackgroundT
     # Complete Login (Issued directly for demo accounts or after OTP verification)
     token_id = str(uuid.uuid4())
     access_token = create_access_token({"sub": str(user.user_id), "email": user.email, "role": user.role, "jti": token_id})
-    register_session(db, user, token_id, device, ip)
-    record_login_attempt(db, user.user_id, device, ip, True, "Login Successful")
-    db.commit()
+    user_resp = UserResponse.from_orm(user)
+    
+    # Non-blocking background session logging: client receives token and redirects in <0.2s
+    background_tasks.add_task(_async_record_session_and_history, user.user_id, token_id, device, ip, "Login Successful")
 
     # Track real-time presence
     update_user_presence(user.user_id, user.name, user.email, user.role, user.avatar_color, "dashboard", ip, device)
@@ -289,14 +302,14 @@ def login(req: UserLoginRequest, request: Request, background_tasks: BackgroundT
     return TokenResponse(
         access_token=access_token,
         token_type="bearer",
-        user=UserResponse.from_orm(user),
+        user=user_resp,
         requires_otp=False,
         email=clean_email,
         message="Login successful."
     )
 
 @router.post("/verify-login-otp", response_model=TokenResponse)
-def verify_login_otp(req: VerifyLoginOTPRequest, request: Request, db: Session = Depends(get_db)):
+def verify_login_otp(req: VerifyLoginOTPRequest, request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     clean_email = req.email.strip().lower()
     user = db.query(User).filter(User.email == clean_email).first()
     if not user:
@@ -317,14 +330,17 @@ def verify_login_otp(req: VerifyLoginOTPRequest, request: Request, db: Session =
         )
         
     otp.used = True
+    db.commit()
+
     ip = get_client_ip(request)
     device = req.device_info or "Web Browser / 2FA Verified"
     
     token_id = str(uuid.uuid4())
     access_token = create_access_token({"sub": str(user.user_id), "email": user.email, "role": user.role, "jti": token_id})
-    register_session(db, user, token_id, device, ip)
-    record_login_attempt(db, user.user_id, device, ip, True, "OTP Login Success")
-    db.commit()
+    user_resp = UserResponse.from_orm(user)
+
+    # Non-blocking background session logging
+    background_tasks.add_task(_async_record_session_and_history, user.user_id, token_id, device, ip, "OTP Login Success")
 
     # Update real-time presence
     update_user_presence(user.user_id, user.name, user.email, user.role, user.avatar_color, "dashboard", ip, device)
@@ -333,14 +349,14 @@ def verify_login_otp(req: VerifyLoginOTPRequest, request: Request, db: Session =
     return TokenResponse(
         access_token=access_token,
         token_type="bearer",
-        user=UserResponse.from_orm(user),
+        user=user_resp,
         requires_otp=False,
         email=clean_email,
         message="Two-step authentication passed. Welcome to VAYORA!"
     )
 
 @router.post("/resend-login-otp")
-def resend_login_otp(req: ResendOTPRequest, request: Request, db: Session = Depends(get_db)):
+def resend_login_otp(req: ResendOTPRequest, request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     clean_email = req.email.strip().lower()
     user = db.query(User).filter(User.email == clean_email).first()
     if not user:
@@ -360,9 +376,9 @@ def resend_login_otp(req: ResendOTPRequest, request: Request, db: Session = Depe
 
     ip = get_client_ip(request)
     if req.otp_type == "verify_email":
-        send_registration_otp_email(clean_email, otp_code, user.name)
+        background_tasks.add_task(send_registration_otp_email, clean_email, otp_code, user.name)
     else:
-        send_login_otp_email(clean_email, otp_code, user.name, ip, "Web Browser")
+        background_tasks.add_task(send_login_otp_email, clean_email, otp_code, user.name, ip, "Web Browser")
 
     return {
         "success": True,
@@ -371,7 +387,7 @@ def resend_login_otp(req: ResendOTPRequest, request: Request, db: Session = Depe
     }
 
 @router.post("/forgot-password")
-def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
+def forgot_password(req: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     clean_email = req.email.strip().lower()
     user = db.query(User).filter(User.email == clean_email).first()
     if not user:
@@ -389,10 +405,7 @@ def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_db)):
     db.add(otp)
     db.commit()
 
-    try:
-        send_password_reset_email(clean_email, otp_code, user.name)
-    except Exception:
-        pass
+    background_tasks.add_task(send_password_reset_email, clean_email, otp_code, user.name)
 
     return {
         "message": f"Password reset code dispatched to {clean_email}.",

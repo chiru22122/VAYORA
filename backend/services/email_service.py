@@ -93,9 +93,9 @@ def send_email_sync(
             msg.attach(MIMEText(html_content, "html"))
 
             if cfg["use_ssl"] or cfg["port"] == 465:
-                server = smtplib.SMTP_SSL(cfg["host"], cfg["port"], timeout=12)
+                server = smtplib.SMTP_SSL(cfg["host"], cfg["port"], timeout=5)
             else:
-                server = smtplib.SMTP(cfg["host"], cfg["port"], timeout=12)
+                server = smtplib.SMTP(cfg["host"], cfg["port"], timeout=5)
                 if cfg["use_tls"]:
                     server.starttls()
 
