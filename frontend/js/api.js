@@ -166,10 +166,14 @@ const VAYORA = (function() {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+
     try {
       const config = {
         method: options.method || 'GET',
         headers,
+        signal: controller.signal,
         ...options
       };
 
@@ -178,6 +182,7 @@ const VAYORA = (function() {
       }
 
       const response = await fetch(url, config);
+      clearTimeout(timeoutId);
 
       if (response.status === 401) {
         const path = window.location.pathname.toLowerCase();
@@ -196,6 +201,10 @@ const VAYORA = (function() {
 
       return data;
     } catch (error) {
+      clearTimeout(timeoutId);
+      if (error && error.name === 'AbortError') {
+        throw new Error('Connection timed out. Please check your network and try again.');
+      }
       console.error(`[VAYORA API Error] ${endpoint}:`, error);
       if (typeof window !== 'undefined' && error instanceof TypeError && error.message.toLowerCase().includes('fetch')) {
         console.warn(`[VAYORA Backend Notice] Could not connect to API at: ${url}. Verify backend status at /api/health`);

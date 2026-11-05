@@ -1,5 +1,5 @@
 // VAYORA Service Worker for Progressive Web App (PWA)
-const CACHE_NAME = 'vayora-shell-v2';
+const CACHE_NAME = 'vayora-shell-v3';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -55,8 +55,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first with cache fallback for HTML pages
-  if (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html')) {
+  // Network-first with cache fallback for HTML, JS, and CSS files to guarantee immediate updates
+  const isCodeAsset = url.pathname.endsWith('.js') || url.pathname.endsWith('.css') || url.pathname.endsWith('.html') || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'));
+  if (isCodeAsset) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
@@ -66,7 +67,7 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(event.request).then((res) => res || caches.match('/dashboard.html')))
+        .catch(() => caches.match(event.request).then((res) => res || (url.pathname.endsWith('.html') ? caches.match('/dashboard.html') : null)))
     );
     return;
   }

@@ -192,7 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 600);
           }
         } catch (err) {
-          VAYORA.showToast('Authentication Failed', err.message, 'error');
+          VAYORA.showToast('Authentication Failed', err.message || 'Authentication failed', 'error');
+        } finally {
           submitBtn.disabled = false;
           submitBtn.innerHTML = 'Sign In to VAYORA';
         }
@@ -227,10 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
           window.location.href = '/dashboard.html';
         }, 600);
       } catch (err) {
-        VAYORA.showToast('Verification Failed', err.message, 'error');
+        VAYORA.showToast('Verification Failed', err.message || 'Verification failed', 'error');
+        clearOtpDigits();
+      } finally {
         verifyLoginBtn.disabled = false;
         verifyLoginBtn.innerHTML = 'Authorize & Sign In';
-        clearOtpDigits();
       }
     }
 

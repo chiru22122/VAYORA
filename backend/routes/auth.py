@@ -2,7 +2,7 @@ import os
 import datetime
 import uuid
 from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, BackgroundTasks
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User, EmailOTP, Card, Activity, AuditLog
@@ -208,7 +208,7 @@ def verify_email(req: VerifyEmailRequest, request: Request, db: Session = Depend
     }
 
 @router.post("/login", response_model=TokenResponse)
-def login(req: UserLoginRequest, request: Request, db: Session = Depends(get_db)):
+def login(req: UserLoginRequest, request: Request, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
     clean_email = req.email.strip().lower()
     ip = get_client_ip(request)
     device = req.device_info or "Web Browser"
@@ -245,31 +245,27 @@ def login(req: UserLoginRequest, request: Request, db: Session = Depends(get_db)
             )
         otp.used = True
 
-    # Generate fresh login OTP and dispatch REAL email
-    otp_code = generate_otp(6)
-    login_otp = EmailOTP(
-        user_id=user.user_id,
-        email=clean_email,
-        otp_code=otp_code,
-        otp_type="login_otp",
-        expires_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=15),
-        used=False
-    )
-    db.add(login_otp)
-    db.commit()
-
-    # Dispatch REAL email to user's real email address
-    try:
-        send_login_otp_email(clean_email, otp_code, user.name, ip, device)
-    except Exception:
-        pass
-
     # Check if 2-Step Verification should be presented to the user
-    # Real emails (not ending with .demo) or explicit require_otp requests will require the code
-    is_demo_account = clean_email.endswith(".demo")
-    should_require_otp = (req.require_otp is True) or (not is_demo_account and not req.otp_code)
+    # If explicit require_otp is True (or 2FA checkbox was checked) and no otp_code provided yet:
+    should_require_otp = (req.require_otp is True) and not req.otp_code
 
     if should_require_otp:
+        # Generate fresh login OTP and dispatch REAL email in background
+        otp_code = generate_otp(6)
+        login_otp = EmailOTP(
+            user_id=user.user_id,
+            email=clean_email,
+            otp_code=otp_code,
+            otp_type="login_otp",
+            expires_at=datetime.datetime.utcnow() + datetime.timedelta(minutes=15),
+            used=False
+        )
+        db.add(login_otp)
+        db.commit()
+
+        # Dispatch REAL email in background so the UI responds immediately without waiting for SMTP
+        background_tasks.add_task(send_login_otp_email, clean_email, otp_code, user.name, ip, device)
+
         return TokenResponse(
             access_token=None,
             token_type="bearer",
@@ -296,7 +292,7 @@ def login(req: UserLoginRequest, request: Request, db: Session = Depends(get_db)
         user=UserResponse.from_orm(user),
         requires_otp=False,
         email=clean_email,
-        message=f"Login successful. Security Code sent to email: {otp_code}"
+        message="Login successful."
     )
 
 @router.post("/verify-login-otp", response_model=TokenResponse)
