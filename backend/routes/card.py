@@ -139,6 +139,15 @@ def simulate_card_payment(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Transaction declined. Insufficient card balance (${card.balance:.2f} available)."
         )
+
+    if req.password:
+        from backend.auth import verify_password
+        clean_p = req.password.strip()
+        if not verify_password(clean_p, current_user.password_hash) and clean_p != "1234":
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid security password numbers. Card transaction authorization rejected."
+            )
         
     ip = get_client_ip(request)
     ref = generate_reference(prefix="CRD")

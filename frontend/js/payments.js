@@ -937,117 +937,108 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderRecentRecipients();
 
     // =======================================================================
-    // FEATURE 4: 4-DIGIT PIN & BIOMETRIC AUTHENTICATION
+    // FEATURE 4: PASSWORD NUMBERS & SECURITY AUTHORIZATION
     // =======================================================================
-    let currentEnteredPin = '';
-    const pinDots = [
-      document.getElementById('pindot-0'),
-      document.getElementById('pindot-1'),
-      document.getElementById('pindot-2'),
-      document.getElementById('pindot-3')
-    ];
+    const payPasswordInput = document.getElementById('modal-payment-password');
+    const togglePayPassBtn = document.getElementById('toggle-pay-password-btn');
+    const payPassErrorEl = document.getElementById('payment-password-error');
     const pinKeypadGrid = document.getElementById('pin-keypad-grid');
+    const pinClearBtn = document.getElementById('pin-clear-btn');
+    const pinBackspaceBtn = document.getElementById('pin-backspace-btn');
     const bioFeedbackWrap = document.getElementById('bio-scanning-feedback');
 
-    function updatePinDotsUI(status = '') {
-      pinDots.forEach((dot, idx) => {
-        if (!dot) return;
-        dot.className = 'pin-dot';
-        if (status === 'success') {
-          dot.classList.add('filled', 'success');
-        } else if (status === 'error') {
-          dot.classList.add('filled', 'error');
-        } else if (idx < currentEnteredPin.length) {
-          dot.classList.add('filled');
-        }
-      });
-    }
-
-    function resetPinState() {
-      currentEnteredPin = '';
-      updatePinDotsUI();
+    function resetPayPasswordState() {
+      if (payPasswordInput) {
+        payPasswordInput.value = '';
+        payPasswordInput.type = 'password';
+        payPasswordInput.classList.remove('input-error-shake');
+      }
+      if (togglePayPassBtn) {
+        togglePayPassBtn.textContent = '👁️';
+        togglePayPassBtn.title = 'Show Password Numbers';
+      }
+      if (payPassErrorEl) {
+        payPassErrorEl.style.display = 'none';
+        payPassErrorEl.textContent = '';
+      }
       if (pinKeypadGrid) pinKeypadGrid.style.display = 'grid';
       if (bioFeedbackWrap) bioFeedbackWrap.style.display = 'none';
     }
 
-    function handlePinDigit(digit) {
-      if (currentEnteredPin.length >= 4) return;
-      currentEnteredPin += digit;
-      updatePinDotsUI();
+    function handleKeypadDigit(digit) {
+      if (!payPasswordInput) return;
+      payPasswordInput.value += digit;
+      if (payPassErrorEl) payPassErrorEl.style.display = 'none';
       VAYORA.playSound('blip');
-
-      if (currentEnteredPin.length === 4) {
-        verifyAndExecuteTransfer();
-      }
     }
 
-    function handlePinBackspace() {
-      if (currentEnteredPin.length > 0) {
-        currentEnteredPin = currentEnteredPin.slice(0, -1);
-        updatePinDotsUI();
-        VAYORA.playSound('blip');
-      }
+    function handleKeypadBackspace() {
+      if (!payPasswordInput || payPasswordInput.value.length === 0) return;
+      payPasswordInput.value = payPasswordInput.value.slice(0, -1);
+      if (payPassErrorEl) payPassErrorEl.style.display = 'none';
+      VAYORA.playSound('blip');
     }
 
-    function triggerBiometricAuth() {
-      if (pinKeypadGrid) pinKeypadGrid.style.display = 'none';
-      if (bioFeedbackWrap) bioFeedbackWrap.style.display = 'block';
-      VAYORA.playSound('scanner');
-
-      setTimeout(() => {
-        currentEnteredPin = '1234';
-        updatePinDotsUI('success');
-        VAYORA.playSound('success');
-        setTimeout(() => {
-          verifyAndExecuteTransfer(true);
-        }, 400);
-      }, 850);
+    function handleKeypadClear() {
+      if (!payPasswordInput) return;
+      payPasswordInput.value = '';
+      if (payPassErrorEl) payPassErrorEl.style.display = 'none';
+      VAYORA.playSound('blip');
     }
 
-    function verifyAndExecuteTransfer(isBiometric = false) {
-      updatePinDotsUI('success');
-      if (executeBtn) {
-        executeBtn.click();
-      }
+    // Toggle Password Visibility (Eye Icon)
+    if (togglePayPassBtn && payPasswordInput) {
+      togglePayPassBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (payPasswordInput.type === 'password') {
+          payPasswordInput.type = 'text';
+          togglePayPassBtn.textContent = '🙈';
+          togglePayPassBtn.title = 'Hide Password Numbers';
+        } else {
+          payPasswordInput.type = 'password';
+          togglePayPassBtn.textContent = '👁️';
+          togglePayPassBtn.title = 'Show Password Numbers';
+        }
+      });
     }
 
     // Bind Keypad clicks
     if (pinKeypadGrid) {
       pinKeypadGrid.querySelectorAll('[data-digit]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          handlePinDigit(btn.getAttribute('data-digit'));
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          handleKeypadDigit(btn.getAttribute('data-digit'));
         });
       });
-      const backspaceBtn = document.getElementById('pin-backspace-btn');
-      if (backspaceBtn) {
-        backspaceBtn.addEventListener('click', handlePinBackspace);
+      if (pinBackspaceBtn) {
+        pinBackspaceBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          handleKeypadBackspace();
+        });
       }
-      const faceIdBtn = document.getElementById('pin-faceid-btn');
-      if (faceIdBtn) {
-        faceIdBtn.addEventListener('click', triggerBiometricAuth);
+      if (pinClearBtn) {
+        pinClearBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          handleKeypadClear();
+        });
       }
     }
 
-    const pinBypassBtn = document.getElementById('pin-bypass-btn');
-    if (pinBypassBtn) {
-      pinBypassBtn.addEventListener('click', () => {
-        currentEnteredPin = '1234';
-        updatePinDotsUI('success');
-        verifyAndExecuteTransfer();
+    // Direct typing in password field
+    if (payPasswordInput) {
+      payPasswordInput.addEventListener('input', () => {
+        if (payPassErrorEl) payPassErrorEl.style.display = 'none';
+      });
+      payPasswordInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (executeBtn && !executeBtn.disabled) {
+            executeBtn.click();
+          }
+        }
       });
     }
-
-    // Physical Keyboard support for PIN inside confirmation modal
-    window.addEventListener('keydown', (e) => {
-      if (!confModal || (!confModal.classList.contains('open') && confModal.style.display !== 'flex')) return;
-      if (e.key >= '0' && e.key <= '9') {
-        e.preventDefault();
-        handlePinDigit(e.key);
-      } else if (e.key === 'Backspace') {
-        e.preventDefault();
-        handlePinBackspace();
-      }
-    });
 
     // =======================================================================
     // FEATURE 1: DIGITAL RECEIPT DOWNLOAD, SHARE & PRINT
@@ -1171,11 +1162,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (confAmtEl) confAmtEl.textContent = `${tx.amount.toFixed(4)} ${tx.asset_symbol}`;
       if (confRecipientEl) confRecipientEl.textContent = tx.recipient;
       if (confNoteEl) confNoteEl.textContent = tx.note || 'None';
-      resetPinState();
+      resetPayPasswordState();
       if (confModal) {
         confModal.classList.add('open');
         confModal.style.display = 'flex';
       }
+      setTimeout(() => {
+        if (payPasswordInput) payPasswordInput.focus();
+      }, 120);
     }
 
     function closeConfirmationModal() {
@@ -1183,6 +1177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         confModal.classList.remove('open');
         confModal.style.display = 'none';
       }
+      resetPayPasswordState();
     }
 
     function proceedToConfirmation() {
@@ -1266,6 +1261,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       executeBtn.addEventListener('click', async () => {
         if (!pendingTx) return;
 
+        // Check password numbers requirement
+        const enteredPassword = payPasswordInput ? payPasswordInput.value.trim() : '';
+        if (!enteredPassword) {
+          if (payPassErrorEl) {
+            payPassErrorEl.textContent = '⚠️ Password numbers are required to authorize this transfer.';
+            payPassErrorEl.style.display = 'block';
+          }
+          if (payPasswordInput) {
+            payPasswordInput.classList.add('input-error-shake');
+            payPasswordInput.focus();
+            setTimeout(() => payPasswordInput.classList.remove('input-error-shake'), 450);
+          }
+          VAYORA.showToast('Authorization Required', 'Please enter your password numbers to authorize this payment', 'error');
+          return;
+        }
+
         executeBtn.disabled = true;
         executeBtn.innerHTML = '<span class="spinner"></span> Authorizing with Ledger...';
 
@@ -1278,6 +1289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
               recipient: pendingTx.recipient,
               asset_symbol: pendingTx.asset_symbol,
               amount: pendingTx.amount,
+              password: enteredPassword,
               note: pendingTx.note,
               idempotency_key: idempotencyKey
             }
@@ -1312,6 +1324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (recipientInput) recipientInput.value = '';
           if (noteInput) noteInput.value = '';
           if (calcFiatEl) calcFiatEl.textContent = '≈ $0.00 USD';
+          pendingTx = null;
 
           // Refresh balances
           const wallet = await VAYORA.request('/wallet');
@@ -1320,11 +1333,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (err) {
           console.error(err);
-          VAYORA.showToast('Transfer Failed', err.message, 'error');
+          const isAuthError = err.status === 401 || (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('unauthorized') || err.message.toLowerCase().includes('declined')));
+          if (isAuthError) {
+            if (payPassErrorEl) {
+              payPassErrorEl.textContent = err.message || '⚠️ Invalid password numbers. Payment transfer declined.';
+              payPassErrorEl.style.display = 'block';
+            }
+            if (payPasswordInput) {
+              payPasswordInput.value = '';
+              payPasswordInput.classList.add('input-error-shake');
+              payPasswordInput.focus();
+              setTimeout(() => payPasswordInput.classList.remove('input-error-shake'), 450);
+            }
+            VAYORA.playSound('error');
+            VAYORA.showToast('Security Authorization Failed', err.message || 'Invalid password numbers. Payment transfer declined.', 'error');
+            // Do NOT null pendingTx so the user can easily re-type their password numbers!
+          } else {
+            VAYORA.showToast('Transfer Failed', err.message, 'error');
+            pendingTx = null;
+          }
         } finally {
           executeBtn.disabled = false;
           executeBtn.textContent = 'Authorize & Execute Transfer';
-          pendingTx = null;
         }
       });
     }

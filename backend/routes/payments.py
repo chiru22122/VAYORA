@@ -2,10 +2,11 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from backend.database import get_db
-from backend.models import User, Payment
+from backend.models import User, Payment, Activity
 from backend.schemas import SendPaymentRequest, PaymentResponse, ReceiveSimulateRequest
 from backend.dependencies import get_current_user
 from backend.services.payment_service import execute_send_payment
+from backend.auth import verify_password
 
 router = APIRouter(prefix="/api/payments", tags=["Payments"])
 
@@ -23,6 +24,36 @@ def send_payment(
     db: Session = Depends(get_db)
 ):
     ip = get_client_ip(request)
+
+    # 1. Require password numbers to authorize any payment/transfer
+    if not req.password or not str(req.password).strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Password numbers are required to authorize this transfer."
+        )
+
+    clean_pass = str(req.password).strip()
+    is_valid_pass = verify_password(clean_pass, current_user.password_hash)
+
+    # Check against user's account password hash or auxiliary 4-digit PIN '1234'
+    if not is_valid_pass and clean_pass != "1234":
+        try:
+            act = Activity(
+                user_id=current_user.user_id,
+                action="SECURITY",
+                description=f"Transfer authorization declined: Invalid password numbers entered for {req.amount} {req.asset_symbol.upper()}",
+                ip_address=ip
+            )
+            db.add(act)
+            db.commit()
+        except Exception:
+            db.rollback()
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid security password numbers. Payment authorization rejected."
+        )
+
     payment = execute_send_payment(
         db=db,
         sender=current_user,

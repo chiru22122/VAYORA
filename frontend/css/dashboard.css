@@ -924,3 +924,15 @@
   border-color: var(--neon-emerald);
   box-shadow: 0 0 10px rgba(0, 245, 155, 0.3);
 }
+
+/* Password Error Shake & Authorization */
+@keyframes inputErrorShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.input-error-shake {
+  animation: inputErrorShake 0.4s ease-in-out;
+  border-color: #ff4757 !important;
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.4) !important;
+}

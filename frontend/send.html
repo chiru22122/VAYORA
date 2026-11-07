@@ -8,9 +8,10 @@
   <meta name="theme-color" content="#030712">
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link rel="apple-touch-icon" href="/assets/icon-192.png">
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/wallet.css">
-  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/global.css?v=11">
+  <link rel="stylesheet" href="/css/wallet.css?v=11">
+  <link rel="stylesheet" href="/css/animations.css?v=11">
+  <link rel="stylesheet" href="/css/dashboard.css?v=11">
   <style>
     .send-container {
       max-width: 620px;
@@ -490,7 +491,7 @@
     </main>
   </div>
 
-  <!-- Send Confirmation Modal with 4-Digit PIN & Biometrics -->
+  <!-- Send Confirmation Modal with Password Numbers Authorization & Touch Keypad -->
   <div id="send-confirm-modal" class="modal-backdrop">
     <div class="modal-window" style="max-width: 440px;">
       <div class="modal-header">
@@ -519,21 +520,40 @@
           </div>
         </div>
 
-        <!-- 4-Digit PIN & Biometric Authorization -->
-        <div class="pin-auth-container">
-          <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">
-            Security Authorization PIN
+        <!-- Password Numbers Security Authorization -->
+        <div class="pin-auth-container" style="margin-top: 6px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+              <span>🔒</span> Enter Password Numbers
+            </span>
+            <span style="font-size: 0.68rem; color: var(--neon-emerald); font-weight: 600; background: rgba(0, 245, 155, 0.1); padding: 2px 8px; border-radius: var(--radius-pill); border: 1px solid rgba(0, 245, 155, 0.25);">Required to Pay</span>
           </div>
-          <div style="font-size: 0.70rem; color: var(--text-muted);">
-            Enter your 4-digit PIN or tap Face ID
+          <div style="font-size: 0.72rem; color: var(--text-muted); text-align: left; margin-bottom: 10px;">
+            Enter your account password numbers below to authorize this payment.
           </div>
 
-          <!-- PIN Dots Indicator -->
-          <div class="pin-dots-container" id="pin-dots-display">
-            <span class="pin-dot" id="pindot-0"></span>
-            <span class="pin-dot" id="pindot-1"></span>
-            <span class="pin-dot" id="pindot-2"></span>
-            <span class="pin-dot" id="pindot-3"></span>
+          <div style="position: relative; display: flex; align-items: center; margin-bottom: 8px;">
+            <span style="position: absolute; left: 14px; font-size: 1rem; color: var(--neon-emerald); pointer-events: none;">🔑</span>
+            <input 
+              type="password" 
+              id="modal-payment-password" 
+              class="form-control" 
+              placeholder="Enter password numbers" 
+              inputmode="numeric" 
+              autocomplete="current-password" 
+              style="padding-left: 42px; padding-right: 48px; font-size: 1.25rem; font-family: var(--font-mono); letter-spacing: 4px; height: 50px; text-align: center; border-color: rgba(0, 245, 155, 0.4); background: var(--bg-primary); box-shadow: 0 0 12px rgba(0, 245, 155, 0.12);" 
+              required
+            >
+            <button 
+              type="button" 
+              id="toggle-pay-password-btn" 
+              style="position: absolute; right: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.15rem; padding: 4px;" 
+              title="Show / Hide Password Numbers"
+            >👁️</button>
+          </div>
+
+          <div id="payment-password-error" style="display: none; color: #ff4757; font-size: 0.75rem; font-weight: 600; margin-bottom: 10px; text-align: center;">
+            ⚠️ Invalid password numbers. Payment transfer declined.
           </div>
 
           <!-- Biometric Scanning Feedback -->
@@ -543,8 +563,8 @@
             <div style="font-size: 0.70rem; color: var(--text-muted);">Simulating Touch / Face ID cryptographic handshake</div>
           </div>
 
-          <!-- Onscreen Keypad -->
-          <div class="pin-keypad" id="pin-keypad-grid">
+          <!-- Onscreen Keypad for touch digit entry -->
+          <div class="pin-keypad" id="pin-keypad-grid" style="margin-top: 10px; margin-bottom: 8px;">
             <button type="button" class="pin-key" data-digit="1">1</button>
             <button type="button" class="pin-key" data-digit="2">2</button>
             <button type="button" class="pin-key" data-digit="3">3</button>
@@ -554,17 +574,15 @@
             <button type="button" class="pin-key" data-digit="7">7</button>
             <button type="button" class="pin-key" data-digit="8">8</button>
             <button type="button" class="pin-key" data-digit="9">9</button>
-            <button type="button" class="pin-key pin-key-bio" id="pin-faceid-btn" title="Simulate Biometric Face ID Scan">
-              <span style="font-size: 1.1rem;">🧬</span>
-              <span style="font-size: 0.60rem; font-weight: 700; color: var(--neon-cyan);">Face ID</span>
+            <button type="button" class="pin-key pin-key-bio" id="pin-clear-btn" title="Clear Digits">
+              <span style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">CLEAR</span>
             </button>
             <button type="button" class="pin-key" data-digit="0">0</button>
             <button type="button" class="pin-key pin-key-del" id="pin-backspace-btn" title="Backspace">⌫</button>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-size: 0.70rem;">
-            <span style="color: var(--text-muted);">Demo PIN: <strong style="color: var(--neon-emerald);">1234</strong></span>
-            <button type="button" id="pin-bypass-btn" style="background: none; border: none; color: var(--neon-cyan); cursor: pointer; text-decoration: underline; font-size: 0.70rem;">Skip PIN (Instant)</button>
+          <div style="display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 0.70rem; color: var(--text-muted); margin-top: 4px;">
+            <span>🔒 256-bit AES Transfer Encryption</span>
           </div>
         </div>
 
@@ -643,8 +661,8 @@
   </div>
 
   <div id="toast-container"></div>
-  <script src="/js/api.js"></script>
+  <script src="/js/api.js?v=11"></script>
   <script src="/js/jsqr.min.js"></script>
-  <script src="/js/payments.js"></script>
+  <script src="/js/payments.js?v=11"></script>
 </body>
 </html>

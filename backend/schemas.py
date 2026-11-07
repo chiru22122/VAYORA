@@ -135,6 +135,7 @@ class SendPaymentRequest(BaseModel):
     recipient: str = Field(..., description="Recipient email address, wallet address, or token address")
     asset_symbol: str = Field(..., description="Asset symbol e.g. USDT, BTC")
     amount: float = Field(..., gt=0, description="Amount to send")
+    password: Optional[str] = Field(None, description="User security password numbers to authorize payment")
     note: Optional[str] = Field(None, max_length=255)
     idempotency_key: Optional[str] = Field(None, description="Optional client idempotency key to prevent duplicate transfers")
 
@@ -303,6 +304,7 @@ class CardThemeRequest(BaseModel):
 class CardSimulatePaymentRequest(BaseModel):
     merchant: str = Field(..., min_length=2, max_length=100)
     amount: float = Field(..., gt=0)
+    password: Optional[str] = Field(None, description="Security password numbers to authorize card payment")
 
 # --- NFC SCHEMAS ---
 
