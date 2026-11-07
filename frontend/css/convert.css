@@ -202,6 +202,8 @@
   border: none;
   cursor: pointer;
   transition: all var(--transition-fast);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .view-toggle-tab:hover {
@@ -212,6 +214,21 @@
   background: var(--bg-card);
   color: var(--text-primary);
   box-shadow: var(--shadow-sm);
+}
+
+/* Convert & Payout Dual-Column Modules Layout */
+.convert-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  align-items: start;
+  margin-bottom: 24px;
+}
+
+.payout-details-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
 }
 
 /* Quick percentage selector buttons */
@@ -226,14 +243,20 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
-  padding: 6px;
-  font-size: 0.75rem;
+  padding: 8px 6px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  font-size: 0.8rem;
   font-family: var(--font-mono);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast);
   text-align: center;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .quick-pct-btn:hover {
@@ -459,19 +482,30 @@
   gap: 8px;
   overflow-x: auto;
   white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.chat-suggestions-bar::-webkit-scrollbar {
+  display: none;
 }
 
 .prompt-chip {
   background: var(--bg-secondary);
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
-  padding: 6px 12px;
-  font-size: 0.76rem;
+  padding: 8px 14px;
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  touch-action: manipulation;
+  font-size: 0.78rem;
   color: var(--text-secondary);
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .prompt-chip:hover {
@@ -563,6 +597,25 @@
   .live-meta-stats {
     flex-wrap: wrap;
     gap: 12px;
+  }
+  .convert-modules-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .payout-details-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .convert-view-toggle {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .view-toggle-tab {
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.82rem;
+    text-align: center;
   }
 }
 

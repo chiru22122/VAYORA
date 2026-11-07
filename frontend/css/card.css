@@ -575,6 +575,12 @@
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-picker-card:active {
+  transform: scale(0.96);
 }
 
 .theme-picker-card:hover {

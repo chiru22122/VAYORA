@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Auto-Pay & Recurring Subscriptions — VAYORA</title>
+  <title>Auto-Pay & Recurring Subscriptions � VAYORA</title>
   <link rel="stylesheet" href="/css/global.css">
   <link rel="stylesheet" href="/css/animations.css">
   <style>
@@ -166,7 +166,7 @@
             <li>
               <a href="/convert.html" class="nav-link" data-page="convert">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M15 9.5a3.5 3.5 0 0 0-7 0c0 2 2 3 4 3s4 1 4 3a3.5 3.5 0 0 1-7 0"/></svg>
-                <span>Convert USDT → INR</span>
+                <span>Convert USDT ? INR</span>
               </a>
             </li>
           </ul>
@@ -234,7 +234,7 @@
           <button class="topbar-action-btn sound-toggle-btn" onclick="VAYORA.toggleSound()"></button>
           <button onclick="VAYORA.openDepositModal()" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span>Deposit Funds</span>
+            <span class="btn-text-desktop">Deposit</span>
           </button>
           <a href="/notifications.html" class="topbar-action-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="notif-badge-dot"></span></a>
           <a href="/profile.html" class="user-profile-chip"><div class="avatar-sphere">U</div><div class="user-info-text"><span class="user-name-label dynamic-user-name">User</span><span class="user-role-label dynamic-user-email">Account</span></div></a>
@@ -321,7 +321,7 @@
                 </div>
               </div>
               <span class="status-pill ${s.status === 'ACTIVE' ? 'status-completed' : 'status-pending'}">
-                ● ${s.status}
+                ? ${s.status}
               </span>
             </div>
 
@@ -338,7 +338,7 @@
           </div>
 
           <div style="display: flex; gap: 8px;">
-            <button onclick="triggerBilling('${s.sub_id}')" class="btn btn-primary btn-sm" style="flex: 2;">⚡ Pay Billing Now</button>
+            <button onclick="triggerBilling('${s.sub_id}')" class="btn btn-primary btn-sm" style="flex: 2;">? Pay Billing Now</button>
             <button onclick="toggleSubscription('${s.sub_id}', ${s.status === 'ACTIVE' ? 'false' : 'true'})" class="btn btn-secondary btn-sm" style="flex: 1;">
               ${s.status === 'ACTIVE' ? 'Pause' : 'Resume'}
             </button>
@@ -376,3 +376,4 @@
   </script>
 </body>
 </html>
+

@@ -1426,10 +1426,12 @@ a {
     margin-left: var(--sidebar-width);
     min-height: 100vh;
     width: calc(100% - var(--sidebar-width));
-    max-width: 1440px;
   }
   .app-content {
     padding: 28px 36px;
+    max-width: 1440px;
+    margin: 0 auto;
+    width: 100%;
   }
   .app-topbar {
     height: 64px;
@@ -1543,12 +1545,19 @@ a {
     min-height: 44px;
   }
 
-  .topbar-right .btn span {
+  .topbar-right .btn .btn-text-desktop {
     display: none !important;
   }
   .topbar-right .btn {
-    padding: 6px 10px !important;
-    min-height: 38px !important;
+    padding: 6px 12px !important;
+    min-height: 40px !important;
+    min-width: 40px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
   .topbar-right {
     gap: 8px !important;
@@ -1577,6 +1586,11 @@ a {
     align-items: center;
     justify-content: center;
     -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  .btn:active, .quick-action-btn:active, .mobile-nav-item:active, .prompt-chip:active {
+    transform: scale(0.97);
+    transition: transform 0.08s ease;
   }
 
   /* Single Column Stack on Mobile */
@@ -1624,7 +1638,7 @@ a {
     max-height: calc(85vh - 100px);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    padding: 16px 18px 24px 18px;
+    padding: 16px 18px calc(24px + env(safe-area-inset-bottom, 16px)) 18px !important;
   }
 }
 

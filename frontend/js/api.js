@@ -1415,6 +1415,16 @@ const VAYORA = (function () {
       initTheme();
       initRipples();
       updateSoundToggleUI();
+
+      // Guaranteed auto-init fallback for mobile navigation and drawer
+      setTimeout(() => {
+        const path = window.location.pathname.toLowerCase();
+        const cleanPath = path.split('/').pop().replace('.html', '') || 'dashboard';
+        const isPublicPage = ['login', 'register', 'forgot', 'index'].includes(cleanPath);
+        if (!isPublicPage && !document.querySelector('.mobile-bottom-nav')) {
+          initShell(cleanPath);
+        }
+      }, 60);
     });
   }
 
