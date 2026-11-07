@@ -1,5 +1,5 @@
 // VAYORA Service Worker for Progressive Web App (PWA)
-const CACHE_NAME = 'vayora-shell-v14';
+const CACHE_NAME = 'vayora-shell-v15';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

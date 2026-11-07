@@ -219,78 +219,6 @@
         
         <div class="send-container">
 
-          <!-- DEDICATED SEPARATE CAMERA & QR SCANNER SECTION -->
-          <div id="send-camera-section" class="vayora-card highlight-cyan" style="margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <div style="width: 32px; height: 32px; border-radius: 50%; background: rgba(0, 245, 155, 0.15); color: var(--neon-emerald); display: flex; align-items: center; justify-content: center; font-size: 1rem;">
-                  📷
-                </div>
-                <div>
-                  <h3 style="font-size: 1.15rem; color: var(--text-primary); margin: 0; font-family: var(--font-display);">Camera &amp; QR Code Scanner</h3>
-                  <div style="font-size: 0.72rem; color: var(--text-muted);">Scan recipient or invoice QR to auto-fill the transfer form</div>
-                </div>
-              </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
-                <span class="status-pill status-active" id="send-cam-live-indicator" style="display: none;">● Live Stream</span>
-                <button type="button" id="toggle-send-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.74rem;">Hide Scanner</button>
-              </div>
-            </div>
-
-            <div id="send-cam-content-wrap">
-              <!-- Scanner Sub-tabs -->
-              <div style="display: flex; gap: 6px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 16px;">
-                <button type="button" id="tab-send-camera" class="scanner-tab-btn active" style="flex: 1; border: none; background: var(--bg-surface); color: var(--primary-color); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Live Camera</button>
-                <button type="button" id="tab-send-upload" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Upload / Drop Image</button>
-              </div>
-
-              <!-- VIEW 1: Live Video Camera Viewfinder -->
-              <div id="view-send-camera" style="display: block; text-align: center;">
-                <div class="scanner-viewport-box" style="position: relative; width: 100%; aspect-ratio: 1/1; max-width: 300px; margin: 0 auto 12px auto; background: #000; border-radius: var(--radius-md); overflow: hidden; border: 2px solid var(--border-medium); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                  <video id="send-video-feed" playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
-                  <canvas id="send-canvas-feed" style="display: none;"></canvas>
-                  
-                  <!-- Viewfinder reticle overlay -->
-                  <div class="scanner-reticle-overlay" style="position: absolute; inset: 0; pointer-events: none; display: flex; align-items: center; justify-content: center;">
-                    <div style="width: 72%; height: 72%; border: 2px solid rgba(0, 245, 155, 0.85); border-radius: 14px; box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45); position: relative;">
-                      <div class="scanner-laser-line"></div>
-                    </div>
-                  </div>
-                  
-                  <div id="send-camera-status-text" style="position: absolute; bottom: 8px; left: 8px; right: 8px; text-align: center; font-size: 0.72rem; background: rgba(0,0,0,0.78); color: #fff; padding: 4px 8px; border-radius: var(--radius-pill);">
-                    Camera ready. Click "Start Camera" to scan.
-                  </div>
-                </div>
-
-                <div style="display: flex; justify-content: center; gap: 8px; flex-wrap: wrap;">
-                  <button type="button" id="send-start-cam-btn" class="btn btn-primary btn-sm" style="font-size: 0.76rem; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                    <span>Start Camera</span>
-                  </button>
-                  <button type="button" id="send-stop-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.76rem; display: inline-flex; align-items: center; gap: 6px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="6" width="12" height="12"/></svg>
-                    <span>Stop Camera</span>
-                  </button>
-                  <button type="button" id="send-flip-cam-btn" class="btn btn-secondary btn-sm" style="font-size: 0.76rem;">
-                    🔄 Flip Camera
-                  </button>
-                </div>
-              </div>
-
-              <!-- VIEW 2: Upload or Drop QR Image -->
-              <div id="view-send-upload" style="display: none;">
-                <div id="send-dropzone-box" style="border: 2px dashed var(--border-medium); border-radius: var(--radius-md); padding: 26px 16px; text-align: center; cursor: pointer; transition: all 0.2s ease; background: var(--bg-secondary); margin-bottom: 8px;">
-                  <div style="font-size: 2rem; margin-bottom: 4px;">🖼️</div>
-                  <div style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Click to Browse or Drag &amp; Drop QR Image</div>
-                  <div style="font-size: 0.74rem; color: var(--text-muted); margin-bottom: 10px;">Or press Ctrl+V anywhere to paste screenshot</div>
-                  <input type="file" id="send-file-picker" accept="image/*" style="display: none;">
-                  <span class="btn btn-primary btn-sm" style="pointer-events: none;">Select File</span>
-                </div>
-                <div id="send-upload-status" style="text-align: center; font-size: 0.74rem; color: var(--text-secondary); min-height: 16px;"></div>
-              </div>
-            </div>
-          </div>
-
           <!-- Core Transfer Card -->
           <div id="send-form-card" class="vayora-card highlight-emerald">
             <div class="card-header">
@@ -335,9 +263,9 @@
                     <span>Recipient Email, Token Address, or VAYORA ID</span>
                     <span id="recipient-online-badge" style="display: none; font-size: 0.7rem; font-weight: 700; color: var(--neon-emerald);"></span>
                   </div>
-                  <button type="button" id="open-qr-scanner-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; font-size: 0.75rem; color: var(--neon-cyan); border-color: rgba(2, 132, 199, 0.4);" title="Scan QR Code to Pre-fill Recipient and Amount">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect x="7" y="7" width="10" height="10" rx="1"/></svg>
-                    <span>Scan QR</span>
+                  <button type="button" id="open-qr-scanner-btn" class="btn btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; font-size: 0.78rem; color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.4); background: rgba(0, 210, 255, 0.08); border-radius: var(--radius-pill); font-weight: 600;" title="Scan QR Code on Camera">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <span>📷 Scan QR</span>
                   </button>
                 </div>
                 <!-- RECENT RECIPIENTS QUICK-PAY CAROUSEL -->
@@ -355,7 +283,10 @@
 
                 <input type="text" id="send-recipient-input" class="form-control" placeholder="Enter recipient email or token address (e.g. TX..., bc1q..., 0x...)" required>
                 <div style="display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap;">
-                  <button type="button" id="scan-qr-quick-btn" class="demo-btn-pill" style="margin: 0; padding: 4px 10px; font-size: 0.72rem; color: var(--neon-cyan); border-color: rgba(2, 132, 199, 0.4);">📷 Scan Recipient QR Code</button>
+                  <button type="button" id="scan-qr-quick-btn" class="btn btn-secondary btn-sm" style="margin: 0; display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; font-size: 0.76rem; color: var(--neon-cyan); border-color: rgba(0, 210, 255, 0.35); background: rgba(0, 210, 255, 0.08); border-radius: var(--radius-pill); font-weight: 600; cursor: pointer;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                    <span>📷 Scan QR on Camera</span>
+                  </button>
                 </div>
               </div>
 
@@ -655,6 +586,6 @@
   <div id="toast-container"></div>
   <script src="/js/api.js?v=11"></script>
   <script src="/js/jsqr.min.js"></script>
-  <script src="/js/payments.js?v=11"></script>
+  <script src="/js/payments.js?v=12"></script>
 </body>
 </html>

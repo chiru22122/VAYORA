@@ -431,42 +431,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
     // =======================================================================
-    // DEDICATED SEPARATE CAMERA & QR SCANNER ENGINE (SEND PAGE)
-    // Works with live camera feed, front/rear toggle, drag-drop, paste & demo presets
+    // CAMERA & QR SCANNER ENGINE (SEND PAGE) - MODAL ONLY
+    // Clean UI: Only appears on camera when the user clicks "Scan QR"
     // =======================================================================
-    const sendCamSection = document.getElementById('send-camera-section');
-    const sendCamContentWrap = document.getElementById('send-cam-content-wrap');
-    const toggleSendCamBtn = document.getElementById('toggle-send-cam-btn');
-    const sendCamLiveIndicator = document.getElementById('send-cam-live-indicator');
-
-    const tabSendCamera = document.getElementById('tab-send-camera');
-    const tabSendUpload = document.getElementById('tab-send-upload');
-    const tabSendDemo = document.getElementById('tab-send-demo');
-
-    const viewSendCamera = document.getElementById('view-send-camera');
-    const viewSendUpload = document.getElementById('view-send-upload');
-    const viewSendDemo = document.getElementById('view-send-demo');
-
-    const sendVideoFeed = document.getElementById('send-video-feed');
-    const sendCanvasFeed = document.getElementById('send-canvas-feed');
-    const sendCameraStatusText = document.getElementById('send-camera-status-text');
-
-    const sendStartCamBtn = document.getElementById('send-start-cam-btn');
-    const sendStopCamBtn = document.getElementById('send-stop-cam-btn');
-    const sendFlipCamBtn = document.getElementById('send-flip-cam-btn');
-
-    const sendDropzoneBox = document.getElementById('send-dropzone-box');
-    const sendFilePicker = document.getElementById('send-file-picker');
-    const sendUploadStatus = document.getElementById('send-upload-status');
-    const sendDemoPresetsContainer = document.getElementById('send-demo-presets-container');
-
-    // Trigger buttons from form
+    const qrModal = document.getElementById('qr-scanner-modal');
+    const closeScannerBtn = document.getElementById('close-qr-scanner-btn');
     const openScannerBtn = document.getElementById('open-qr-scanner-btn');
     const quickScannerBtn = document.getElementById('scan-qr-quick-btn');
 
-    // Modal compatibility (if opened)
-    const qrModal = document.getElementById('qr-scanner-modal');
-    const closeScannerBtn = document.getElementById('close-qr-scanner-btn');
+    const tabScanCamera = document.getElementById('tab-scan-camera');
+    const tabScanUpload = document.getElementById('tab-scan-upload');
+    const scanViewCamera = document.getElementById('scan-view-camera');
+    const scanViewUpload = document.getElementById('scan-view-upload');
+
+    const qrVideo = document.getElementById('qr-video-element') || document.getElementById('send-video-feed');
+    const qrCanvas = document.getElementById('qr-canvas-hidden') || document.getElementById('send-canvas-feed');
+    const cameraStatusMsg = document.getElementById('camera-status-msg') || document.getElementById('send-camera-status-text');
+
+    const flipCamBtn = document.getElementById('btn-toggle-camera-facing') || document.getElementById('send-flip-cam-btn');
+    const restartCamBtn = document.getElementById('btn-restart-camera') || document.getElementById('send-start-cam-btn');
+
+    const qrDropzone = document.getElementById('qr-dropzone') || document.getElementById('send-dropzone-box');
+    const qrFileInput = document.getElementById('qr-file-input') || document.getElementById('send-file-picker');
+    const uploadStatusMsg = document.getElementById('upload-status-msg') || document.getElementById('send-upload-status');
 
     let sendCameraStream = null;
     let sendCameraAnimFrame = null;
@@ -476,31 +463,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startSendCamera() {
       stopSendCamera();
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        if (sendCameraStatusText) sendCameraStatusText.textContent = "Camera API not supported on this browser. Use Upload tab.";
+        if (cameraStatusMsg) cameraStatusMsg.textContent = "Camera API not supported on this device. Please use Upload tab.";
         return;
       }
 
-      if (sendCameraStatusText) sendCameraStatusText.textContent = "Initializing camera stream...";
+      if (cameraStatusMsg) cameraStatusMsg.textContent = "Connecting to camera...";
 
       try {
         sendCameraStream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: sendFacingMode }
         });
-        if (sendVideoFeed) {
-          sendVideoFeed.srcObject = sendCameraStream;
-          sendVideoFeed.setAttribute("playsinline", true);
-          await sendVideoFeed.play();
+        if (qrVideo) {
+          qrVideo.srcObject = sendCameraStream;
+          qrVideo.setAttribute("playsinline", true);
+          await qrVideo.play();
           isSendScannerActive = true;
-          if (sendCamLiveIndicator) sendCamLiveIndicator.style.display = 'inline-block';
-          if (sendCameraStatusText) sendCameraStatusText.textContent = "Point camera at any payment QR code";
+          if (cameraStatusMsg) cameraStatusMsg.textContent = "Point camera at any payment QR code";
           scanSendCameraFrame();
         }
       } catch (err) {
         console.warn("Send camera access failed:", err);
-        if (sendCameraStatusText) {
-          sendCameraStatusText.textContent = "Camera unavailable or permission denied. Try Upload or Demo tab.";
+        if (cameraStatusMsg) {
+          cameraStatusMsg.textContent = "Camera unavailable or permission denied. Please use the Upload tab.";
         }
-        if (sendCamLiveIndicator) sendCamLiveIndicator.style.display = 'none';
       }
     }
 
@@ -513,22 +498,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         sendCameraStream.getTracks().forEach(track => track.stop());
         sendCameraStream = null;
       }
-      if (sendVideoFeed) {
-        sendVideoFeed.srcObject = null;
+      if (qrVideo) {
+        qrVideo.srcObject = null;
       }
       isSendScannerActive = false;
-      if (sendCamLiveIndicator) sendCamLiveIndicator.style.display = 'none';
     }
 
     function scanSendCameraFrame() {
-      if (!sendVideoFeed || !isSendScannerActive) return;
+      if (!qrVideo || !isSendScannerActive) return;
 
-      if (sendVideoFeed.readyState === sendVideoFeed.HAVE_ENOUGH_DATA) {
-        const canvas = sendCanvasFeed || document.createElement('canvas');
-        canvas.width = sendVideoFeed.videoWidth || 400;
-        canvas.height = sendVideoFeed.videoHeight || 400;
+      if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+        const canvas = qrCanvas || document.createElement('canvas');
+        canvas.width = qrVideo.videoWidth || 400;
+        canvas.height = qrVideo.videoHeight || 400;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(sendVideoFeed, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(qrVideo, 0, 0, canvas.width, canvas.height);
 
         try {
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -540,8 +524,9 @@ document.addEventListener('DOMContentLoaded', async () => {
               const parsed = parsePaymentPayload(code.data);
               if (parsed && parsed.recipient) {
                 stopSendCamera();
+                closeSendScannerModal();
                 applyScannedPaymentData(parsed, true);
-                if (sendCameraStatusText) sendCameraStatusText.textContent = `✓ Scanned: ${parsed.recipient.slice(0, 16)}...`;
+                if (cameraStatusMsg) cameraStatusMsg.textContent = `✓ Scanned: ${parsed.recipient.slice(0, 16)}...`;
                 const formCard = document.getElementById('send-form-card');
                 if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
@@ -557,96 +542,85 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function switchSendScannerTab(tabName) {
-      [tabSendCamera, tabSendUpload, tabSendDemo].forEach(btn => {
-        if (btn) btn.classList.remove('active');
-      });
-      [viewSendCamera, viewSendUpload, viewSendDemo].forEach(v => {
-        if (v) v.style.display = 'none';
-      });
+      if (tabScanCamera) tabScanCamera.classList.toggle('active', tabName === 'camera');
+      if (tabScanUpload) tabScanUpload.classList.toggle('active', tabName === 'upload');
+
+      if (scanViewCamera) scanViewCamera.style.display = (tabName === 'camera') ? 'block' : 'none';
+      if (scanViewUpload) scanViewUpload.style.display = (tabName === 'upload') ? 'block' : 'none';
 
       if (tabName === 'camera') {
-        if (tabSendCamera) tabSendCamera.classList.add('active');
-        if (viewSendCamera) viewSendCamera.style.display = 'block';
         startSendCamera();
-      } else if (tabName === 'upload') {
-        if (tabSendUpload) tabSendUpload.classList.add('active');
-        if (viewSendUpload) viewSendUpload.style.display = 'block';
+      } else {
         stopSendCamera();
-      } else if (tabName === 'demo') {
-        if (tabSendDemo) tabSendDemo.classList.add('active');
-        if (viewSendDemo) viewSendDemo.style.display = 'block';
-        stopSendCamera();
-        renderSendDemoPresets();
       }
     }
 
-    if (toggleSendCamBtn && sendCamContentWrap) {
-      toggleSendCamBtn.addEventListener('click', () => {
-        const isHidden = (sendCamContentWrap.style.display === 'none');
-        sendCamContentWrap.style.display = isHidden ? 'block' : 'none';
-        toggleSendCamBtn.textContent = isHidden ? 'Hide Scanner' : 'Show Scanner';
-        if (!isHidden) {
-          stopSendCamera();
-        } else if (tabSendCamera && tabSendCamera.classList.contains('active')) {
-          startSendCamera();
-        }
-      });
-    }
-
-    function focusSendScanner() {
-      if (sendCamContentWrap && sendCamContentWrap.style.display === 'none') {
-        sendCamContentWrap.style.display = 'block';
-        if (toggleSendCamBtn) toggleSendCamBtn.textContent = 'Hide Scanner';
-      }
-      if (sendCamSection) {
-        sendCamSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    function openSendScannerModal() {
+      if (qrModal) {
+        qrModal.style.display = 'flex';
+        qrModal.classList.add('open');
       }
       switchSendScannerTab('camera');
     }
 
-    if (openScannerBtn) openScannerBtn.addEventListener('click', focusSendScanner);
-    if (quickScannerBtn) quickScannerBtn.addEventListener('click', focusSendScanner);
-    if (closeScannerBtn && qrModal) {
-      closeScannerBtn.addEventListener('click', () => {
+    function closeSendScannerModal() {
+      if (qrModal) {
         qrModal.style.display = 'none';
-        stopSendCamera();
+        qrModal.classList.remove('open');
+      }
+      stopSendCamera();
+    }
+
+    if (openScannerBtn) openScannerBtn.addEventListener('click', openSendScannerModal);
+    if (quickScannerBtn) quickScannerBtn.addEventListener('click', openSendScannerModal);
+    if (closeScannerBtn) closeScannerBtn.addEventListener('click', closeSendScannerModal);
+
+    if (qrModal) {
+      qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) {
+          closeSendScannerModal();
+        }
       });
     }
 
-    if (tabSendCamera) tabSendCamera.addEventListener('click', () => switchSendScannerTab('camera'));
-    if (tabSendUpload) tabSendUpload.addEventListener('click', () => switchSendScannerTab('upload'));
-    if (tabSendDemo) tabSendDemo.addEventListener('click', () => switchSendScannerTab('demo'));
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && qrModal && qrModal.classList.contains('open')) {
+        closeSendScannerModal();
+      }
+    });
 
-    if (sendStartCamBtn) sendStartCamBtn.addEventListener('click', startSendCamera);
-    if (sendStopCamBtn) sendStopCamBtn.addEventListener('click', stopSendCamera);
-    if (sendFlipCamBtn) {
-      sendFlipCamBtn.addEventListener('click', () => {
+    if (tabScanCamera) tabScanCamera.addEventListener('click', () => switchSendScannerTab('camera'));
+    if (tabScanUpload) tabScanUpload.addEventListener('click', () => switchSendScannerTab('upload'));
+
+    if (restartCamBtn) restartCamBtn.addEventListener('click', startSendCamera);
+    if (flipCamBtn) {
+      flipCamBtn.addEventListener('click', () => {
         sendFacingMode = (sendFacingMode === 'environment') ? 'user' : 'environment';
         startSendCamera();
       });
     }
 
-    // Dropzone & File Input for Send
-    if (sendDropzoneBox && sendFilePicker) {
-      sendDropzoneBox.addEventListener('click', () => sendFilePicker.click());
-      sendFilePicker.addEventListener('change', (e) => {
+    // Dropzone & File Input for Send Modal
+    if (qrDropzone && qrFileInput) {
+      qrDropzone.addEventListener('click', () => qrFileInput.click());
+      qrFileInput.addEventListener('change', (e) => {
         if (e.target.files && e.target.files[0]) {
           processSendImageFile(e.target.files[0]);
         }
       });
 
-      sendDropzoneBox.addEventListener('dragover', (e) => {
+      qrDropzone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        sendDropzoneBox.style.borderColor = 'var(--neon-emerald)';
+        qrDropzone.style.borderColor = 'var(--neon-emerald)';
       });
 
-      sendDropzoneBox.addEventListener('dragleave', () => {
-        sendDropzoneBox.style.borderColor = 'var(--border-medium)';
+      qrDropzone.addEventListener('dragleave', () => {
+        qrDropzone.style.borderColor = 'var(--border-medium)';
       });
 
-      sendDropzoneBox.addEventListener('drop', (e) => {
+      qrDropzone.addEventListener('drop', (e) => {
         e.preventDefault();
-        sendDropzoneBox.style.borderColor = 'var(--border-medium)';
+        qrDropzone.style.borderColor = 'var(--border-medium)';
         if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
           processSendImageFile(e.dataTransfer.files[0]);
         }
@@ -655,10 +629,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function processSendImageFile(file) {
       if (!file || !file.type.startsWith('image/')) {
-        if (sendUploadStatus) sendUploadStatus.textContent = 'Please select a valid image (PNG, JPG, WebP)';
+        if (uploadStatusMsg) uploadStatusMsg.textContent = 'Please select a valid image (PNG, JPG, WebP)';
         return;
       }
-      if (sendUploadStatus) sendUploadStatus.textContent = 'Decoding QR code from image...';
+      if (uploadStatusMsg) uploadStatusMsg.textContent = 'Decoding QR code from image...';
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -676,17 +650,18 @@ document.addEventListener('DOMContentLoaded', async () => {
               if (code && code.data) {
                 const parsed = parsePaymentPayload(code.data);
                 if (parsed && parsed.recipient) {
+                  closeSendScannerModal();
                   applyScannedPaymentData(parsed, true);
-                  if (sendUploadStatus) sendUploadStatus.innerHTML = '<span style="color: var(--neon-emerald);">✓ QR Code detected and auto-filled!</span>';
+                  if (uploadStatusMsg) uploadStatusMsg.innerHTML = '<span style="color: var(--neon-emerald);">✓ QR Code detected and auto-filled!</span>';
                   const formCard = document.getElementById('send-form-card');
                   if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
                   return;
                 }
               }
             }
-            if (sendUploadStatus) sendUploadStatus.innerHTML = '<span style="color: var(--neon-amber);">⚠️ No valid payment QR found in image.</span>';
+            if (uploadStatusMsg) uploadStatusMsg.innerHTML = '<span style="color: var(--neon-amber);">⚠️ No valid payment QR found in image.</span>';
           } catch (err) {
-            if (sendUploadStatus) sendUploadStatus.textContent = 'Failed to decode image data.';
+            if (uploadStatusMsg) uploadStatusMsg.textContent = 'Failed to decode image data.';
           }
         };
         img.src = e.target.result;
@@ -700,42 +675,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       for (const item of items) {
         if (item.type.indexOf('image') === 0) {
           const blob = item.getAsFile();
-          switchSendScannerTab('upload');
-          processSendImageFile(blob);
+          if (qrModal && qrModal.classList.contains('open')) {
+            switchSendScannerTab('upload');
+            processSendImageFile(blob);
+          }
           break;
         }
       }
     });
-
-    function renderSendDemoPresets() {
-      if (!sendDemoPresetsContainer) return;
-      sendDemoPresetsContainer.innerHTML = SHARED_DEMO_PRESETS.map((p, idx) => `
-        <div class="demo-qr-card" data-idx="${idx}" style="background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: all 0.2s ease;">
-          <div>
-            <div style="font-weight: 700; font-size: 0.84rem; color: var(--text-primary);">${p.label}</div>
-            <div style="font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-muted);">${p.recipient.slice(0, 20)}...</div>
-          </div>
-          <button type="button" class="btn btn-primary btn-sm" style="font-size: 0.74rem; padding: 4px 10px; white-space: nowrap;">⚡ Auto-Fill</button>
-        </div>
-      `).join('');
-
-      sendDemoPresetsContainer.querySelectorAll('.demo-qr-card').forEach(card => {
-        card.addEventListener('click', () => {
-          const idx = parseInt(card.getAttribute('data-idx'), 10);
-          const p = SHARED_DEMO_PRESETS[idx];
-          if (p) {
-            applyScannedPaymentData({
-              recipient: p.recipient,
-              asset: p.asset,
-              amount: p.amount,
-              note: p.note
-            }, true);
-            const formCard = document.getElementById('send-form-card');
-            if (formCard) formCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        });
-      });
-    }
 
     function applyScannedPaymentData(data, showNotification = true) {
       if (!data || !data.recipient) {
