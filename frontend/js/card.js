@@ -279,6 +279,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   function setup3DTilt() {
     if (!cardScene || !cardObject) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // Enable 3D mousemove physics only on desktop devices with precision pointers
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
     cardScene.addEventListener('mousemove', (e) => {
       const rect = cardScene.getBoundingClientRect();

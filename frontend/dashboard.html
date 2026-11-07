@@ -8,18 +8,26 @@
   <meta name="theme-color" content="#030712">
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link rel="apple-touch-icon" href="/assets/icon-192.png">
-  <link rel="stylesheet" href="/css/global.css?v=8">
-  <link rel="stylesheet" href="/css/dashboard.css?v=8">
-  <link rel="stylesheet" href="/css/card.css?v=8">
-  <link rel="stylesheet" href="/css/animations.css?v=8">
+  <link rel="stylesheet" href="/css/global.css?v=9">
+  <link rel="stylesheet" href="/css/dashboard.css?v=9">
+  <link rel="stylesheet" href="/css/card.css?v=9">
+  <link rel="stylesheet" href="/css/animations.css?v=9">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Clean Dashboard Aesthetics */
+    /* Separated Grid: 2-column Widescreen on Laptop, 1-column Stack on Mobile */
     .dashboard-master-grid {
       display: grid;
       grid-template-columns: 2.2fr 1fr;
-      gap: 22px;
+      gap: 24px;
       margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .dashboard-master-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
     }
 
     .cyber-hero-card {
@@ -677,9 +685,9 @@
   </div>
 
   <div id="toast-container"></div>
-  <script src="/config.js?v=8"></script>
-  <script src="/js/api.js?v=8"></script>
-  <script src="/js/dashboard.js?v=8"></script>
+  <script src="/config.js?v=9"></script>
+  <script src="/js/api.js?v=9"></script>
+  <script src="/js/dashboard.js?v=9"></script>
   <script>
     function quickSendTo(recipient) {
       VAYORA.playSound('click');

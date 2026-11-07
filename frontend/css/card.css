@@ -534,8 +534,32 @@
 
 .theme-picker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 14px;
+}
+
+@media (max-width: 900px) {
+  .theme-picker-grid {
+    display: flex !important;
+    overflow-x: auto;
+    gap: 12px;
+    padding: 4px 2px 10px 2px;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+  .theme-picker-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .theme-picker-card {
+    flex: 0 0 132px;
+    min-width: 132px;
+    scroll-snap-align: start;
+  }
+  .card-theme-selector-section {
+    padding: 16px 14px;
+    margin: 20px 0;
+  }
 }
 
 .theme-picker-card {

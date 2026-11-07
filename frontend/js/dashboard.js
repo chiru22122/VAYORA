@@ -130,8 +130,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 1500);
   }
 
-  // Interactive Specular Mouse Glare for Virtual Obsidian Card
+  // Interactive Specular Mouse Glare for Virtual Obsidian Card (Desktop precision pointers only)
   function initInteractiveCardGlow() {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     const cards = document.querySelectorAll('.mini-card-widget, .cyber-hero-card');
     cards.forEach(card => {
       card.addEventListener('mousemove', (e) => {

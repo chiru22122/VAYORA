@@ -1076,26 +1076,127 @@ const VAYORA = (function () {
       });
     }
 
-    // Mobile menu toggle & outside-click drawer auto-close
-    const mobileBtn = document.getElementById('mobile-menu-btn');
-    const sidebar = document.querySelector('.app-sidebar');
-    if (mobileBtn && sidebar) {
-      mobileBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        sidebar.classList.toggle('mobile-open');
-      });
-      document.addEventListener('click', (e) => {
-        if (sidebar.classList.contains('mobile-open') && !sidebar.contains(e.target) && e.target !== mobileBtn) {
-          sidebar.classList.remove('mobile-open');
-        }
-      });
-      sidebar.querySelectorAll('.nav-link').forEach(link => {
+    // Mount Ergonomic Mobile Bottom Navigation for Touch Devices (< 901px)
+    renderMobileBottomNav(activePage);
+
+    // Setup Mobile Sidebar Slide-Over Drawer with Blurred Backdrop Overlay
+    setupMobileSidebarDrawer();
+
+    updateSoundToggleUI();
+  }
+
+  function renderMobileBottomNav(activePage) {
+    if (typeof document === 'undefined') return;
+    const path = window.location.pathname.toLowerCase();
+    if (path.includes('login') || path.includes('register') || path.includes('forgot') || path === '/' || path.endsWith('/index.html')) {
+      return;
+    }
+
+    let navEl = document.querySelector('.mobile-bottom-nav');
+    if (!navEl) {
+      navEl = document.createElement('nav');
+      navEl.className = 'mobile-bottom-nav';
+      navEl.setAttribute('aria-label', 'Mobile Navigation');
+
+      const isVercel = window.location.hostname && window.location.hostname.includes('vercel.app');
+      const getHref = (p) => isVercel ? `/${p}` : `/${p}.html`;
+
+      navEl.innerHTML = `
+        <a href="${getHref('dashboard')}" class="mobile-nav-item ${activePage === 'dashboard' ? 'active' : ''}" data-page="dashboard">
+          <div class="mobile-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </div>
+          <span class="mobile-nav-label">Home</span>
+        </a>
+        <a href="${getHref('card')}" class="mobile-nav-item ${activePage === 'card' ? 'active' : ''}" data-page="card">
+          <div class="mobile-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <span class="mobile-nav-label">Cards</span>
+        </a>
+        <a href="${getHref('send')}" class="mobile-nav-item mobile-nav-action ${activePage === 'send' ? 'active' : ''}" data-page="send">
+          <div class="mobile-nav-action-circle">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </div>
+          <span class="mobile-nav-label">Send</span>
+        </a>
+        <a href="${getHref('wallet')}" class="mobile-nav-item ${activePage === 'wallet' ? 'active' : ''}" data-page="wallet">
+          <div class="mobile-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+          </div>
+          <span class="mobile-nav-label">Wallet</span>
+        </a>
+        <button type="button" class="mobile-nav-item" id="mobile-nav-more-btn" data-page="more">
+          <div class="mobile-nav-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="19" r="1.5"/></svg>
+          </div>
+          <span class="mobile-nav-label">More</span>
+        </button>
+      `;
+
+      document.body.appendChild(navEl);
+
+      navEl.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
-          sidebar.classList.remove('mobile-open');
+          playSound('click');
         });
       });
+
+      const moreBtn = document.getElementById('mobile-nav-more-btn');
+      if (moreBtn) {
+        moreBtn.addEventListener('click', () => {
+          playSound('click');
+          const sidebar = document.querySelector('.app-sidebar');
+          const backdrop = document.querySelector('.sidebar-backdrop');
+          if (sidebar) {
+            sidebar.classList.toggle('mobile-open');
+            if (backdrop) backdrop.classList.toggle('active', sidebar.classList.contains('mobile-open'));
+          }
+        });
+      }
     }
-    updateSoundToggleUI();
+  }
+
+  function setupMobileSidebarDrawer() {
+    const sidebar = document.querySelector('.app-sidebar');
+    if (!sidebar) return;
+
+    let backdrop = document.querySelector('.sidebar-backdrop');
+    if (!backdrop) {
+      backdrop = document.createElement('div');
+      backdrop.className = 'sidebar-backdrop';
+      document.body.appendChild(backdrop);
+    }
+
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    if (mobileBtn && !mobileBtn._hasDrawerListener) {
+      mobileBtn._hasDrawerListener = true;
+      mobileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        playSound('click');
+        sidebar.classList.toggle('mobile-open');
+        backdrop.classList.toggle('active', sidebar.classList.contains('mobile-open'));
+      });
+    }
+
+    backdrop.addEventListener('click', () => {
+      sidebar.classList.remove('mobile-open');
+      backdrop.classList.remove('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (sidebar.classList.contains('mobile-open') && !sidebar.contains(e.target) && (!mobileBtn || !mobileBtn.contains(e.target))) {
+        sidebar.classList.remove('mobile-open');
+        backdrop.classList.remove('active');
+      }
+    });
+
+    sidebar.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        sidebar.classList.remove('mobile-open');
+        backdrop.classList.remove('active');
+      });
+    });
   }
 
   // Pre-initialize theme immediately upon script and DOM loading
