@@ -13,12 +13,17 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(255), unique=True, index=True, nullable=False)
     password_hash = Column(String(255), nullable=False)
+    payment_password_hash = Column(String(255), nullable=True)
     email_verified = Column(Boolean, default=False, nullable=False)
     role = Column(String(20), default="user", nullable=False)  # 'user' or 'admin'
     phone = Column(String(30), nullable=True)
     avatar_color = Column(String(20), default="#00f59b", nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, nullable=False)
+
+    @property
+    def has_payment_password(self) -> bool:
+        return bool(self.payment_password_hash)
 
     # Relationships
     accounts = relationship("Account", back_populates="user", cascade="all, delete-orphan")

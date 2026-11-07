@@ -1,5 +1,5 @@
 // VAYORA Service Worker for Progressive Web App (PWA)
-const CACHE_NAME = 'vayora-shell-v9';
+const CACHE_NAME = 'vayora-shell-v10';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -83,7 +83,7 @@ self.addEventListener('fetch', (event) => {
           if (networkResponse && networkResponse.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
           }
-        }).catch(() => {});
+        }).catch(() => { });
         return cachedResponse;
       }
       return fetch(event.request).then((networkResponse) => {

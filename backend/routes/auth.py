@@ -84,6 +84,7 @@ def register(req: UserRegisterRequest, request: Request, background_tasks: Backg
         name=req.name.strip(),
         email=clean_email,
         password_hash=hash_password(req.password),
+        payment_password_hash=hash_password(req.password),
         email_verified=False,
         role="user",
         phone=req.phone,

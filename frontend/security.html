@@ -267,6 +267,22 @@
                 Update Password
               </button>
             </form>
+
+            <!-- Payment Password Numbers Configuration -->
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px dashed var(--border-medium);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 6px;">
+                  <span>🔒</span> Payment Security Password Numbers
+                </span>
+                <span class="status-pill status-completed" style="font-size: 0.65rem;">Active</span>
+              </div>
+              <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 12px;">
+                Used to authorize all upcoming payments, transfers, and card transactions.
+              </p>
+              <button type="button" onclick="VAYORA.openPaymentPasswordSetupModal()" class="btn btn-secondary btn-block btn-sm" style="border-color: rgba(0, 245, 155, 0.4); color: var(--neon-emerald);">
+                🔑 Change Payment Password Numbers
+              </button>
+            </div>
           </div>
 
         </div>
@@ -301,7 +317,7 @@
   </div>
 
   <div id="toast-container"></div>
-  <script src="/js/api.js"></script>
-  <script src="/js/security.js"></script>
+  <script src="/js/api.js?v=11"></script>
+  <script src="/js/security.js?v=11"></script>
 </body>
 </html>

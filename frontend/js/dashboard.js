@@ -25,6 +25,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     initCurrencySwitcher();
     initYieldLiveTicker();
     initInteractiveCardGlow();
+
+    // Check if user just logged in or needs payment password numbers configured
+    const justLoggedIn = sessionStorage.getItem('vayora_just_logged_in');
+    const u = VAYORA.getCurrentUser();
+    if (u) {
+      const pwdKey = 'vayora_payment_pwd_confirmed_' + (u.email || u.user_id);
+      if (justLoggedIn === 'true' || !localStorage.getItem(pwdKey)) {
+        sessionStorage.removeItem('vayora_just_logged_in');
+        setTimeout(() => {
+          if (typeof VAYORA.openPaymentPasswordSetupModal === 'function') {
+            VAYORA.openPaymentPasswordSetupModal();
+          }
+        }, 500);
+      }
+    }
   } catch (err) {
     console.error('Failed to initialize dashboard:', err);
     VAYORA.showToast('Data Sync Notice', 'Connected to real-time portfolio ledger.', 'info');

@@ -989,6 +989,161 @@ const VAYORA = (function () {
     }
   }
 
+  // --- PAYMENT PASSWORD SETUP / CONFIRMATION MODAL ---
+  function openPaymentPasswordSetupModal(options = {}) {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    let modal = document.getElementById('payment-password-setup-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'payment-password-setup-modal';
+      modal.className = 'modal-backdrop';
+      modal.innerHTML = `
+        <div class="modal-window" style="max-width: 460px;">
+          <div class="modal-header">
+            <div class="modal-title" style="display: flex; align-items: center; gap: 8px;">
+              <span>🔐</span>
+              <span>Payment Password Security</span>
+            </div>
+            <button type="button" class="modal-close-btn" onclick="document.getElementById('payment-password-setup-modal').classList.remove('open')">✕</button>
+          </div>
+          <div class="modal-body" style="padding: 20px 22px;">
+            <div style="background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.25); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 18px; text-align: left;">
+              <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--neon-emerald); font-size: 0.88rem; margin-bottom: 4px;">
+                <span>🛡️</span> Security Authorization Setup
+              </div>
+              <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45;">
+                As you sign in, add or confirm your <strong>Password Numbers</strong> first. This password will be required to authorize all your upcoming payments, transfers, and transactions.
+              </div>
+            </div>
+
+            <form id="setup-payment-password-form">
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label style="font-size: 0.82rem; font-weight: 700; color: var(--text-primary); display: flex; justify-content: space-between; margin-bottom: 6px;">
+                  <span>Payment Password Numbers</span>
+                  <span style="font-size: 0.70rem; color: var(--neon-emerald);">Required to Pay</span>
+                </label>
+                <div style="position: relative; display: flex; align-items: center;">
+                  <span style="position: absolute; left: 14px; font-size: 1rem; color: var(--neon-emerald); pointer-events: none;">🔑</span>
+                  <input 
+                    type="password" 
+                    id="setup-pay-pwd-input" 
+                    class="form-control" 
+                    placeholder="Enter password numbers (e.g. 123456789)" 
+                    inputmode="numeric" 
+                    autocomplete="current-password" 
+                    style="padding-left: 42px; padding-right: 48px; font-size: 1.15rem; font-family: var(--font-mono); letter-spacing: 2px; height: 48px; text-align: center; border-color: rgba(0, 245, 155, 0.4);" 
+                    required 
+                    autofocus
+                  >
+                  <button 
+                    type="button" 
+                    id="setup-pay-pwd-eye" 
+                    style="position: absolute; right: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px;" 
+                    title="Show / Hide Password"
+                  >👁️</button>
+                </div>
+                <div id="setup-pay-pwd-error" style="display: none; color: #ff4757; font-size: 0.76rem; font-weight: 600; margin-top: 6px; text-align: center;"></div>
+              </div>
+
+              <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
+                <button type="submit" id="setup-pay-pwd-submit-btn" class="btn btn-primary btn-block btn-lg" style="font-weight: 700;">
+                  Set &amp; Activate Payment Password
+                </button>
+                <button type="button" id="setup-pay-pwd-use-login-btn" class="btn btn-secondary btn-block" style="font-size: 0.80rem; border-color: rgba(255,255,255,0.12);">
+                  Use My Current Sign-In Password
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      const eyeBtn = document.getElementById('setup-pay-pwd-eye');
+      const input = document.getElementById('setup-pay-pwd-input');
+      const errEl = document.getElementById('setup-pay-pwd-error');
+      const form = document.getElementById('setup-payment-password-form');
+      const useLoginBtn = document.getElementById('setup-pay-pwd-use-login-btn');
+      const submitBtn = document.getElementById('setup-pay-pwd-submit-btn');
+
+      if (eyeBtn && input) {
+        eyeBtn.addEventListener('click', () => {
+          if (input.type === 'password') {
+            input.type = 'text';
+            eyeBtn.textContent = '🙈';
+          } else {
+            input.type = 'password';
+            eyeBtn.textContent = '👁️';
+          }
+        });
+      }
+
+      async function savePassword(pwd) {
+        if (!pwd || pwd.length < 4) {
+          if (errEl) {
+            errEl.textContent = '⚠️ Password numbers must be at least 4 digits.';
+            errEl.style.display = 'block';
+          }
+          if (input) input.classList.add('input-error-shake');
+          setTimeout(() => input && input.classList.remove('input-error-shake'), 450);
+          return;
+        }
+
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.innerHTML = '<span class="spinner"></span> Activating...';
+        }
+
+        try {
+          await request('/security/payment-password', {
+            method: 'POST',
+            body: { payment_password: pwd }
+          });
+
+          localStorage.setItem('vayora_payment_pwd_confirmed_' + (user.email || user.user_id), 'true');
+          modal.classList.remove('open');
+          showToast('Payment Password Active', 'Your security password numbers are set! Use them for all upcoming payments.', 'success');
+          if (options.onSuccess) options.onSuccess(pwd);
+        } catch (err) {
+          if (errEl) {
+            errEl.textContent = '⚠️ ' + (err.message || 'Failed to set payment password');
+            errEl.style.display = 'block';
+          }
+          showToast('Setup Failed', err.message, 'error');
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = 'Set &amp; Activate Payment Password';
+          }
+        }
+      }
+
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          savePassword(input ? input.value.trim() : '');
+        });
+      }
+
+      if (useLoginBtn) {
+        useLoginBtn.addEventListener('click', () => {
+          localStorage.setItem('vayora_payment_pwd_confirmed_' + (user.email || user.user_id), 'true');
+          modal.classList.remove('open');
+          showToast('Password Configured', 'Your sign-in password numbers will be used for all upcoming payments!', 'success');
+          if (options.onSuccess) options.onSuccess();
+        });
+      }
+    }
+
+    modal.classList.add('open');
+    setTimeout(() => {
+      const input = document.getElementById('setup-pay-pwd-input');
+      if (input) input.focus();
+    }, 150);
+  }
+
   // --- 3D TILT PHYSICS ENGINE (CLEAN NO-OP) ---
   function init3DTilt() {
     // Disabled in favor of clean simple light/dark theme
@@ -1311,6 +1466,7 @@ const VAYORA = (function () {
     initRipples,
     injectAuroraBackground,
     openDepositModal,
+    openPaymentPasswordSetupModal,
     playSound,
     toggleSound,
     initPWA,

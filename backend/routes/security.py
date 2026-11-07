@@ -5,7 +5,7 @@ from backend.database import get_db
 from backend.models import User, Session as UserSession, LoginHistory, RecoveryCode, Activity
 from backend.schemas import (
     SecurityOverviewResponse, SessionResponse, LoginHistoryResponse,
-    PasswordChangeRequest
+    PasswordChangeRequest, SetPaymentPasswordRequest
 )
 from backend.dependencies import get_current_user
 from backend.auth import hash_password, verify_password
@@ -99,6 +99,10 @@ def change_password(
         raise HTTPException(status_code=400, detail="Current password incorrect")
         
     current_user.password_hash = hash_password(req.new_password)
+    # Also keep payment password aligned if user hasn't explicitly set a separate one
+    if not current_user.payment_password_hash:
+        current_user.payment_password_hash = hash_password(req.new_password)
+
     act = Activity(
         user_id=current_user.user_id,
         action="SECURITY",
@@ -108,6 +112,35 @@ def change_password(
     db.add(act)
     db.commit()
     return {"message": "Password changed successfully"}
+
+@router.post("/payment-password")
+def set_payment_password(
+    req: SetPaymentPasswordRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    clean_p = req.payment_password.strip()
+    if len(clean_p) < 4:
+        raise HTTPException(status_code=400, detail="Payment password numbers must be at least 4 digits")
+
+    # If current_password is provided and user has a password_hash, verify it
+    if req.current_password and req.current_password.strip():
+        if not verify_password(req.current_password.strip(), current_user.password_hash):
+            raise HTTPException(status_code=400, detail="Current account password is incorrect")
+
+    current_user.payment_password_hash = hash_password(clean_p)
+    act = Activity(
+        user_id=current_user.user_id,
+        action="SECURITY",
+        description="Payment security password numbers configured",
+        ip_address="127.0.0.1"
+    )
+    db.add(act)
+    db.commit()
+    return {
+        "status": "SUCCESS",
+        "message": "Payment password numbers successfully configured! Use these numbers for all upcoming payments."
+    }
 
 @router.post("/recovery-codes")
 def generate_recovery_codes(

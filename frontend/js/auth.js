@@ -185,6 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (res.access_token) {
             VAYORA.setToken(res.access_token);
             VAYORA.setCurrentUser(res.user);
+            sessionStorage.setItem('vayora_just_logged_in', 'true');
             VAYORA.showToast('Welcome Back', `Logged in as ${res.user.name}`, 'success');
             // Instant redirect: zero lag
             VAYORA.navigateTo('dashboard');
@@ -221,6 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         VAYORA.setToken(res.access_token);
         VAYORA.setCurrentUser(res.user);
+        sessionStorage.setItem('vayora_just_logged_in', 'true');
         VAYORA.showToast('Authentication Verified', `Welcome back, ${res.user.name}!`, 'success');
         // Instant redirect: zero lag
         VAYORA.navigateTo('dashboard');

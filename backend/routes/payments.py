@@ -33,9 +33,17 @@ def send_payment(
         )
 
     clean_pass = str(req.password).strip()
-    is_valid_pass = verify_password(clean_pass, current_user.password_hash)
+    is_valid_pass = False
 
-    # Check against user's account password hash or auxiliary 4-digit PIN '1234'
+    # Check dedicated payment_password_hash first if set
+    if current_user.payment_password_hash:
+        is_valid_pass = verify_password(clean_pass, current_user.payment_password_hash)
+
+    # Check primary account password_hash
+    if not is_valid_pass:
+        is_valid_pass = verify_password(clean_pass, current_user.password_hash)
+
+    # Check auxiliary 4-digit PIN '1234'
     if not is_valid_pass and clean_pass != "1234":
         try:
             act = Activity(

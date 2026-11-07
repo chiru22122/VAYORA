@@ -50,6 +50,10 @@ class PasswordChangeRequest(BaseModel):
     old_password: str
     new_password: str = Field(..., min_length=6, max_length=100)
 
+class SetPaymentPasswordRequest(BaseModel):
+    payment_password: str = Field(..., min_length=4, max_length=100, description="Security password numbers used for authorizing payments")
+    current_password: Optional[str] = None
+
 class ProfileUpdateRequest(BaseModel):
     name: Optional[str] = None
     phone: Optional[str] = None
@@ -62,6 +66,7 @@ class UserResponse(BaseModel):
     role: str
     phone: Optional[str] = None
     avatar_color: Optional[str] = "#00f59b"
+    has_payment_password: Optional[bool] = False
     created_at: datetime.datetime
 
     class Config:
