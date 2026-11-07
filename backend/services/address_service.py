@@ -10,24 +10,8 @@ BECH32_CHARSET = "qpzry9x8gf2tvdw0s3jn54khce6mua7l"
 BASE58_CHARSET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
 HEX_CHARSET = "0123456789abcdef"
 
-# Canonical fixed addresses for demo personas
+# Canonical fixed addresses for system personas
 DEMO_PERSONA_ADDRESSES = {
-    "sender@vayora.demo": {
-        "USDT": ("TX7A1vSenderUSDT99qKLmP3w8xV2y5R1", "TRC-20 (Tron Network)"),
-        "USDC": ("0x1111A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8", "ERC-20 (Ethereum)"),
-        "BTC":  ("bc1qsender42a8z9w0y1x2v3u4t5s6r7q8p9o0m1", "Native SegWit (Bech32)"),
-        "ETH":  ("0x71C94B2E8F19D382A0F8372651B44390C12E7B90", "ERC-20 / Ethereum Mainnet"),
-        "SOL":  ("SolSenderVa11111111111111111111111111111111", "Solana SPL"),
-        "INR":  ("sender.vayora@icici", "UPI / IMPS Virtual Account"),
-    },
-    "receiver@vayora.demo": {
-        "USDT": ("TY8B2uReceiverUSDT88rMNqQ4x9yW3z6S2", "TRC-20 (Tron Network)"),
-        "USDC": ("0x2222B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A1", "ERC-20 (Ethereum)"),
-        "BTC":  ("bc1qrecv88b9a0z1y2x3v4u5t6s7r8q9p0o1m2k3", "Native SegWit (Bech32)"),
-        "ETH":  ("0x34A991E47B02D338FA8291410651A827B1390A77", "ERC-20 / Ethereum Mainnet"),
-        "SOL":  ("SolReceiverVa2222222222222222222222222222222", "Solana SPL"),
-        "INR":  ("receiver.vayora@icici", "UPI / IMPS Virtual Account"),
-    },
     "admin@vayora.demo": {
         "USDT": ("TA9AdminTreasuryUSDT77xKLmQ2w7yU1x4P9", "TRC-20 (Tron Network)"),
         "USDC": ("0x999C0F33A27118B82736C52166904B8E110F99BB", "ERC-20 (Ethereum)"),

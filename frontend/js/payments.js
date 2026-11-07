@@ -460,38 +460,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     }
 
-    // Quick Fill Recipient Demo Helpers
-    if (fillDemoReceiverBtn) {
-      fillDemoReceiverBtn.addEventListener('click', () => {
-        const selected = getSelectedAsset();
-        const sym = selected ? selected.symbol : 'USDT';
-        const currentUser = VAYORA.getCurrentUser();
-        const isUserSender = (!currentUser || currentUser.email === 'sender@vayora.demo');
 
-        const targetMap = isUserSender ? DEMO_RECEIVER_ADDRESSES : DEMO_SENDER_ADDRESSES;
-        const targetAddr = targetMap[sym] || targetMap['USDT'];
-
-        if (recipientInput) {
-          recipientInput.value = targetAddr;
-          checkRecipientPresence();
-          VAYORA.showToast('Demo Auto-Filled', `Recipient filled with verified ${sym} address`, 'info');
-        }
-      });
-    }
-
-    if (fillDemoEmailBtn) {
-      fillDemoEmailBtn.addEventListener('click', () => {
-        const currentUser = VAYORA.getCurrentUser();
-        const isUserSender = (!currentUser || currentUser.email === 'sender@vayora.demo');
-        const targetEmail = isUserSender ? 'receiver@vayora.demo' : 'sender@vayora.demo';
-
-        if (recipientInput) {
-          recipientInput.value = targetEmail;
-          checkRecipientPresence();
-          VAYORA.showToast('Demo Auto-Filled', `Recipient filled with internal account ${targetEmail}`, 'info');
-        }
-      });
-    }
 
     // =======================================================================
     // DEDICATED SEPARATE CAMERA & QR SCANNER ENGINE (SEND PAGE)
@@ -895,9 +864,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // =======================================================================
     // FEATURE 2: RECENT RECIPIENTS QUICK-PAY CAROUSEL
     // =======================================================================
+    // Recent contacts list without demo accounts
     const recentRecipientsList = document.getElementById('recent-recipients-list');
     const DEFAULT_RECENT_CONTACTS = [
-      { name: 'Demo Receiver', address: 'receiver@vayora.demo', initial: 'DR', color: 'var(--neon-emerald)' },
       { name: 'Sarah Chen', address: 'sarah.chen@vayora.fi', initial: 'SC', color: 'var(--neon-cyan)' },
       { name: 'Marcus Vance', address: 'marcus.v@crypto.pay', initial: 'MV', color: 'var(--neon-purple)' },
       { name: 'Liquidity Node', address: 'node-01@vayora.net', initial: 'LN', color: '#ffb703' }

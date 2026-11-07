@@ -4,7 +4,7 @@
  * real-time presence (WebSocket + heartbeat), and real payment checkout modal.
  */
 
-const VAYORA = (function() {
+const VAYORA = (function () {
   // Read runtime environment configuration (supports frontend/.env and window.__ENV__)
   window.__ENV__ = window.__ENV__ || {};
 
@@ -113,7 +113,7 @@ const VAYORA = (function() {
           }
         });
       }
-    } catch (e) {}
+    } catch (e) { }
   })();
 
   let _presenceWs = null;
@@ -449,7 +449,7 @@ const VAYORA = (function() {
     if (!dateStr) return '—';
     const d = parseDate(dateStr);
     if (!d || isNaN(d.getTime())) return String(dateStr);
-    
+
     return d.toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -487,9 +487,6 @@ const VAYORA = (function() {
       hour12: true
     });
   }
-
-  // Demo Switcher Helper - Disabled in Production
-  async function switchDemoUser() {}
 
   // --- REAL-TIME PRESENCE & WEBSOCKET ENGINE ---
 
@@ -1179,7 +1176,7 @@ const VAYORA = (function() {
         _cachedLiveRate = parseFloat(data.rate);
         _lastLiveRateFetch = now;
       }
-    } catch (e) {}
+    } catch (e) { }
     return _cachedLiveRate;
   }
 
@@ -1206,7 +1203,6 @@ const VAYORA = (function() {
     formatTimeOnly,
     parseDate,
     navigateTo,
-    switchDemoUser,
     initShell,
     initTheme,
     toggleTheme,
