@@ -994,6 +994,14 @@ const VAYORA = (function () {
     const user = getCurrentUser();
     if (!user) return;
 
+    const userKey = user.user_id || user.email;
+    const isPermanent = localStorage.getItem('vayora_payment_pin_permanent_' + userKey) === 'true';
+
+    // If already set permanently and not forced by user clicking topbar PIN button, do not show
+    if (!options.force && (isPermanent || user.has_payment_password)) {
+      return;
+    }
+
     let modal = document.getElementById('payment-password-setup-modal');
     if (!modal) {
       modal = document.createElement('div');
@@ -1006,15 +1014,15 @@ const VAYORA = (function () {
               <span>🔐</span>
               <span>Payment Password Security</span>
             </div>
-            <button type="button" class="modal-close-btn" onclick="document.getElementById('payment-password-setup-modal').classList.remove('open')">✕</button>
+            <button type="button" class="modal-close-btn" id="payment-password-setup-close-btn">✕</button>
           </div>
           <div class="modal-body" style="padding: 20px 22px;">
             <div style="background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.25); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 18px; text-align: left;">
               <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--neon-emerald); font-size: 0.88rem; margin-bottom: 4px;">
-                <span>🛡️</span> Security Authorization Setup
+                <span>🛡️</span> Permanent Security PIN Setup
               </div>
               <div style="font-size: 0.78rem; color: var(--text-secondary); line-height: 1.45;">
-                As you sign in, add or confirm your <strong>Password Numbers</strong> first. This password will be required to authorize all your upcoming payments, transfers, and transactions.
+                Add or confirm your <strong>Password Numbers</strong> once. This PIN will be stored permanently to authorize your payments and transfers.
               </div>
             </div>
 
@@ -1030,7 +1038,7 @@ const VAYORA = (function () {
                     type="password" 
                     id="setup-pay-pwd-input" 
                     class="form-control" 
-                    placeholder="Enter password numbers (e.g. 123456789)" 
+                    placeholder="Enter password numbers (e.g. 1234)" 
                     inputmode="numeric" 
                     autocomplete="current-password" 
                     style="padding-left: 42px; padding-right: 48px; font-size: 1.15rem; font-family: var(--font-mono); letter-spacing: 2px; height: 48px; text-align: center; border-color: rgba(0, 245, 155, 0.4);" 
@@ -1049,7 +1057,7 @@ const VAYORA = (function () {
 
               <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 18px;">
                 <button type="submit" id="setup-pay-pwd-submit-btn" class="btn btn-primary btn-block btn-lg" style="font-weight: 700;">
-                  Set &amp; Activate Payment Password
+                  Set Permanent Payment PIN
                 </button>
                 <button type="button" id="setup-pay-pwd-use-login-btn" class="btn btn-secondary btn-block" style="font-size: 0.80rem; border-color: rgba(255,255,255,0.12);">
                   Use My Current Sign-In Password
@@ -1067,6 +1075,14 @@ const VAYORA = (function () {
       const form = document.getElementById('setup-payment-password-form');
       const useLoginBtn = document.getElementById('setup-pay-pwd-use-login-btn');
       const submitBtn = document.getElementById('setup-pay-pwd-submit-btn');
+      const closeBtn = document.getElementById('payment-password-setup-close-btn');
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
+          modal.classList.remove('open');
+        });
+      }
 
       if (eyeBtn && input) {
         eyeBtn.addEventListener('click', () => {
@@ -1093,7 +1109,7 @@ const VAYORA = (function () {
 
         if (submitBtn) {
           submitBtn.disabled = true;
-          submitBtn.innerHTML = '<span class="spinner"></span> Activating...';
+          submitBtn.innerHTML = '<span class="spinner"></span> Saving Permanent PIN...';
         }
 
         try {
@@ -1102,9 +1118,13 @@ const VAYORA = (function () {
             body: { payment_password: pwd }
           });
 
-          localStorage.setItem('vayora_payment_pwd_confirmed_' + (user.email || user.user_id), 'true');
+          localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
+          localStorage.setItem('vayora_permanent_pay_pin_' + userKey, pwd);
+          user.has_payment_password = true;
+          setCurrentUser(user);
+
           modal.classList.remove('open');
-          showToast('Payment Password Active', 'Your security password numbers are set! Use them for all upcoming payments.', 'success');
+          showToast('Payment PIN Active', 'Your security password numbers are set permanently! All upcoming payments will authorize seamlessly.', 'success');
           if (options.onSuccess) options.onSuccess(pwd);
         } catch (err) {
           if (errEl) {
@@ -1115,7 +1135,7 @@ const VAYORA = (function () {
         } finally {
           if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.innerHTML = 'Set &amp; Activate Payment Password';
+            submitBtn.innerHTML = 'Set Permanent Payment PIN';
           }
         }
       }
@@ -1129,9 +1149,11 @@ const VAYORA = (function () {
 
       if (useLoginBtn) {
         useLoginBtn.addEventListener('click', () => {
-          localStorage.setItem('vayora_payment_pwd_confirmed_' + (user.email || user.user_id), 'true');
+          localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
+          user.has_payment_password = true;
+          setCurrentUser(user);
           modal.classList.remove('open');
-          showToast('Password Configured', 'Your sign-in password numbers will be used for all upcoming payments!', 'success');
+          showToast('Password Configured', 'Your sign-in password numbers will permanently authorize all upcoming payments!', 'success');
           if (options.onSuccess) options.onSuccess();
         });
       }

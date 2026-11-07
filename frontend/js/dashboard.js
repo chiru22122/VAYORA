@@ -26,18 +26,28 @@ document.addEventListener('DOMContentLoaded', async () => {
     initYieldLiveTicker();
     initInteractiveCardGlow();
 
-    // Check if user just logged in or needs payment password numbers configured
-    const justLoggedIn = sessionStorage.getItem('vayora_just_logged_in');
+    // Authorized PIN / Payment Password: ONLY ASK ONCE, PERMANENT
     const u = VAYORA.getCurrentUser();
     if (u) {
-      const pwdKey = 'vayora_payment_pwd_confirmed_' + (u.email || u.user_id);
-      if (justLoggedIn === 'true' || !localStorage.getItem(pwdKey)) {
-        sessionStorage.removeItem('vayora_just_logged_in');
+      const userKey = u.user_id || u.email;
+      const permKey = 'vayora_payment_pin_permanent_' + userKey;
+      const isAlreadyPermanent = localStorage.getItem(permKey) === 'true';
+      const hasDbPassword = Boolean(u.has_payment_password);
+
+      // Only prompt ONCE for brand-new users who haven't set or confirmed their PIN yet
+      if (!isAlreadyPermanent && !hasDbPassword) {
         setTimeout(() => {
           if (typeof VAYORA.openPaymentPasswordSetupModal === 'function') {
-            VAYORA.openPaymentPasswordSetupModal();
+            VAYORA.openPaymentPasswordSetupModal({
+              onSuccess: (pwd) => {
+                localStorage.setItem(permKey, 'true');
+                if (pwd) {
+                  localStorage.setItem('vayora_permanent_pay_pin_' + userKey, pwd);
+                }
+              }
+            });
           }
-        }, 500);
+        }, 800);
       }
     }
   } catch (err) {

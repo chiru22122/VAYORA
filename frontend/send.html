@@ -532,6 +532,16 @@
             Enter your account password numbers below to authorize this payment.
           </div>
 
+          <!-- Permanent Authorized PIN Indicator -->
+          <div id="permanent-pin-status-badge" style="display: none; align-items: center; justify-content: space-between; background: rgba(0, 245, 155, 0.08); border: 1px solid rgba(0, 245, 155, 0.25); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px;">
+            <span style="font-size: 0.78rem; color: var(--neon-emerald); font-weight: 700; display: flex; align-items: center; gap: 6px;">
+              <span>🔒</span> Permanent Authorized PIN Applied
+            </span>
+            <button type="button" id="btn-edit-permanent-pin" style="background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 0.74rem; font-weight: 600; padding: 2px 4px;">
+              Change PIN
+            </button>
+          </div>
+
           <div style="position: relative; display: flex; align-items: center; margin-bottom: 8px;">
             <span style="position: absolute; left: 14px; font-size: 1rem; color: var(--neon-emerald); pointer-events: none;">🔑</span>
             <input 

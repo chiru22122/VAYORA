@@ -185,7 +185,14 @@ document.addEventListener('DOMContentLoaded', () => {
           if (res.access_token) {
             VAYORA.setToken(res.access_token);
             VAYORA.setCurrentUser(res.user);
-            sessionStorage.setItem('vayora_just_logged_in', 'true');
+            
+            // Set permanent authorization PIN (only ask once, permanent)
+            const userKey = res.user.user_id || res.user.email;
+            if (password && !localStorage.getItem('vayora_permanent_pay_pin_' + userKey)) {
+              localStorage.setItem('vayora_permanent_pay_pin_' + userKey, password);
+            }
+            localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
+
             VAYORA.showToast('Welcome Back', `Logged in as ${res.user.name}`, 'success');
             // Instant redirect: zero lag
             VAYORA.navigateTo('dashboard');
@@ -222,7 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         VAYORA.setToken(res.access_token);
         VAYORA.setCurrentUser(res.user);
-        sessionStorage.setItem('vayora_just_logged_in', 'true');
+        const userKey = res.user.user_id || res.user.email;
+        localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
         VAYORA.showToast('Authentication Verified', `Welcome back, ${res.user.name}!`, 'success');
         // Instant redirect: zero lag
         VAYORA.navigateTo('dashboard');
@@ -338,6 +346,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
           VAYORA.setToken(res.access_token);
           VAYORA.setCurrentUser(res.user);
+          const regUserKey = res.user.user_id || res.user.email;
+          if (password) {
+            localStorage.setItem('vayora_permanent_pay_pin_' + regUserKey, password);
+          }
+          localStorage.setItem('vayora_payment_pin_permanent_' + regUserKey, 'true');
           registeredEmail = email;
 
           // Open Email Verification Modal with real email alert

@@ -946,12 +946,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     const pinClearBtn = document.getElementById('pin-clear-btn');
     const pinBackspaceBtn = document.getElementById('pin-backspace-btn');
     const bioFeedbackWrap = document.getElementById('bio-scanning-feedback');
+    const permBadge = document.getElementById('permanent-pin-status-badge');
+    const editPermBtn = document.getElementById('btn-edit-permanent-pin');
+
+    if (editPermBtn && payPasswordInput) {
+      editPermBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        payPasswordInput.value = '';
+        if (permBadge) permBadge.style.display = 'none';
+        if (pinKeypadGrid) pinKeypadGrid.style.display = 'grid';
+        payPasswordInput.focus();
+      });
+    }
 
     function resetPayPasswordState() {
+      const u = VAYORA.getCurrentUser();
+      const userKey = u ? (u.user_id || u.email) : null;
+      const savedPermanentPin = userKey ? localStorage.getItem('vayora_permanent_pay_pin_' + userKey) : null;
+
       if (payPasswordInput) {
-        payPasswordInput.value = '';
         payPasswordInput.type = 'password';
         payPasswordInput.classList.remove('input-error-shake');
+        if (savedPermanentPin) {
+          payPasswordInput.value = savedPermanentPin;
+          if (permBadge) permBadge.style.display = 'flex';
+          if (pinKeypadGrid) pinKeypadGrid.style.display = 'none';
+        } else {
+          payPasswordInput.value = '';
+          if (permBadge) permBadge.style.display = 'none';
+          if (pinKeypadGrid) pinKeypadGrid.style.display = 'grid';
+        }
       }
       if (togglePayPassBtn) {
         togglePayPassBtn.textContent = '👁️';
@@ -961,7 +985,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         payPassErrorEl.style.display = 'none';
         payPassErrorEl.textContent = '';
       }
-      if (pinKeypadGrid) pinKeypadGrid.style.display = 'grid';
       if (bioFeedbackWrap) bioFeedbackWrap.style.display = 'none';
     }
 
@@ -1319,6 +1342,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             'success'
           );
 
+          // Save authorized PIN permanently so the user never has to re-type it
+          const u = VAYORA.getCurrentUser();
+          if (u && enteredPassword) {
+            const userKey = u.user_id || u.email;
+            localStorage.setItem('vayora_permanent_pay_pin_' + userKey, enteredPassword);
+            localStorage.setItem('vayora_payment_pin_permanent_' + userKey, 'true');
+          }
+
           // Reset inputs
           if (amountInput) amountInput.value = '';
           if (recipientInput) recipientInput.value = '';
@@ -1335,6 +1366,14 @@ document.addEventListener('DOMContentLoaded', async () => {
           console.error(err);
           const isAuthError = err.status === 401 || (err.message && (err.message.toLowerCase().includes('password') || err.message.toLowerCase().includes('unauthorized') || err.message.toLowerCase().includes('declined')));
           if (isAuthError) {
+            const u = VAYORA.getCurrentUser();
+            if (u) {
+              const userKey = u.user_id || u.email;
+              localStorage.removeItem('vayora_permanent_pay_pin_' + userKey);
+            }
+            if (permBadge) permBadge.style.display = 'none';
+            if (pinKeypadGrid) pinKeypadGrid.style.display = 'grid';
+
             if (payPassErrorEl) {
               payPassErrorEl.textContent = err.message || '⚠️ Invalid password numbers. Payment transfer declined.';
               payPassErrorEl.style.display = 'block';
