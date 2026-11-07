@@ -6,29 +6,20 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Shared verified demo addresses and presets for camera scanners on Send & Receive
-  const DEMO_RECEIVER_ADDRESSES = {
-    "USDT": "TY8B2uReceiverUSDT88rMNqQ4x9yW3z6S2",
-    "USDC": "0x2222B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A1",
-    "BTC":  "bc1qrecv88b9a0z1y2x3v4u5t6s7r8q9p0o1m2k3",
+  // Canonical verified fallback addresses for supported digital assets
+  const CANONICAL_FALLBACK_ADDRESSES = {
+    "USDT": "TK8m9fQa7wKxR4j7V2bYmNqX9yP3z6L2M1",
+    "USDC": "0x71C94B2E8F19D382A0F8372651B44390C12E7B90",
+    "BTC":  "bc1q9p8o7n6m5l4k3j2h1g0f9e8d7c6b5a4z3y2x1w",
     "ETH":  "0x34A991E47B02D338FA8291410651A827B1390A77",
-    "SOL":  "SolReceiverVa2222222222222222222222222222222",
-    "INR":  "receiver.vayora@icici"
-  };
-
-  const DEMO_SENDER_ADDRESSES = {
-    "USDT": "TX7A1vSenderUSDT99qKLmP3w8xV2y5R1",
-    "USDC": "0x1111A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8",
-    "BTC":  "bc1qsender42a8z9w0y1x2v3u4t5s6r7q8p9o0m1",
-    "ETH":  "0x71C94B2E8F19D382A0F8372651B44390C12E7B90",
-    "SOL":  "SolSenderVa11111111111111111111111111111111",
-    "INR":  "sender.vayora@icici"
+    "SOL":  "8gW8tVaZ7bY3mNqX9yP3z6L2M1TK8m9fQa7wKxR4j7V2",
+    "INR":  "settlement.vayora@icici"
   };
 
   const SHARED_DEMO_PRESETS = [
     {
-      label: "USDT Payment Request (25.00 USDT)",
-      recipient: DEMO_RECEIVER_ADDRESSES["USDT"],
+      label: "USDT Settlement Transfer (25.00 USDT)",
+      recipient: CANONICAL_FALLBACK_ADDRESSES["USDT"],
       asset: "USDT",
       amount: 25.00,
       note: "Invoice #104 (TRC-20 Transfer)",
@@ -36,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     {
       label: "USDC Transfer (50.00 USDC)",
-      recipient: DEMO_RECEIVER_ADDRESSES["USDC"],
+      recipient: CANONICAL_FALLBACK_ADDRESSES["USDC"],
       asset: "USDC",
       amount: 50.00,
       note: "Settlement for App Milestone",
@@ -44,7 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     {
       label: "Bitcoin Payment (0.002 BTC)",
-      recipient: DEMO_RECEIVER_ADDRESSES["BTC"],
+      recipient: CANONICAL_FALLBACK_ADDRESSES["BTC"],
       asset: "BTC",
       amount: 0.002,
       note: "BTC Vault Deposit",
@@ -52,7 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     },
     {
       label: "INR Domestic UPI Payout (₹1,500.00)",
-      recipient: DEMO_RECEIVER_ADDRESSES["INR"],
+      recipient: CANONICAL_FALLBACK_ADDRESSES["INR"],
       asset: "INR",
       amount: 1500.00,
       note: "Split lunch bill",
@@ -286,29 +277,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const senderNetLabelEl = document.getElementById('sender-network-label');
     const copySenderAddrBtn = document.getElementById('copy-sender-addr-btn');
 
-    // Quick Fill Demo Helpers
-    const fillDemoReceiverBtn = document.getElementById('fill-demo-receiver-btn');
-    const fillDemoEmailBtn = document.getElementById('fill-demo-receiver-email-btn');
-
-    // Pre-known demo addresses map for demo recipient helper
-    const DEMO_RECEIVER_ADDRESSES = {
-      "USDT": "TY8B2uReceiverUSDT88rMNqQ4x9yW3z6S2",
-      "USDC": "0x2222B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A1",
-      "BTC":  "bc1qrecv88b9a0z1y2x3v4u5t6s7r8q9p0o1m2k3",
-      "ETH":  "0x34A991E47B02D338FA8291410651A827B1390A77",
-      "SOL":  "SolReceiverVa2222222222222222222222222222222",
-      "INR":  "receiver.vayora@icici"
-    };
-
-    const DEMO_SENDER_ADDRESSES = {
-      "USDT": "TX7A1vSenderUSDT99qKLmP3w8xV2y5R1",
-      "USDC": "0x1111A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8",
-      "BTC":  "bc1qsender42a8z9w0y1x2v3u4t5s6r7q8p9o0m1",
-      "ETH":  "0x71C94B2E8F19D382A0F8372651B44390C12E7B90",
-      "SOL":  "SolSenderVa11111111111111111111111111111111",
-      "INR":  "sender.vayora@icici"
-    };
-
     try {
       const wallet = await VAYORA.request('/wallet');
       balances = wallet.balances || [];
@@ -369,7 +337,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const sym = selected.symbol;
       const net = selected.network || 'Mainnet';
-      const senderAddr = tokenAddresses[sym] || `0x${sym}AddressPending`;
+      const senderAddr = tokenAddresses[sym] || CANONICAL_FALLBACK_ADDRESSES[sym] || `0x${sym}AddressPending`;
 
       if (senderNetLabelEl) senderNetLabelEl.textContent = net;
       if (senderAddrValEl) senderAddrValEl.textContent = senderAddr;
@@ -869,13 +837,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const DEFAULT_RECENT_CONTACTS = [
       { name: 'Sarah Chen', address: 'sarah.chen@vayora.fi', initial: 'SC', color: 'var(--neon-cyan)' },
       { name: 'Marcus Vance', address: 'marcus.v@crypto.pay', initial: 'MV', color: 'var(--neon-purple)' },
-      { name: 'Liquidity Node', address: 'node-01@vayora.net', initial: 'LN', color: '#ffb703' }
+      { name: 'Settlement Node', address: 'settlement@vayora.network', initial: 'SN', color: '#00f59b' }
     ];
 
     function getSavedContacts() {
       try {
         const raw = localStorage.getItem('vayora_recent_contacts');
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          const cleaned = parsed.filter(c => {
+            const str = ((c.name || '') + ' ' + (c.address || '')).toLowerCase();
+            return !str.includes('demo') && !str.includes('receiver') && !str.includes('sender');
+          });
+          if (cleaned.length !== parsed.length) {
+            localStorage.setItem('vayora_recent_contacts', JSON.stringify(cleaned));
+          }
+          if (cleaned.length > 0) return cleaned;
+        }
       } catch (e) {}
       return DEFAULT_RECENT_CONTACTS;
     }
@@ -1500,7 +1478,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
       } catch (err) {
         console.warn("Receive camera access failed:", err);
-        if (recCameraMsg) recCameraMsg.textContent = "Camera permission denied or unavailable. Use file upload or demo cards below.";
+        if (recCameraMsg) recCameraMsg.textContent = "Camera permission denied or unavailable. Please use QR file upload.";
       }
     }
 

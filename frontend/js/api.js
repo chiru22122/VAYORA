@@ -1228,6 +1228,10 @@ const VAYORA = (function () {
       const nameEls = document.querySelectorAll('.dynamic-user-name');
       nameEls.forEach(el => el.textContent = user.name);
 
+      document.querySelectorAll('.card-holder-name, #card-cardholder-display').forEach(el => {
+        el.textContent = user.name.toUpperCase();
+      });
+
       const emailEls = document.querySelectorAll('.dynamic-user-email');
       emailEls.forEach(el => el.textContent = user.email);
 

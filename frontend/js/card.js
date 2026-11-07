@@ -27,6 +27,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   let currentCard = null;
 
+  // Immediately display user's real name instead of any demo placeholder
+  const activeUser = VAYORA.getCurrentUser();
+  if (activeUser && cardholderNameEl) {
+    cardholderNameEl.textContent = (activeUser.name || 'VAYORA MEMBER').toUpperCase();
+  }
+
   const THEMES_CONFIG = {
     'MONEY HEIST': {
       className: 'theme-money-heist',
@@ -198,7 +204,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentCard = await VAYORA.request('/card');
     if (!currentCard) return;
 
-    if (cardholderNameEl) cardholderNameEl.textContent = currentCard.cardholder_name;
+    const u = VAYORA.getCurrentUser();
+    const finalCardName = (currentCard.cardholder_name && !currentCard.cardholder_name.toUpperCase().includes('DEMO')) 
+      ? currentCard.cardholder_name 
+      : ((u && u.name) ? u.name.toUpperCase() : 'VAYORA MEMBER');
+    if (cardholderNameEl) cardholderNameEl.textContent = finalCardName;
     if (cardNumberEl) cardNumberEl.textContent = currentCard.masked_number;
     if (cardExpiryEl) cardExpiryEl.textContent = currentCard.expiry;
     if (cardCvvEl) cardCvvEl.textContent = currentCard.cvv;

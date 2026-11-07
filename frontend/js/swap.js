@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (q) {
         toAmountOutput.value = q.to_amount.toFixed(6);
         rateDisplay.textContent = `1 ${fromSymbol} ≈ ${q.rate.toFixed(4)} ${toSymbol}`;
-        feeDisplay.textContent = `${q.fee.toFixed(6)} ${toSymbol} (0.1% demo fee)`;
+        feeDisplay.textContent = `${q.fee.toFixed(6)} ${toSymbol} (0.1% platform fee)`;
       }
     } catch (e) {
       console.warn('Quote error:', e);

@@ -12,12 +12,12 @@ HEX_CHARSET = "0123456789abcdef"
 
 # Canonical fixed addresses for system personas
 DEMO_PERSONA_ADDRESSES = {
-    "admin@vayora.demo": {
-        "USDT": ("TA9AdminTreasuryUSDT77xKLmQ2w7yU1x4P9", "TRC-20 (Tron Network)"),
+    "admin@vayora.com": {
+        "USDT": ("TA97e937d32bb5848529f7902bc9166f21x4P9", "TRC-20 (Tron Network)"),
         "USDC": ("0x999C0F33A27118B82736C52166904B8E110F99BB", "ERC-20 (Ethereum)"),
-        "BTC":  ("bc1qadmintreaz88v7w6u5t4s3r2q1p0o9n8m7l6k", "Native SegWit (Bech32)"),
+        "BTC":  ("bc1q97e937d32bb5848529f7902bc9166f21p0o9n8", "Native SegWit (Bech32)"),
         "ETH":  ("0x999B0F33A27118B82736C52166904B8E110F99AA", "ERC-20 / Ethereum Mainnet"),
-        "SOL":  ("SolAdminTreasury1111111111111111111111111111", "Solana SPL"),
+        "SOL":  ("SolVayoraTreasurySettlement111111111111111111", "Solana SPL"),
         "INR":  ("treasury.vayora@rbi", "RBI Liquidity Clearing"),
     }
 }

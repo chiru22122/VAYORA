@@ -242,7 +242,6 @@
               <div style="display: flex; gap: 6px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 16px;">
                 <button type="button" id="tab-send-camera" class="scanner-tab-btn active" style="flex: 1; border: none; background: var(--bg-surface); color: var(--primary-color); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Live Camera</button>
                 <button type="button" id="tab-send-upload" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Upload / Drop Image</button>
-                <button type="button" id="tab-send-demo" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 7px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Instant Demo Presets</button>
               </div>
 
               <!-- VIEW 1: Live Video Camera Viewfinder -->
@@ -289,14 +288,6 @@
                 </div>
                 <div id="send-upload-status" style="text-align: center; font-size: 0.74rem; color: var(--text-secondary); min-height: 16px;"></div>
               </div>
-
-              <!-- VIEW 3: Instant Demo Presets -->
-              <div id="view-send-demo" style="display: none;">
-                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px;">Simulate scanning a real recipient invoice QR code to test form auto-fill:</div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 8px;" id="send-demo-presets-container">
-                  <!-- Populated dynamically by payments.js -->
-                </div>
-              </div>
             </div>
           </div>
 
@@ -310,7 +301,7 @@
                 </h2>
                 <div class="card-subtitle">Direct atomic database execution on VAYORA Ledger</div>
               </div>
-              <span class="status-pill status-completed">Zero Demo Fee</span>
+              <span class="status-pill status-completed">Zero Platform Fee</span>
             </div>
 
             <form id="send-payment-form">
@@ -393,7 +384,7 @@
                 </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
                   <span>Network Fee:</span>
-                  <span style="color: var(--neon-emerald); font-weight: 700;">₹0.00 / $0.00 (Demo Free)</span>
+                  <span style="color: var(--neon-emerald); font-weight: 700;">₹0.00 / $0.00 (Zero Fee)</span>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
                   <span>Settlement Time:</span>
@@ -506,7 +497,7 @@
         <div style="background: var(--bg-secondary); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 16px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <span style="font-size: 0.72rem; color: var(--text-muted);">Total Transfer</span>
-            <span class="status-pill status-completed" style="font-size: 0.65rem;">Zero Fee Demo</span>
+            <span class="status-pill status-completed" style="font-size: 0.65rem;">Zero Platform Fee</span>
           </div>
           <div style="text-align: center; margin: 4px 0 10px 0;">
             <div id="modal-conf-amount" style="font-family: var(--font-display); font-size: 2rem; font-weight: 800; color: var(--neon-emerald); text-shadow: 0 0 20px rgba(0, 245, 155, 0.35);">100.00 USDT</div>
@@ -619,7 +610,6 @@
         <div style="display: flex; gap: 6px; background: var(--bg-secondary); padding: 4px; border-radius: var(--radius-pill); margin-bottom: 18px;">
           <button type="button" id="tab-scan-camera" class="scanner-tab-btn active" style="flex: 1; border: none; background: var(--bg-surface); color: var(--primary-color); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Live Camera</button>
           <button type="button" id="tab-scan-upload" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Upload / Drop Image</button>
-          <button type="button" id="tab-scan-demo" class="scanner-tab-btn" style="flex: 1; border: none; background: transparent; color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius-pill); font-size: 0.78rem; font-weight: 700; cursor: pointer;">Demo QRs</button>
         </div>
 
         <!-- VIEW 1: Camera Scanner -->
@@ -656,14 +646,6 @@
             <span class="btn btn-primary btn-sm" style="pointer-events: none;">Browse File</span>
           </div>
           <div id="upload-status-msg" style="text-align: center; font-size: 0.78rem; color: var(--text-secondary); min-height: 18px;"></div>
-        </div>
-
-        <!-- VIEW 3: Instant Demo Test QRs -->
-        <div id="scan-view-demo" style="display: none;">
-          <p style="font-size: 0.78rem; color: var(--text-muted); margin-bottom: 10px;">Select a simulated recipient QR to test auto-fill instantly without needing a physical camera:</p>
-          <div style="display: flex; flex-direction: column; gap: 8px;" id="demo-qr-list">
-            <!-- Populated dynamically by payments.js -->
-          </div>
         </div>
 
       </div>

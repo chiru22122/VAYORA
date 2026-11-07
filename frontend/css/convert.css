@@ -66,10 +66,12 @@
     transform: scale(0.9);
     box-shadow: 0 0 0 0 rgba(5, 150, 105, 0.7);
   }
+
   70% {
     transform: scale(1.1);
     box-shadow: 0 0 0 8px rgba(5, 150, 105, 0);
   }
+
   100% {
     transform: scale(0.9);
     box-shadow: 0 0 0 0 rgba(5, 150, 105, 0);
@@ -175,7 +177,9 @@
 }
 
 @keyframes spinRate {
-  100% { transform: rotate(360deg); }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Mode Switcher Tabs */
@@ -384,8 +388,15 @@
 }
 
 @keyframes bubbleFadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .chat-bubble.bot {
@@ -581,12 +592,25 @@
   animation: typingBounce 1.4s infinite ease-in-out both;
 }
 
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
 
 @keyframes typingBounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
+
+  0%,
+  80%,
+  100% {
+    transform: scale(0);
+  }
+
+  40% {
+    transform: scale(1);
+  }
 }
 
 @media (max-width: 900px) {
@@ -594,23 +618,28 @@
     flex-direction: column;
     gap: 6px;
   }
+
   .live-meta-stats {
     flex-wrap: wrap;
     gap: 12px;
   }
+
   .convert-modules-grid {
     grid-template-columns: 1fr;
     gap: 20px;
   }
+
   .payout-details-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+
   .convert-view-toggle {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 1fr;
   }
+
   .view-toggle-tab {
     justify-content: center;
     padding: 10px 8px;
@@ -620,16 +649,23 @@
 }
 
 @media (max-width: 600px) {
-  .convert-card-main, .swap-container, .conversion-card {
+
+  .convert-card-main,
+  .swap-container,
+  .conversion-card {
     padding: 16px 12px;
     border-radius: var(--radius-lg);
   }
-  .currency-input-row, .convert-input-row {
+
+  .currency-input-row,
+  .convert-input-row {
     flex-direction: column;
     align-items: stretch;
     gap: 8px;
   }
-  .currency-amount-input, .convert-amount-input {
+
+  .currency-amount-input,
+  .convert-amount-input {
     font-size: clamp(1.4rem, 6vw, 1.8rem);
   }
 }
