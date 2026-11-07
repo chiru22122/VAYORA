@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
             VAYORA.setCurrentUser(res.user);
             VAYORA.showToast('Welcome Back', `Logged in as ${res.user.name}`, 'success');
             // Instant redirect: zero lag
-            window.location.href = '/dashboard.html';
+            VAYORA.navigateTo('dashboard');
             return;
           }
         } catch (err) {
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         VAYORA.setCurrentUser(res.user);
         VAYORA.showToast('Authentication Verified', `Welcome back, ${res.user.name}!`, 'success');
         // Instant redirect: zero lag
-        window.location.href = '/dashboard.html';
+        VAYORA.navigateTo('dashboard');
         return;
       } catch (err) {
         VAYORA.showToast('Verification Failed', err.message || 'Verification failed', 'error');
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
           } else {
             VAYORA.showToast('Account Created', 'Welcome to VAYORA! Check your email for verification.', 'success');
-            setTimeout(() => window.location.href = '/dashboard.html', 800);
+            setTimeout(() => VAYORA.navigateTo('dashboard'), 600);
           }
         } catch (err) {
           VAYORA.showToast('Registration Error', err.message, 'error');
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           verifyOtpBtn.innerHTML = 'Verified!';
           VAYORA.showToast('Verified!', 'Email address verified successfully. Entering dashboard...', 'success');
-          window.location.href = '/dashboard.html';
+          VAYORA.navigateTo('dashboard');
         } catch (err) {
           isVerifyingOtp = false;
           verifyOtpBtn.disabled = false;

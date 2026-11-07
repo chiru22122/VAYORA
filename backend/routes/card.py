@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User, Card, Transaction, Activity, Notification
-from backend.schemas import CardResponse, CardFreezeRequest, CardSimulatePaymentRequest
+from backend.schemas import CardResponse, CardFreezeRequest, CardThemeRequest, CardSimulatePaymentRequest
 from backend.dependencies import get_current_user
 from backend.auth import generate_virtual_card_number, generate_reference
 
@@ -85,6 +85,34 @@ def unfreeze_card(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Card not found")
         
     card.status = "ACTIVE"
+    db.commit()
+    db.refresh(card)
+    return CardResponse.from_orm(card)
+
+@router.post("/theme", response_model=CardResponse)
+def update_card_theme(
+    req: CardThemeRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    card = db.query(Card).filter(Card.user_id == current_user.user_id).first()
+    if not card:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Card not found")
+        
+    theme = req.card_tier.strip().upper()
+    valid_themes = ["MONEY HEIST", "BLACK OBSIDIAN", "ROYAL SAPPHIRE", "CYBER HOLOGRAPHIC", "24K GOLD"]
+    if theme not in valid_themes:
+        theme = "MONEY HEIST" if "HEIST" in theme or "DALI" in theme else "BLACK OBSIDIAN"
+        
+    card.card_tier = theme
+    
+    act = Activity(
+        user_id=current_user.user_id,
+        action="CARD",
+        description=f"Virtual card design edition updated to {card.card_tier}",
+        reference_id=f"CRD-{card.card_id}"
+    )
+    db.add(act)
     db.commit()
     db.refresh(card)
     return CardResponse.from_orm(card)

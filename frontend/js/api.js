@@ -141,10 +141,20 @@ const VAYORA = (function() {
     localStorage.setItem('vayora_user', JSON.stringify(user));
   }
 
+  function navigateTo(page) {
+    const isVercel = typeof window !== 'undefined' && window.location.hostname && window.location.hostname.includes('vercel.app');
+    const cleanPage = page.replace(/^\//, '').replace(/\.html$/, '');
+    if (isVercel) {
+      window.location.href = `/${cleanPage}`;
+    } else {
+      window.location.href = `/${cleanPage}.html`;
+    }
+  }
+
   function logout() {
     localStorage.removeItem('vayora_token');
     localStorage.removeItem('vayora_user');
-    window.location.href = '/login.html';
+    navigateTo('login');
   }
 
   async function request(endpoint, options = {}) {
@@ -1035,7 +1045,7 @@ const VAYORA = (function() {
     if (!user) {
       const path = window.location.pathname.toLowerCase();
       if (!path.includes('login') && !path.includes('register') && !path.includes('forgot') && !path.endsWith('/') && !path.includes('index')) {
-        window.location.href = '/login.html';
+        navigateTo('login');
         return;
       }
     }
@@ -1195,6 +1205,7 @@ const VAYORA = (function() {
     formatDateOnly,
     formatTimeOnly,
     parseDate,
+    navigateTo,
     switchDemoUser,
     initShell,
     initTheme,

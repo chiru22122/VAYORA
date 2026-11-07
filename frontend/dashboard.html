@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -8,9 +8,10 @@
   <meta name="theme-color" content="#030712">
   <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
   <link rel="apple-touch-icon" href="/assets/icon-192.png">
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/dashboard.css">
-  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/global.css?v=8">
+  <link rel="stylesheet" href="/css/dashboard.css?v=8">
+  <link rel="stylesheet" href="/css/card.css?v=8">
+  <link rel="stylesheet" href="/css/animations.css?v=8">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     /* Clean Dashboard Aesthetics */
@@ -556,12 +557,12 @@
           <div style="display: flex; flex-direction: column; gap: 24px;">
             
             <!-- 3D Virtual Obsidian Card Widget -->
-            <div class="mini-card-widget tilt-card animate-entrance stagger-4">
+            <div class="mini-card-widget tilt-card animate-entrance stagger-4" id="dashboard-mini-card-widget">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
-                <div style="font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--neon-cyan); font-weight: 800;">VAYORA OBSIDIAN DEBIT</div>
+                <div id="mini-card-brand-label" class="mini-card-badge" style="font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; color: var(--neon-cyan); font-weight: 800;">VAYORA OBSIDIAN DEBIT</div>
                 <svg width="36" height="24" viewBox="0 0 36 24" fill="none"><rect width="36" height="24" rx="4" fill="rgba(255,255,255,0.06)"/><path d="M12 18V6H8.5L5 8.5V18H12Z" fill="var(--neon-emerald)"/></svg>
               </div>
-              <div style="font-family: var(--font-mono); font-size: 1.25rem; letter-spacing: 3px; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 0 15px rgba(255,255,255,0.3);">
+              <div id="mini-card-number-display" style="font-family: var(--font-mono); font-size: 1.25rem; letter-spacing: 3px; color: #fff; font-weight: 700; margin-bottom: 12px; text-shadow: 0 0 15px rgba(255,255,255,0.3);">
                 •••• •••• •••• 4242
               </div>
               <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px;">
@@ -571,7 +572,7 @@
                 </div>
                 <div>
                   <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Card Tier</div>
-                  <div style="font-size: 0.82rem; font-weight: 800; color: var(--neon-emerald);">BLACK OBSIDIAN</div>
+                  <div id="mini-card-tier-label" style="font-size: 0.82rem; font-weight: 800; color: var(--neon-emerald);">BLACK OBSIDIAN</div>
                 </div>
               </div>
               <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-subtle); display: flex; gap: 8px;">
@@ -676,8 +677,9 @@
   </div>
 
   <div id="toast-container"></div>
-  <script src="/js/api.js"></script>
-  <script src="/js/dashboard.js"></script>
+  <script src="/config.js?v=8"></script>
+  <script src="/js/api.js?v=8"></script>
+  <script src="/js/dashboard.js?v=8"></script>
   <script>
     function quickSendTo(recipient) {
       VAYORA.playSound('click');

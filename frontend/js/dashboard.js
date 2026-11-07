@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await Promise.all([
       loadDashboardWallet(),
       loadRecentTransactions(),
-      loadSecurityOverview()
+      loadSecurityOverview(),
+      loadDashboardCard()
     ]);
     initChart('7D');
     initMarketTicker();
@@ -141,6 +142,72 @@ document.addEventListener('DOMContentLoaded', async () => {
         card.style.setProperty('--mouse-y', `${y}px`);
       });
     });
+  }
+
+  async function loadDashboardCard() {
+    const miniWidget = document.getElementById('dashboard-mini-card-widget');
+    const brandLabel = document.getElementById('mini-card-brand-label');
+    const numberDisplay = document.getElementById('mini-card-number-display');
+    const tierLabel = document.getElementById('mini-card-tier-label');
+
+    // Instant local cache render
+    const cachedTheme = localStorage.getItem('vayora_card_theme') || 'BLACK OBSIDIAN';
+    applyMiniCardTheme(cachedTheme);
+
+    try {
+      const card = await VAYORA.request('/card');
+      if (!card) return;
+      if (numberDisplay) numberDisplay.textContent = card.masked_number;
+      if (card.card_tier) {
+        applyMiniCardTheme(card.card_tier);
+        localStorage.setItem('vayora_card_theme', card.card_tier);
+      }
+    } catch (e) {
+      console.warn('Mini-card load warning:', e);
+    }
+
+    function applyMiniCardTheme(rawKey) {
+      if (!miniWidget) return;
+      const key = (rawKey || '').toUpperCase();
+      miniWidget.classList.remove('theme-money-heist', 'theme-royal-sapphire', 'theme-cyber-holographic', 'theme-24k-gold', 'theme-black-obsidian');
+
+      if (key.includes('HEIST') || key.includes('DALI')) {
+        miniWidget.classList.add('theme-money-heist');
+        if (brandLabel) brandLabel.textContent = 'VAYORA LA RESISTENCIA';
+        if (tierLabel) {
+          tierLabel.textContent = 'MONEY HEIST (DALI)';
+          tierLabel.style.color = '#ffd700';
+        }
+      } else if (key.includes('SAPPHIRE')) {
+        miniWidget.classList.add('theme-royal-sapphire');
+        if (brandLabel) brandLabel.textContent = 'VAYORA ROYAL SAPPHIRE';
+        if (tierLabel) {
+          tierLabel.textContent = 'WORLD ELITE';
+          tierLabel.style.color = '#38bdf8';
+        }
+      } else if (key.includes('HOLO') || key.includes('CYBER')) {
+        miniWidget.classList.add('theme-cyber-holographic');
+        if (brandLabel) brandLabel.textContent = 'VAYORA QUANTUM HOLO';
+        if (tierLabel) {
+          tierLabel.textContent = 'CYBER QUANTUM';
+          tierLabel.style.color = '#f472b6';
+        }
+      } else if (key.includes('GOLD')) {
+        miniWidget.classList.add('theme-24k-gold');
+        if (brandLabel) brandLabel.textContent = 'VAYORA 24K SOVEREIGN';
+        if (tierLabel) {
+          tierLabel.textContent = '24K GOLD BULLION';
+          tierLabel.style.color = '#fef3c7';
+        }
+      } else {
+        miniWidget.classList.add('theme-black-obsidian');
+        if (brandLabel) brandLabel.textContent = 'VAYORA OBSIDIAN DEBIT';
+        if (tierLabel) {
+          tierLabel.textContent = 'BLACK OBSIDIAN';
+          tierLabel.style.color = 'var(--neon-emerald)';
+        }
+      }
+    }
   }
 
   async function loadDashboardWallet() {

@@ -1,12 +1,12 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Virtual Card — VAYORA</title>
-  <link rel="stylesheet" href="/css/global.css">
-  <link rel="stylesheet" href="/css/card.css">
-  <link rel="stylesheet" href="/css/animations.css">
+  <link rel="stylesheet" href="/css/global.css?v=8">
+  <link rel="stylesheet" href="/css/card.css?v=8">
+  <link rel="stylesheet" href="/css/animations.css?v=8">
 </head>
 <body>
 
@@ -201,10 +201,20 @@
               <div class="card-face card-face-front">
                 <div class="card-hologram-overlay"></div>
 
+                <!-- Salvador Dalí Mask Watermark (Money Heist) -->
+                <svg class="card-watermark card-watermark-dali" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                  <path d="M 50,68 C 42,66 32,60 25,48 C 24,46 22,48 24,51 C 29,66 40,73 49,71 C 50,71 50,71 51,71 C 60,73 71,66 76,51 C 78,48 76,46 75,48 C 68,60 58,66 50,68 Z" fill="#ffd700" />
+                  <path d="M 28,34 Q 38,26 44,32" stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <ellipse cx="36" cy="38" rx="4" ry="2.5" fill="#ffd700"/>
+                  <path d="M 72,34 Q 62,26 56,32" stroke="#ffd700" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <ellipse cx="64" cy="38" rx="4" ry="2.5" fill="#ffd700"/>
+                  <path d="M 50,30 L 48,52 L 53,52" stroke="#ffd700" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                </svg>
+
                 <div class="card-top-row">
                   <div class="card-brand-badge">
                     <span class="card-brand-name">VAYORA<span>.</span></span>
-                    <span style="font-size: 0.65rem; color: var(--neon-emerald); font-weight: 700; letter-spacing: 1px; border: 1px solid rgba(0,245,155,0.4); padding: 2px 6px; border-radius: 4px;">OBSIDIAN</span>
+                    <span class="card-brand-tier-badge" id="card-tier-badge" style="font-size: 0.65rem; color: var(--neon-emerald); font-weight: 700; letter-spacing: 1px; border: 1px solid rgba(0,245,155,0.4); padding: 2px 6px; border-radius: 4px;">OBSIDIAN</span>
                   </div>
 
                   <div class="card-chip-contactless">
@@ -235,12 +245,84 @@
                   <span style="font-size: 0.7rem; color: #64748b; margin-right: 12px; font-weight: 600;">CVV</span>
                   <span class="cvv-number" id="card-cvv-display">782</span>
                 </div>
-                <div class="card-back-disclaimer">
+                <div class="card-back-disclaimer" id="card-disclaimer-display">
                   This virtual card is issued for controlled academic prototyping by VAYORA Core.
                   Authorized for simulated online payments and NFC contactless tap experiments.
                 </div>
               </div>
 
+            </div>
+          </div>
+
+          <!-- Card Theme Selector Gallery -->
+          <div class="card-theme-selector-section animate-entrance">
+            <div class="theme-selector-header">
+              <div>
+                <div class="theme-selector-title">
+                  <span>🎨 Virtual Card Editions & Themes</span>
+                </div>
+                <div class="theme-selector-subtitle">Switch your virtual card skin instantly across all devices</div>
+              </div>
+              <span id="current-theme-pill" class="badge-tag" style="background: rgba(37, 99, 235, 0.12); color: var(--primary-color); font-weight: 700; padding: 4px 10px; border-radius: 6px;">BLACK OBSIDIAN</span>
+            </div>
+
+            <div class="theme-picker-grid" id="card-theme-picker-grid">
+              <!-- 1. Money Heist (Dalí Edition) -->
+              <div class="theme-picker-card" data-theme="MONEY HEIST">
+                <div class="theme-swatch-preview theme-swatch-heist">
+                  <!-- Mini Dalí Mask SVG -->
+                  <svg viewBox="0 0 100 100" width="34" height="34" style="filter: drop-shadow(0 0 4px rgba(255,215,0,0.6));">
+                    <path d="M 50,68 C 42,66 32,60 25,48 C 24,46 22,48 24,51 C 29,66 40,73 49,71 C 50,71 50,71 51,71 C 60,73 71,66 76,51 C 78,48 76,46 75,48 C 68,60 58,66 50,68 Z" fill="#ffd700" />
+                    <path d="M 28,34 Q 38,26 44,32" stroke="#ffd700" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="36" cy="38" rx="4" ry="2.5" fill="#ffd700"/>
+                    <path d="M 72,34 Q 62,26 56,32" stroke="#ffd700" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <ellipse cx="64" cy="38" rx="4" ry="2.5" fill="#ffd700"/>
+                  </svg>
+                </div>
+                <div class="theme-picker-name">Money Heist</div>
+                <div class="theme-picker-tier">Dalí Crimson</div>
+                <div class="theme-active-indicator">✓</div>
+              </div>
+
+              <!-- 2. Black Obsidian -->
+              <div class="theme-picker-card" data-theme="BLACK OBSIDIAN">
+                <div class="theme-swatch-preview theme-swatch-obsidian">
+                  <span style="font-size: 16px; color: #10b981; font-weight: 800; font-family: var(--font-mono);">◆</span>
+                </div>
+                <div class="theme-picker-name">Black Obsidian</div>
+                <div class="theme-picker-tier">Stealth Carbon</div>
+                <div class="theme-active-indicator">✓</div>
+              </div>
+
+              <!-- 3. Royal Sapphire -->
+              <div class="theme-picker-card" data-theme="ROYAL SAPPHIRE">
+                <div class="theme-swatch-preview theme-swatch-sapphire">
+                  <span style="font-size: 16px; color: #38bdf8; font-weight: 800;">✦</span>
+                </div>
+                <div class="theme-picker-name">Royal Sapphire</div>
+                <div class="theme-picker-tier">World Elite</div>
+                <div class="theme-active-indicator">✓</div>
+              </div>
+
+              <!-- 4. Cyber Holographic -->
+              <div class="theme-picker-card" data-theme="CYBER HOLOGRAPHIC">
+                <div class="theme-swatch-preview theme-swatch-holo">
+                  <span style="font-size: 16px; color: #f472b6; font-weight: 800;">❖</span>
+                </div>
+                <div class="theme-picker-name">Cyber Holo</div>
+                <div class="theme-picker-tier">Quantum Neon</div>
+                <div class="theme-active-indicator">✓</div>
+              </div>
+
+              <!-- 5. 24K Gold Sovereign -->
+              <div class="theme-picker-card" data-theme="24K GOLD">
+                <div class="theme-swatch-preview theme-swatch-gold">
+                  <span style="font-size: 16px; color: #fffbeb; font-weight: 800;">👑</span>
+                </div>
+                <div class="theme-picker-name">24K Gold</div>
+                <div class="theme-picker-tier">Bullion VIP</div>
+                <div class="theme-active-indicator">✓</div>
+              </div>
             </div>
           </div>
 
@@ -285,7 +367,8 @@
   </div>
 
   <div id="toast-container"></div>
-  <script src="/js/api.js"></script>
-  <script src="/js/card.js"></script>
+  <script src="/config.js?v=8"></script>
+  <script src="/js/api.js?v=8"></script>
+  <script src="/js/card.js?v=8"></script>
 </body>
 </html>

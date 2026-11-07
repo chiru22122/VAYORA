@@ -1,4 +1,4 @@
-﻿/* ==========================================================================
+/* ==========================================================================
    VAYORA VIRTUAL CARD & NFC STYLES
    Simple Light / Dark Theme
    ========================================================================== */
@@ -304,17 +304,384 @@
     padding: 8px 10px;
     white-space: nowrap;
   }
-  .card-controls-group {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 8px;
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .card-controls-group .btn {
-    flex: 1;
-    font-size: 0.8rem;
-    padding: 8px 10px;
-    white-space: nowrap;
-  }
+}
+
+/* ==========================================================================
+   EXCLUSIVE VIRTUAL CARD DESIGN THEMES & EDITIONS
+   Money Heist (Dalí Edition), Black Obsidian, Royal Sapphire,
+   Cyber Holographic, and 24K Gold Sovereign
+   ========================================================================== */
+
+/* Ambient Vector Watermarks */
+.card-face .card-watermark {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.4s ease;
+}
+
+/* 🎭 MONEY HEIST / LA RESISTENCIA (DALI EDITION) */
+.card-object.theme-money-heist .card-face-front {
+  background: 
+    radial-gradient(circle at 82% 28%, rgba(239, 68, 68, 0.32) 0%, transparent 55%),
+    radial-gradient(circle at 18% 85%, rgba(185, 28, 28, 0.25) 0%, transparent 45%),
+    linear-gradient(135deg, #2b0303 0%, #680808 32%, #991010 65%, #1f0202 100%);
+  border: 1px solid rgba(255, 215, 0, 0.38);
+  box-shadow: 0 20px 45px -10px rgba(153, 16, 16, 0.45), 0 0 25px rgba(239, 68, 68, 0.22), 0 0 0 1px rgba(255, 215, 0, 0.2) inset;
+}
+
+.card-object.theme-money-heist .card-face-back {
+  background: linear-gradient(135deg, #1f0202 0%, #450a0a 50%, #150202 100%);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.card-object.theme-money-heist .card-watermark-dali {
+  display: block;
+  right: -10px;
+  bottom: -15px;
+  width: 190px;
+  height: 190px;
+  opacity: 0.22;
+  filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.4));
+}
+
+.card-object.theme-money-heist .card-brand-tier-badge {
+  color: #ffd700 !important;
+  border-color: rgba(255, 215, 0, 0.5) !important;
+  background: rgba(255, 215, 0, 0.12) !important;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.25);
+  letter-spacing: 1.2px;
+}
+
+.card-object.theme-money-heist .card-number-display {
+  background: linear-gradient(180deg, #ffffff 0%, #fef08a 40%, #ffd700 70%, #d4af37 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.85));
+}
+
+.card-object.theme-money-heist .card-holder-name,
+.card-object.theme-money-heist .card-expiry-val {
+  color: #fef08a;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+}
+
+.card-object.theme-money-heist .emv-chip {
+  background: linear-gradient(135deg, #d4af37 0%, #fff099 45%, #b8860b 80%, #7d5705 100%);
+  border: 1px solid rgba(139, 0, 0, 0.6);
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.35);
+}
+
+.card-object.theme-money-heist .card-cvv-strip {
+  background: #fef3c7;
+  border-left: 4px solid #b91c1c;
+}
+
+/* 🖤 BLACK OBSIDIAN (STEALTH TITANIUM) */
+.card-object.theme-black-obsidian .card-face-front {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.7);
+}
+
+.card-object.theme-black-obsidian .card-brand-tier-badge {
+  color: var(--neon-emerald) !important;
+  border-color: rgba(0, 245, 155, 0.4) !important;
+  background: rgba(0, 245, 155, 0.08) !important;
+}
+
+/* 💙 ROYAL SAPPHIRE (WORLD ELITE) */
+.card-object.theme-royal-sapphire .card-face-front {
+  background: 
+    radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.3) 0%, transparent 55%),
+    linear-gradient(135deg, #091e42 0%, #1e3a8a 35%, #2563eb 72%, #0284c7 100%);
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  box-shadow: 0 20px 45px -10px rgba(37, 99, 235, 0.45), 0 0 25px rgba(56, 189, 248, 0.25), 0 0 0 1px rgba(191, 219, 254, 0.2) inset;
+}
+
+.card-object.theme-royal-sapphire .card-face-back {
+  background: linear-gradient(135deg, #091e42 0%, #172554 60%, #0c1a30 100%);
+  border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+.card-object.theme-royal-sapphire .card-brand-tier-badge {
+  color: #38bdf8 !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
+  background: rgba(56, 189, 248, 0.12) !important;
+  box-shadow: 0 0 8px rgba(56, 189, 248, 0.3);
+}
+
+.card-object.theme-royal-sapphire .card-number-display {
+  color: #f0f9ff;
+  text-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+}
+
+.card-object.theme-royal-sapphire .emv-chip {
+  background: linear-gradient(135deg, #e0f2fe 0%, #93c5fd 50%, #60a5fa 100%);
+  border: 1px solid rgba(30, 58, 138, 0.4);
+}
+
+/* 🌈 CYBER HOLOGRAPHIC (QUANTUM MATRIX) */
+.card-object.theme-cyber-holographic .card-face-front {
+  background: 
+    radial-gradient(circle at 75% 25%, rgba(236, 72, 153, 0.35) 0%, transparent 50%),
+    radial-gradient(circle at 20% 80%, rgba(6, 182, 212, 0.3) 0%, transparent 45%),
+    linear-gradient(135deg, #312e81 0%, #4f46e5 30%, #c026d3 65%, #0891b2 100%);
+  border: 1px solid rgba(244, 114, 182, 0.4);
+  box-shadow: 0 20px 45px -10px rgba(192, 38, 211, 0.4), 0 0 25px rgba(6, 182, 212, 0.25);
+}
+
+.card-object.theme-cyber-holographic .card-hologram-overlay {
+  display: block !important;
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.22) 50%, transparent 65%);
+  animation: holoSheen 6s infinite linear;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes holoSheen {
+  0% { transform: translateY(-30%) rotate(25deg); }
+  50% { transform: translateY(30%) rotate(25deg); }
+  100% { transform: translateY(-30%) rotate(25deg); }
+}
+
+.card-object.theme-cyber-holographic .card-face-back {
+  background: linear-gradient(135deg, #1e1b4b 0%, #4a044e 50%, #082f49 100%);
+  border: 1px solid rgba(244, 114, 182, 0.3);
+}
+
+.card-object.theme-cyber-holographic .card-brand-tier-badge {
+  color: #f472b6 !important;
+  border-color: rgba(244, 114, 182, 0.5) !important;
+  background: rgba(244, 114, 182, 0.12) !important;
+  box-shadow: 0 0 10px rgba(244, 114, 182, 0.3);
+}
+
+/* 👑 24K GOLD SOVEREIGN (BULLION VIP) */
+.card-object.theme-24k-gold .card-face-front {
+  background: 
+    radial-gradient(circle at 75% 25%, rgba(254, 240, 138, 0.45) 0%, transparent 55%),
+    linear-gradient(135deg, #582f04 0%, #92400e 25%, #d97706 50%, #fbbf24 75%, #78350f 100%);
+  border: 1px solid rgba(254, 243, 199, 0.5);
+  box-shadow: 0 20px 45px -10px rgba(217, 119, 6, 0.55), 0 0 25px rgba(245, 158, 11, 0.3), 0 0 0 1px rgba(254, 243, 199, 0.4) inset;
+}
+
+.card-object.theme-24k-gold .card-face-back {
+  background: linear-gradient(135deg, #3d2105 0%, #78350f 50%, #2b1401 100%);
+  border: 1px solid rgba(254, 243, 199, 0.3);
+}
+
+.card-object.theme-24k-gold .card-brand-tier-badge {
+  color: #fef3c7 !important;
+  border-color: rgba(254, 243, 199, 0.6) !important;
+  background: rgba(254, 243, 199, 0.18) !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.35);
+}
+
+.card-object.theme-24k-gold .card-number-display {
+  background: linear-gradient(180deg, #ffffff 0%, #fef3c7 40%, #fde047 70%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(69, 26, 3, 0.8));
+}
+
+.card-object.theme-24k-gold .card-holder-name,
+.card-object.theme-24k-gold .card-expiry-val {
+  color: #fffbeb;
+  text-shadow: 0 1px 3px rgba(69, 26, 3, 0.8);
+}
+
+/* ==========================================================================
+   THEME SELECTOR GALLERY COMPONENT
+   ========================================================================== */
+.card-theme-selector-section {
+  margin: 32px 0;
+  padding: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+}
+
+.theme-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.theme-selector-title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-selector-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.theme-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 14px;
+}
+
+.theme-picker-card {
+  background: var(--bg-canvas);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 12px 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  user-select: none;
+}
+
+.theme-picker-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border-medium);
+  box-shadow: 0 8px 18px -4px rgba(15, 23, 42, 0.12);
+}
+
+.theme-picker-card.active {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.04);
+  box-shadow: 0 0 0 2px #2563eb, 0 8px 20px -4px rgba(37, 99, 235, 0.25);
+}
+
+.theme-swatch-preview {
+  width: 100%;
+  aspect-ratio: 1.586 / 1;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.theme-swatch-heist {
+  background: linear-gradient(135deg, #300000 0%, #8b0000 45%, #b30000 75%, #1a0000 100%);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+}
+
+.theme-swatch-obsidian {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+}
+
+.theme-swatch-sapphire {
+  background: linear-gradient(135deg, #091e42 0%, #1e3a8a 40%, #2563eb 75%, #0284c7 100%);
+}
+
+.theme-swatch-holo {
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 30%, #c026d3 65%, #0891b2 100%);
+}
+
+.theme-swatch-gold {
+  background: linear-gradient(135deg, #582f04 0%, #b45309 35%, #fbbf24 70%, #78350f 100%);
+  border: 1px solid rgba(254, 243, 199, 0.4);
+}
+
+.theme-picker-name {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  line-height: 1.2;
+}
+
+.theme-picker-tier {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+}
+
+.theme-active-indicator {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.theme-picker-card.active .theme-active-indicator {
+  display: flex;
+}
+
+/* ==========================================================================
+   DASHBOARD MINI-CARD WIDGET THEMES
+   ========================================================================== */
+.mini-card-widget.theme-money-heist {
+  background: 
+    radial-gradient(circle at 82% 28%, rgba(239, 68, 68, 0.3) 0%, transparent 55%),
+    linear-gradient(135deg, #2b0303 0%, #680808 35%, #991010 70%, #1f0202 100%) !important;
+  border: 1px solid rgba(255, 215, 0, 0.35) !important;
+  box-shadow: 0 12px 30px -5px rgba(153, 16, 16, 0.4), 0 0 20px rgba(239, 68, 68, 0.2) !important;
+}
+
+.mini-card-widget.theme-money-heist .mini-card-badge {
+  color: #ffd700 !important;
+}
+
+.mini-card-widget.theme-royal-sapphire {
+  background: 
+    radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.25) 0%, transparent 50%),
+    linear-gradient(135deg, #091e42 0%, #1e3a8a 35%, #2563eb 72%, #0284c7 100%) !important;
+  border: 1px solid rgba(147, 197, 253, 0.35) !important;
+  box-shadow: 0 12px 30px -5px rgba(37, 99, 235, 0.4) !important;
+}
+
+.mini-card-widget.theme-royal-sapphire .mini-card-badge {
+  color: #38bdf8 !important;
+}
+
+.mini-card-widget.theme-cyber-holographic {
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 30%, #c026d3 65%, #0891b2 100%) !important;
+  border: 1px solid rgba(244, 114, 182, 0.35) !important;
+  box-shadow: 0 12px 30px -5px rgba(192, 38, 211, 0.35) !important;
+}
+
+.mini-card-widget.theme-cyber-holographic .mini-card-badge {
+  color: #f472b6 !important;
+}
+
+.mini-card-widget.theme-24k-gold {
+  background: 
+    radial-gradient(circle at 75% 25%, rgba(254, 240, 138, 0.4) 0%, transparent 55%),
+    linear-gradient(135deg, #582f04 0%, #92400e 25%, #d97706 50%, #fbbf24 75%, #78350f 100%) !important;
+  border: 1px solid rgba(254, 243, 199, 0.45) !important;
+  box-shadow: 0 12px 30px -5px rgba(217, 119, 6, 0.45) !important;
+}
+
+.mini-card-widget.theme-24k-gold .mini-card-badge {
+  color: #fef3c7 !important;
 }

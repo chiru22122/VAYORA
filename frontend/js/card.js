@@ -1,6 +1,7 @@
 /**
  * VAYORA VIRTUAL CARD ENGINE
- * Interactive 3D tilt, card flip, freeze/unfreeze state, and online payment demo.
+ * Interactive 3D tilt, card flip, freeze/unfreeze state, online payment demo,
+ * and exclusive selectable virtual card editions (including Money Heist Dalí Edition).
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -17,12 +18,61 @@ document.addEventListener('DOMContentLoaded', async () => {
   const cardCvvEl = document.getElementById('card-cvv-display');
   const cardBalanceEl = document.getElementById('card-balance-display');
   const cardStatusBadge = document.getElementById('card-status-badge');
+  const cardTierBadge = document.getElementById('card-tier-badge');
+  const currentThemePill = document.getElementById('current-theme-pill');
+  const cardDisclaimerEl = document.getElementById('card-disclaimer-display');
+  const daliWatermarkEl = document.querySelector('.card-watermark-dali');
+
+  const themeCards = document.querySelectorAll('.theme-picker-card');
 
   let currentCard = null;
 
+  const THEMES_CONFIG = {
+    'MONEY HEIST': {
+      className: 'theme-money-heist',
+      tierLabel: 'LA RESISTENCIA',
+      pillLabel: 'MONEY HEIST (DALI)',
+      title: 'Money Heist (Dalí Edition)',
+      disclaimer: 'O bella ciao, bella ciao. Authorized for simulated operations by the Professor & VAYORA Network.'
+    },
+    'BLACK OBSIDIAN': {
+      className: 'theme-black-obsidian',
+      tierLabel: 'BLACK OBSIDIAN',
+      pillLabel: 'BLACK OBSIDIAN',
+      title: 'Black Obsidian',
+      disclaimer: 'This virtual card is issued for controlled academic prototyping by VAYORA Core.'
+    },
+    'ROYAL SAPPHIRE': {
+      className: 'theme-royal-sapphire',
+      tierLabel: 'ROYAL SAPPHIRE',
+      pillLabel: 'ROYAL SAPPHIRE',
+      title: 'Royal Sapphire',
+      disclaimer: 'World Elite private virtual concierge card issued by VAYORA Global.'
+    },
+    'CYBER HOLOGRAPHIC': {
+      className: 'theme-cyber-holographic',
+      tierLabel: 'CYBER QUANTUM',
+      pillLabel: 'CYBER HOLO',
+      title: 'Cyber Holographic',
+      disclaimer: 'Iridescent holographic zero-knowledge virtual asset card on VAYORA Layer 2.'
+    },
+    '24K GOLD': {
+      className: 'theme-24k-gold',
+      tierLabel: '24K SOVEREIGN',
+      pillLabel: '24K GOLD',
+      title: '24K Gold Sovereign',
+      disclaimer: 'Bullion VIP reserve card authorized for high-velocity global settlement.'
+    }
+  };
+
   try {
+    // Check initial cached theme from localStorage for instant render
+    const initialCachedTheme = localStorage.getItem('vayora_card_theme') || 'BLACK OBSIDIAN';
+    applyThemeUI(initialCachedTheme);
+
     await loadCardDetails();
     setup3DTilt();
+    initThemePicker();
 
     if (flipBtn && cardObject) {
       flipBtn.addEventListener('click', () => {
@@ -50,6 +100,100 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.error('Card init error:', err);
   }
 
+  function normalizeThemeKey(raw) {
+    if (!raw) return 'BLACK OBSIDIAN';
+    const s = raw.toString().toUpperCase();
+    if (s.includes('HEIST') || s.includes('DALI') || s.includes('RESISTENCIA')) return 'MONEY HEIST';
+    if (s.includes('SAPPHIRE')) return 'ROYAL SAPPHIRE';
+    if (s.includes('HOLO') || s.includes('CYBER')) return 'CYBER HOLOGRAPHIC';
+    if (s.includes('GOLD')) return '24K GOLD';
+    return 'BLACK OBSIDIAN';
+  }
+
+  function applyThemeUI(rawKey) {
+    const key = normalizeThemeKey(rawKey);
+    const cfg = THEMES_CONFIG[key] || THEMES_CONFIG['BLACK OBSIDIAN'];
+
+    if (cardObject) {
+      // Remove all theme classes
+      Object.values(THEMES_CONFIG).forEach(c => cardObject.classList.remove(c.className));
+      cardObject.classList.add(cfg.className);
+    }
+
+    if (cardTierBadge) {
+      cardTierBadge.textContent = cfg.tierLabel;
+    }
+
+    if (currentThemePill) {
+      currentThemePill.textContent = cfg.pillLabel;
+    }
+
+    if (cardDisclaimerEl) {
+      cardDisclaimerEl.textContent = cfg.disclaimer;
+    }
+
+    if (daliWatermarkEl) {
+      daliWatermarkEl.style.display = (key === 'MONEY HEIST') ? 'block' : 'none';
+    }
+
+    // Update active highlight in theme gallery
+    themeCards.forEach(card => {
+      const cardTheme = normalizeThemeKey(card.getAttribute('data-theme'));
+      if (cardTheme === key) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    localStorage.setItem('vayora_card_theme', key);
+  }
+
+  function initThemePicker() {
+    themeCards.forEach(card => {
+      card.addEventListener('click', async () => {
+        const selectedTheme = card.getAttribute('data-theme');
+        if (!selectedTheme) return;
+
+        const normKey = normalizeThemeKey(selectedTheme);
+        applyThemeUI(normKey);
+
+        // Tactile audio feedback
+        if (typeof VAYORA.playSound === 'function') {
+          VAYORA.playSound('coin');
+        }
+
+        // Morph animation flair
+        if (cardObject) {
+          cardObject.style.transition = 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          cardObject.style.transform = 'scale(1.02) rotateY(10deg)';
+          setTimeout(() => {
+            cardObject.style.transform = '';
+            setTimeout(() => {
+              cardObject.style.transition = 'transform 0.5s ease';
+            }, 300);
+          }, 300);
+        }
+
+        const cfg = THEMES_CONFIG[normKey];
+        VAYORA.showToast('Card Edition Selected', `${cfg.title} design applied.`, 'success');
+
+        // Persist theme to database
+        try {
+          await VAYORA.request('/card/theme', {
+            method: 'POST',
+            body: { card_tier: normKey }
+          });
+          if (currentCard) {
+            currentCard.card_tier = normKey;
+          }
+        } catch (e) {
+          console.warn('Could not persist theme to server:', e);
+        }
+      });
+    });
+  }
+
   async function loadCardDetails() {
     currentCard = await VAYORA.request('/card');
     if (!currentCard) return;
@@ -59,6 +203,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (cardExpiryEl) cardExpiryEl.textContent = currentCard.expiry;
     if (cardCvvEl) cardCvvEl.textContent = currentCard.cvv;
     if (cardBalanceEl) cardBalanceEl.textContent = `$${currentCard.balance.toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+
+    if (currentCard.card_tier) {
+      applyThemeUI(currentCard.card_tier);
+    }
 
     updateStatusUI(currentCard.status);
   }

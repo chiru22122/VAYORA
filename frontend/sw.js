@@ -1,5 +1,5 @@
 // VAYORA Service Worker for Progressive Web App (PWA)
-const CACHE_NAME = 'vayora-shell-v5';
+const CACHE_NAME = 'vayora-shell-v6';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -12,7 +12,9 @@ const STATIC_ASSETS = [
   '/transactions.html',
   '/css/global.css',
   '/css/dashboard.css',
+  '/css/card.css',
   '/js/api.js',
+  '/js/card.js',
   '/js/payments.js',
   '/js/jsqr.min.js',
   '/js/qrcode.min.js',

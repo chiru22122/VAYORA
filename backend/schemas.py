@@ -297,6 +297,9 @@ class CardResponse(BaseModel):
 class CardFreezeRequest(BaseModel):
     freeze: bool
 
+class CardThemeRequest(BaseModel):
+    card_tier: str = Field(..., min_length=2, max_length=50)
+
 class CardSimulatePaymentRequest(BaseModel):
     merchant: str = Field(..., min_length=2, max_length=100)
     amount: float = Field(..., gt=0)
